@@ -2,15 +2,37 @@
 
 /*
 |--------------------------------------------------------------------------
-| Application Routes
+| Public routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
+*/
+$aPublicConfig = [
+  'prefix' => 'public'
+];
+
+$router->group($aPublicConfig, function () use ($router) {
+
+    require __DIR__.'/public/index.php';
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Private routes
+|--------------------------------------------------------------------------
 |
 */
+$aPrivateConfig = [
+  'prefix' => 'private'
+];
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+$router->group($aPrivateConfig, function () use ($router) {
+
+    require __DIR__.'/private/index.php';
+
 });
+
+
+
+$router->get('/initialize_database', 'HomeController@initialize_database');
+$router->get('/initialize_database_mockup', 'HomeController@initialize_database_mockup');
