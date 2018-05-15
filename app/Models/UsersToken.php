@@ -51,8 +51,8 @@ class UsersToken extends Model
 			->getToken()
 		;
 
-		$tokenMdl->token = (string) $token;
-		var_dump("Generated Token: ".$tokenMdl->token);
+		$tokenMdl->key = (string) $token;
+		var_dump("Generated Token: ".$tokenMdl->key);
 
 		$tokenMdl->save();
 
