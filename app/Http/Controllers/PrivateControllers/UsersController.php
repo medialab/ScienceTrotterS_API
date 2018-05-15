@@ -77,6 +77,8 @@ class UsersController extends Controller
 	}
 
 	public function logout(Request $request) {
+		var_dump("LOGOUT");
+		exit;
 		$tokenMdl = UsersToken::getFromHeader($request);
 		if (!$tokenMdl) {
 			return response()->json(['status' => 'fail'], 401);
