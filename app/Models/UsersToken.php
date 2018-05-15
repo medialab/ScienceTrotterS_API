@@ -41,7 +41,6 @@ class UsersToken extends Model
 			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
 			->setAudience('http://'.$_SERVER['HTTP_HOST'])
 			->setId($user->id, true)
-			->setUid($user->id, true)
 			->setIssuedAt(time())
 			->setNotBefore(time() + 20)
 			->setExpiration(time() + Self::$expireDelay)
