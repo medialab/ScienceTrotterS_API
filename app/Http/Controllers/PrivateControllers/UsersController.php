@@ -64,22 +64,11 @@ class UsersController extends Controller
 
     		var_dump("Generating New Token");
 			$tokenMdl = UsersToken::generateToken($user);
-	    	/*if (!$token || $token->isExpired()) {
-	    	}
-	    	else{
-	    		var_dump("Token Exists");
-	    		var_dump($tokenMdl->id,$tokenMdl->user,$tokenMdl->key);
 
-	    		$token->setExpiration(time() + UsersToken::getExpireDelay());
-	    		$tokenMdl->key = (string)$token;
-	    		$tokenMdl->update();
-	    		var_dump("Token Updated");
-	    	}*/
-
-			return response()->json(['status' => 'success','token' => $token]);
+			return response()->json(['status' => 'success','token' => $tokenMdl->key]);
 		}
 		else{
-			return response()->json(['status' => 'fail'],401);
+			return response()->json(['status' => 'fail'], 401);
 		}
 	}
 

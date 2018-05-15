@@ -29,7 +29,7 @@ class UserAuthMiddleware extends Controller
 
     	$token = (new TokenParser())->parse($auth);
 
-    	if (!$token) {
+    	if (!$token || $token->isExpired()) {
     		var_dump("Bad Token");
     		return response()->json(['error' => 'Unauthorized'], 401);
     	}
@@ -44,6 +44,6 @@ class UserAuthMiddleware extends Controller
 		$user = Users::where('id', $tokenMdl->user)->first();
 		UsersToken::generateToken($user, $tokenMdl);
 
-		return $next($oRequest);
+		return $oNext($oRequest);
     }
 }
