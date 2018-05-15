@@ -78,7 +78,6 @@ class UsersController extends Controller
 
 	public function logout(Request $request) {
 		var_dump("LOGOUT");
-		exit;
 		$tokenMdl = UsersToken::getFromHeader($request);
 		if (!$tokenMdl) {
 			var_dump("No Model Found");
@@ -87,6 +86,8 @@ class UsersController extends Controller
 
 		var_dump("Deleting Token");
 		$tokenMdl->delete();
+		var_dump("Done");
+		exit;
 
 		return response()->json(['status' => 'success'], 200);
 	}
