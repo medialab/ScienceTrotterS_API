@@ -37,8 +37,7 @@ class UserAuthMiddleware extends Controller
     	}
 
 		$tokenMdl = UsersToken::where('key', $auth)->first();
-		var_dump($tokenMdl);
-		var_dump($tokenMdl->id);
+		
 		if (!$tokenMdl) {
     		var_dump("Token Not Registerd");
 			return response()->json(['error' => 'Unauthorized'], 401);

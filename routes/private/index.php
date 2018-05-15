@@ -8,7 +8,6 @@ $router->get('/home', 'HomeController@home');
 
 $aConfig = [
     'prefix' => 'users',
-    'middleware' => 'auth'
 ];
 
 $router->group($aConfig, function () use ($router) {
