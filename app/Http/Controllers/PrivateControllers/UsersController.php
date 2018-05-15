@@ -48,6 +48,10 @@ class UsersController extends Controller
 		
 	    if($request->input('password') === $user->password){
 			$token = new UsersToken($user);
+			if (empty($token)) {
+				$token->delete();
+			}
+			var_dump($token);
 			exit;
 
 			Users::where('email', $request->input('email'))->update(['token' => $token]);;
