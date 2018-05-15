@@ -33,7 +33,7 @@ class UsersToken extends Model
 	}
 	
 	public static function generateToken(Users $user) {
-		$tokenMdl = new UserToken($user);
+		$tokenMdl = new UsersToken($user);
 
 		$token = (new TokenBuilder())
 			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
@@ -45,7 +45,7 @@ class UsersToken extends Model
 			->setExpiration(time() + Self::$expireDelay)
 			->getToken()
 		;
-		
+
 		var_dump($token);
 		var_dump($tokenMdl);
 		exit;
