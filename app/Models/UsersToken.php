@@ -66,12 +66,15 @@ class UsersToken extends Model
 	}
 
 	public static function getFromHeader($request) {
+		var_dump("Getting From Header");
 		$auth = $oRequest->header("Authorization");
     	if (!$auth) {
     		return false;
     	}
+		var_dump("Auth: ".$auth);
 
     	$token = (new TokenParser())->parse($auth);
+		var_dump($token);
     	return UsersToken::where('user', $token->getClaim('uid'))->first();
 	}
 }
