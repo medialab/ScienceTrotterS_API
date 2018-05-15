@@ -58,7 +58,7 @@ class UsersToken extends Model
 			$tokenMdl->update();
 		}
 		else{
-			$tokenMdl->updateinsertAndSetId();
+			$tokenMdl->insertAndSetId();
 		}
 
 		return $tokenMdl;
