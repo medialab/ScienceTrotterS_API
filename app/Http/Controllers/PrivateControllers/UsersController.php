@@ -81,9 +81,11 @@ class UsersController extends Controller
 		exit;
 		$tokenMdl = UsersToken::getFromHeader($request);
 		if (!$tokenMdl) {
+			var_dump("No Model Found");
 			return response()->json(['status' => 'fail'], 401);
 		}
 
+		var_dump("Deleting Token");
 		$tokenMdl->delete();
 
 		return response()->json(['status' => 'success'], 200);
