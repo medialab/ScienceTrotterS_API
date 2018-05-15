@@ -59,7 +59,7 @@ class UsersController extends Controller
 	    	$tokenMdl = UsersToken::where('user', $user->id)->first();
 
 	    	if (!empty($tokenMdl)) {
-	    		$token = (new Parser())->parse($tokenMdl->key);
+	    		$token = (new TokenParser())->parse($tokenMdl->key);
 	    	}
 
 	    	if (!$token || $token->isExpired()) {
