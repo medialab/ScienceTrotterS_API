@@ -54,12 +54,7 @@ class UsersToken extends Model
 		$tokenMdl->token = (string) $token;
 		var_dump("Generated Token: ".$tokenMdl->token);
 
-		if ($tokenMdl->id) {
-			$tokenMdl->update();
-		}
-		else{
-			$tokenMdl->performInsert();
-		}
+		$tokenMdl->save();
 
 		return $tokenMdl;
 	}
