@@ -62,9 +62,9 @@ class UsersController extends Controller
 	    		$token = (new TokenParser())->parse($tokenMdl->key);
 	    	}
 
-	    	if (!$token || $token->isExpired()) {
-	    		var_dump("No Token Found Or expired -- Generating");
-				$tokenMdl = UsersToken::generateToken($user);
+    		var_dump("Generating New Token");
+			$tokenMdl = UsersToken::generateToken($user);
+	    	/*if (!$token || $token->isExpired()) {
 	    	}
 	    	else{
 	    		var_dump("Token Exists");
@@ -74,10 +74,7 @@ class UsersController extends Controller
 	    		$tokenMdl->key = (string)$token;
 	    		$tokenMdl->update();
 	    		var_dump("Token Updated");
-	    	}
-
-	    	exit;
-			
+	    	}*/
 
 			return response()->json(['status' => 'success','token' => $token]);
 		}
