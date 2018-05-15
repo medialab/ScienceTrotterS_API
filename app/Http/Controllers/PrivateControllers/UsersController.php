@@ -55,7 +55,7 @@ class UsersController extends Controller
 	    	}
 	    	else{
 	    		var_dump("Token Exists");
-	    		var_dump($token);
+	    		var_dump($token->id,$token->user,$token->key);
 	    	}
 
 	    	exit;
