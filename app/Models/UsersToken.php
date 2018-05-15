@@ -62,7 +62,7 @@ class UsersToken extends Model
 
 		$tokenMdl->save();
 
-		return $token;
+		return $tokenMdl->key;
 	}
 
 	public static function getFromHeader($request) {
