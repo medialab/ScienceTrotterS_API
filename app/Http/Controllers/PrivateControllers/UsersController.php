@@ -47,7 +47,7 @@ class UsersController extends Controller
 		$user = Users::where('email', $request->input('email'))->first();
 		
 	    if($request->input('password') === $user->password){
-			$token = new UsersToken($this);
+			$token = new UsersToken($user);
 			exit;
 
 			Users::where('email', $request->input('email'))->update(['token' => $token]);;
