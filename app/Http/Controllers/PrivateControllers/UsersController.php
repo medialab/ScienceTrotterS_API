@@ -8,6 +8,10 @@ use App\Utils\ValidatorUtil as Validator;
 use App\Models\Users;
 use App\Models\UsersToken;
 
+use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Builder as TokenBuilder;
+use Lcobucci\JWT\Parser as TokenParser;
+
 class UsersController extends Controller
 {
 
@@ -49,15 +53,26 @@ class UsersController extends Controller
 		
 	    if($request->input('password') === $user->password){
 			var_dump("Getting Token");
-	    	$token = UsersToken::where('user', $user->id)->first();
+			$token = false;
+	    	$tokenMdl = UsersToken::where('user', $user->id)->first();
 
-	    	if (empty($token)) {
+	    	if (!empty($tokenMdl)) {
+	    		$token = 
+	    	}
+
+	    	if (empty($tokenMdl)) {
 	    		var_dump("No Token Found Or expired -- Generating");
-				$token = UsersToken::generateToken($user);
+				$tokenMdl = UsersToken::generateToken($user);
 	    	}
 	    	else{
 	    		var_dump("Token Exists");
-	    		var_dump($token->id,$token->user,$token->key);
+	    		var_dump($tokenMdl->id,$tokenMdl->user,$tokenMdl->key);
+	    		$token = (new Parser())->parse($tokenMdl->key);
+
+	    		$token->setExpiration(time() + UsersToken::getExpireDelay());
+	    		$tokenMdl->key = (string)$token;
+	    		$tokenMdl->update();
+	    		var_dump("Token Updated");
 	    	}
 
 	    	exit;

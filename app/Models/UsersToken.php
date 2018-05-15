@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Lcobucci\JWT\Builder as TokenBuilder;
+use Lcobucci\JWT\Token;
 
 class UsersToken extends Model
 {
@@ -34,8 +35,11 @@ class UsersToken extends Model
 		return Self::$expireDelay;
 	}
 	
-	public static function generateToken(Users $user) {
-		$tokenMdl = new UsersToken([], $user);
+	public static function generateToken(Users $user, UsersToken $tokenMdl=null) {
+		if (is_null($tokenMdl)) {
+			$tokenMdl = new UsersToken([], $user);
+		}
+
 
 		$token = (new TokenBuilder())
 			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
@@ -47,8 +51,16 @@ class UsersToken extends Model
 			->getToken()
 		;
 
-		var_dump($token);
-		var_dump($tokenMdl);
-		exit;
+		$tokenMdl->token = (string) $token;
+		var_dump("Generated Token: ".$tokenMdl->token);
+
+		if ($tokenMdl->id) {
+			$tokenMdl->update();
+		}
+		else{
+			$tokenMdl->updateinsertAndSetId();
+		}
+
+		return $tokenMdl;
 	}
 }
