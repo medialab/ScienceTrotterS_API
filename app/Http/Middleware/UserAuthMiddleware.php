@@ -14,7 +14,8 @@ class UserAuthMiddleware extends Controller
 
     public function handle(Request $oRequest, Closure $oNext)
     {
-      var_dump("TEST AUTH");
-      exit;
+		$auth = $oRequest->header("Authorization");
+		var_dump("AUTH Header: ".$auth);
+		exit;
     }
 }
