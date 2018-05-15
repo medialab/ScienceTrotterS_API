@@ -73,7 +73,13 @@ class UsersController extends Controller
 	}
 
 	public function logout(Request $request) {
-		var_dump("LOGIN OUT");
-		exit;
+		$tokenMdl = UsersToken::getFromHeader($request);
+		if (!$tokenMdl) {
+			return response()->json(['status' => 'fail'], 401);
+		}
+
+		$tokenMdl->delete();
+
+		return response()->json(['status' => 'success'], 200);
 	}
 }

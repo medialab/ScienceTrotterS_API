@@ -4,7 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Lcobucci\JWT\Builder as TokenBuilder;
-use Lcobucci\JWT\Token;
+
+use Lcobucci\JWT\Builder as TokenBuilder;
+use Lcobucci\JWT\Parser as TokenParser;
+use Lcobucci\JWT\ValidationData;
 
 class UsersToken extends Model
 {
@@ -33,6 +36,10 @@ class UsersToken extends Model
 	public static function getExpireDelay() {
 		return Self::$expireDelay;
 	}
+
+	public static function idfyUser(Users $user) {
+		return md5($user->id.'-'.$user->created_at.'-'$user->email);
+	}
 	
 	public static function generateToken(Users $user, UsersToken $tokenMdl=null) {
 		if (is_null($tokenMdl)) {
@@ -42,7 +49,8 @@ class UsersToken extends Model
 		$token = (new TokenBuilder())
 			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
 			->setAudience('http://'.$_SERVER['HTTP_HOST'])
-			->setId($user->id, true)
+			->setId(Self::idfy($user), true)
+			->set('uid', $user->id)
 			->setIssuedAt(time())
 			->setNotBefore(time() + 20)
 			->setExpiration(time() + Self::$expireDelay)
@@ -57,4 +65,13 @@ class UsersToken extends Model
 		return $tokenMdl;
 	}
 
+	public static function getFromHeader($request) {
+		$auth = $oRequest->header("Authorization");
+    	if (!$auth) {
+    		return false;
+    	}
+
+    	$token = (new TokenParser())->parse($auth);
+    	return UsersToken::where('user', $token->getClaim('uid'))->first();
+	}
 }

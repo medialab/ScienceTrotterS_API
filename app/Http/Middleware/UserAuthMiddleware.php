@@ -13,6 +13,7 @@ use App\Models\UsersToken;
 use Lcobucci\JWT\Token;
 use Lcobucci\JWT\Builder as TokenBuilder;
 use Lcobucci\JWT\Parser as TokenParser;
+use Lcobucci\JWT\ValidationData;
 
 class UserAuthMiddleware extends Controller
 {
@@ -28,16 +29,24 @@ class UserAuthMiddleware extends Controller
     	}
 
     	var_dump($auth);
-
     	$token = (new TokenParser())->parse($auth);
 
-    	if (!$token || $token->isExpired()) {
+    	$validationData = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
+    	$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
+    	$validationData->setAudience('http://'.$_SERVER['HTTP_HOST']);
+    	$validationData->setId(UsersToken::idfy($user));
+
+    	if (!$token || !$token->validate($validationData)) {
     		var_dump("Bad Token");
-    		return response()->json(['error' => 'Unauthorized'], 401);
+    		return response()->json(['error' => 'Invalid Token'], 401);
     	}
 
-		$tokenMdl = UsersToken::where('key', $auth)->first();
-		
+    	if ($token->isExpired()) {
+    		var_dump("Token Expired");
+    		return response()->json(['error' => 'Token Expired'], 401);
+    	}
+
+		$tokenMdl = UsersToken::where('user', $token->getClaim('uid'))->first();
 		if (!$tokenMdl) {
     		var_dump("Token Not Registerd");
 			return response()->json(['error' => 'Unauthorized'], 401);
