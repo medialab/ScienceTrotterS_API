@@ -39,7 +39,6 @@ class UsersToken extends Model
 			$tokenMdl = new UsersToken([], $user);
 		}
 
-
 		$token = (new TokenBuilder())
 			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
 			->setAudience('http://'.$_SERVER['HTTP_HOST'])
@@ -57,4 +56,5 @@ class UsersToken extends Model
 
 		return $tokenMdl;
 	}
+
 }
