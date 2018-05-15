@@ -18,7 +18,6 @@ class UsersToken extends Model
 		}
 	}
 
-	public $timestamps = false;
 	protected $table = 'users_token';
 
 	protected $casts = [
