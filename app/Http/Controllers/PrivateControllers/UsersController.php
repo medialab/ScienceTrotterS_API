@@ -47,7 +47,7 @@ class UsersController extends Controller
 		$user = Users::where('email', $request->input('email'))->first();
 		
 	    if($request->input('password') === $user->password){
-	    	$token = UsersToken::where('user', $user->id);
+	    	$token = UsersToken::where('user', $user->id)->first();
 
 	    	if (empty($token)) {
 	    		var_dump("No Token Found Or expired -- Generating");
