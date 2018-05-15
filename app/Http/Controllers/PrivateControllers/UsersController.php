@@ -45,7 +45,7 @@ class UsersController extends Controller
 		]);
 
 		$user = Users::where('email', $request->input('email'))->first();
-		 
+		 var_dump($user);
 	    if(Hash::check($request->input('password'), $user->password)){
 			$token = new UsersToken($this);
 			exit;
