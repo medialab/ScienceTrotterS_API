@@ -21,21 +21,25 @@ class UserAuthMiddleware extends Controller
     public function handle(Request $oRequest, Closure $oNext)
     {
 		$auth = $oRequest->header("Authorization");
+    	if (!$auth) {
+    		return response()->json(['error' => 'Unauthorized'], 401);
+    	}
+
     	$token = (new TokenParser())->parse($auth);
 
     	if (!$token) {
-    		return false;
+    		return response()->json(['error' => 'Unauthorized'], 401);
     	}
 
 		$tokenMdl = UsersToken::where('key', $auth)->first();
 		if (!$tokenMdl) {
-			return false;
+			return response()->json(['error' => 'Unauthorized'], 401);
 		}
 
 		var_dump("AUTH Header: ".$auth);
 		$user = Users::where('id', $tokenMdl->user)->first();
 		UsersToken::generateToken($user, $tokenMdl);
 
-		return true;
+		return $next($oRequest);
     }
 }
