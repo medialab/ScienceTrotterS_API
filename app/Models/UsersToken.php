@@ -58,6 +58,7 @@ class UsersToken extends Model
 
 		$tokenMdl->key = (string) $token;
 		var_dump("Generated Token: ".$tokenMdl->key);
+		var_dump("Generated ID: ".Self::idfyUser($user));
 
 		$tokenMdl->save();
 
