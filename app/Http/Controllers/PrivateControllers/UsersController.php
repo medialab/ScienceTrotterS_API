@@ -12,6 +12,8 @@ use Lcobucci\JWT\Token;
 use Lcobucci\JWT\Builder as TokenBuilder;
 use Lcobucci\JWT\Parser as TokenParser;
 
+use Lcobucci\JWT\ValidationData;
+
 class UsersController extends Controller
 {
 
@@ -57,17 +59,16 @@ class UsersController extends Controller
 	    	$tokenMdl = UsersToken::where('user', $user->id)->first();
 
 	    	if (!empty($tokenMdl)) {
-	    		$token = 
+	    		$token = (new Parser())->parse($tokenMdl->key);
 	    	}
 
-	    	if (empty($tokenMdl)) {
+	    	if (!$token || $token->isExpired()) {
 	    		var_dump("No Token Found Or expired -- Generating");
 				$tokenMdl = UsersToken::generateToken($user);
 	    	}
 	    	else{
 	    		var_dump("Token Exists");
 	    		var_dump($tokenMdl->id,$tokenMdl->user,$tokenMdl->key);
-	    		$token = (new Parser())->parse($tokenMdl->key);
 
 	    		$token->setExpiration(time() + UsersToken::getExpireDelay());
 	    		$tokenMdl->key = (string)$token;
