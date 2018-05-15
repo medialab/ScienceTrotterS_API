@@ -51,7 +51,7 @@ class UsersController extends Controller
 
 	    	if (empty($token)) {
 	    		var_dump("No Token Found Or expired -- Generating");
-				$token = new UsersToken::generateToken($user);
+				$token = UsersToken::generateToken($user);
 	    	}
 	    	else{
 	    		var_dump("Token Exists");
