@@ -44,9 +44,11 @@ class UsersController extends Controller
 			'password' => 'required'
 		]);
 
+		var_dump("Getting User");
 		$user = Users::where('email', $request->input('email'))->first();
 		
 	    if($request->input('password') === $user->password){
+			var_dump("Getting Token");
 	    	$token = UsersToken::where('user', $user->id)->first();
 
 	    	if (empty($token)) {
