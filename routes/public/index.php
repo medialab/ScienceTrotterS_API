@@ -4,9 +4,7 @@ $aConfig = [
   'prefix' => 'auth'
 ];
 $router->group($aConfig, function () use ($router) {
-
     require __DIR__.'/auth.php';
-
 });
 
 $aConfig = [
@@ -17,3 +15,7 @@ $router->group($aConfig, function () use ($router) {
     require __DIR__.'/cities.php';
 
 });
+
+$aConfig = [
+    'prefix' => 'users',
+];

@@ -1,4 +1,4 @@
 <?php
 
-$router->post('/register', 'UsersController@home');
-$router->get('/logIn', 'UsersController@list');
+$router->get('/login', 'UsersController@login');
+$router->get('/logout', 'UsersController@logout');

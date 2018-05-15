@@ -38,7 +38,7 @@ class UsersController extends Controller
 		return $this->sendResponse($oUsers->toArray(), null);
 	}
 
-	public function login(Request $request) {
+	public function authenticate(Request $request) {
 		$this->validate($request, [
 			'email' => 'required',
 			'password' => 'required'
@@ -57,10 +57,5 @@ class UsersController extends Controller
 		else{
 			return response()->json(['status' => 'fail'],401);
 		}
-	}
-
-	public function logout(Request $request) {
-		var_dump("LOGIN OUT");
-		exit;
 	}
 }
