@@ -67,7 +67,7 @@ class UsersToken extends Model
 
 	public static function getFromHeader($request) {
 		var_dump("Getting From Header");
-		$auth = $oRequest->header("Authorization");
+		$auth = $request->header("Authorization");
     	if (!$auth) {
     		return false;
     	}
