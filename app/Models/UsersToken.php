@@ -34,12 +34,20 @@ class UsersToken extends Model
 	
 	public static function generateToken(Users $user) {
 		$tokenMdl = new UserToken($user);
-		var_dump($tokenMdl);
-		exit;
 
 		$token = (new TokenBuilder())
 			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
 			->setAudience('http://'.$_SERVER['HTTP_HOST'])
+			->setId($user->id, true)
+			->setUid($user->id, true)
+			->setIssuedAt(time())
+			->setNotBefore(time() + 20)
+			->setExpiration(time() + Self::$expireDelay)
+			->getToken()
 		;
+		
+		var_dump($token);
+		var_dump($tokenMdl);
+		exit;
 	}
 }
