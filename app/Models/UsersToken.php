@@ -11,7 +11,7 @@ class UsersToken extends Model
 
 	function __construct(array $attributes = [], Users $user=null) {
 		Parent::__construct($attributes);
-		
+
 		if (!is_null($user)) {
 			$this->user = $user->id;
 		}
@@ -35,7 +35,7 @@ class UsersToken extends Model
 	}
 	
 	public static function generateToken(Users $user) {
-		$tokenMdl = new UsersToken($user);
+		$tokenMdl = new UsersToken([], $user);
 
 		$token = (new TokenBuilder())
 			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
