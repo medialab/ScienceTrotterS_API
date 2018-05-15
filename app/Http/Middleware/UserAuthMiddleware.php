@@ -26,7 +26,7 @@ class UserAuthMiddleware extends Controller
     		var_dump("No Auth Header");
     		return response()->json(['error' => 'Unauthorized'], 401);
     	}
-    	
+
     	var_dump($auth);
 
     	$token = (new TokenParser())->parse($auth);
@@ -37,6 +37,7 @@ class UserAuthMiddleware extends Controller
     	}
 
 		$tokenMdl = UsersToken::where('key', $auth)->first();
+		var_dump($tokenMdl, $tokenMdl->id);
 		if (!$tokenMdl) {
     		var_dump("Token Not Registerd");
 			return response()->json(['error' => 'Unauthorized'], 401);
