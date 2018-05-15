@@ -26,6 +26,8 @@ class UserAuthMiddleware extends Controller
     		var_dump("No Auth Header");
     		return response()->json(['error' => 'Unauthorized'], 401);
     	}
+    	
+    	var_dump($auth);
 
     	$token = (new TokenParser())->parse($auth);
 
