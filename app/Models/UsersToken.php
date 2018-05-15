@@ -38,7 +38,7 @@ class UsersToken extends Model
 	}
 
 	public static function idfyUser(Users $user) {
-		return md5($user->id.'-'.$user->created_at.'-'$user->email);
+		return md5($user->id.'-'.$user->created_at.'-'.$user->email);
 	}
 	
 	public static function generateToken(Users $user, UsersToken $tokenMdl=null) {
