@@ -40,7 +40,12 @@ class UserAuthMiddleware extends Controller
     		var_dump("Token Not Registerd");
 			return response()->json(['error' => 'Unauthorized'], 401);
 		}
+
 		$user = Users::where('id', $tokenMdl->user)->first();
+		if (!$user) {
+    		var_dump("No User");
+			return response()->json(['error' => 'Unauthorized'], 401);
+		}
 
     	$validationData = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
     	$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
@@ -48,7 +53,7 @@ class UserAuthMiddleware extends Controller
     	$validationData->setId(UsersToken::idfyUser($user));
 
     	if (!$token->validate($validationData)) {
-    		var_dump("Bad Token");
+    		var_dump("Token Invalid");
     		return response()->json(['error' => 'Invalid Token'], 401);
     	}
 
