@@ -29,14 +29,25 @@ class UserAuthMiddleware extends Controller
     	}
 
     	var_dump($auth);
-    	$token = (new TokenParser())->parse($auth);
+    	$token = (new TokenParser())->parse($auth);    	
+    	if (!$token) {
+    		var_dump("Bad Token");
+    		return response()->json(['error' => 'Unauthorized'], 401);
+    	}
+
+		$tokenMdl = UsersToken::where('user', $token->getClaim('uid'))->first();
+		if (!$tokenMdl) {
+    		var_dump("Token Not Registerd");
+			return response()->json(['error' => 'Unauthorized'], 401);
+		}
+		$user = Users::where('id', $tokenMdl->user)->first();
 
     	$validationData = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
     	$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
     	$validationData->setAudience('http://'.$_SERVER['HTTP_HOST']);
     	$validationData->setId(UsersToken::idfyUser($user));
 
-    	if (!$token || !$token->validate($validationData)) {
+    	if (!$token->validate($validationData)) {
     		var_dump("Bad Token");
     		return response()->json(['error' => 'Invalid Token'], 401);
     	}
@@ -46,14 +57,7 @@ class UserAuthMiddleware extends Controller
     		return response()->json(['error' => 'Token Expired'], 401);
     	}
 
-		$tokenMdl = UsersToken::where('user', $token->getClaim('uid'))->first();
-		if (!$tokenMdl) {
-    		var_dump("Token Not Registerd");
-			return response()->json(['error' => 'Unauthorized'], 401);
-		}
-
 		var_dump("AUTH Header: ".$auth);
-		$user = Users::where('id', $tokenMdl->user)->first();
 		UsersToken::generateToken($user, $tokenMdl);
 
 		return $oNext($oRequest);
