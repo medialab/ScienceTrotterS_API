@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Lcobucci\JWT\Builder as TokenBuilder;
 
-use Lcobucci\JWT\Builder as TokenBuilder;
 use Lcobucci\JWT\Parser as TokenParser;
 use Lcobucci\JWT\ValidationData;
 
