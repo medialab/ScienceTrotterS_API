@@ -34,7 +34,7 @@ class UserAuthMiddleware extends Controller
     	$validationData = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
     	$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
     	$validationData->setAudience('http://'.$_SERVER['HTTP_HOST']);
-    	$validationData->setId(UsersToken::idfy($user));
+    	$validationData->setId(UsersToken::idfyUser($user));
 
     	if (!$token || !$token->validate($validationData)) {
     		var_dump("Bad Token");

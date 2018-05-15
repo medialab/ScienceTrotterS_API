@@ -48,7 +48,7 @@ class UsersToken extends Model
 		$token = (new TokenBuilder())
 			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
 			->setAudience('http://'.$_SERVER['HTTP_HOST'])
-			->setId(Self::idfy($user), true)
+			->setId(Self::idfyUser($user), true)
 			->set('uid', $user->id)
 			->setIssuedAt(time())
 			->setNotBefore(time() + 20)
