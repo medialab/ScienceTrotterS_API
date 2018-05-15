@@ -59,10 +59,14 @@ class UsersController extends Controller
 	    	$tokenMdl = UsersToken::where('user', $user->id)->first();
 
 	    	if (!empty($tokenMdl)) {
+    			var_dump("Parsing TokenMdl");
 	    		$token = (new TokenParser())->parse($tokenMdl->key);
 	    	}
+	    	else{
+    			var_dump("New Token");
+	    	}
 
-    		var_dump("Generating New Token");
+    		var_dump("Generating Updated Token");
 			$tokenMdl = UsersToken::generateToken($user);
 
 			return response()->json(['status' => 'success','token' => $tokenMdl->key]);
