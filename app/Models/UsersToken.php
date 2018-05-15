@@ -9,7 +9,9 @@ class UsersToken extends Model
 {
 	private static $expireDelay = 3600;
 
-	function __construct(Users $user=null) {
+	function __construct(array $attributes = [], Users $user=null) {
+		Parent::__construct($attributes);
+		
 		if (!is_null($user)) {
 			$this->user = $user->id;
 		}
