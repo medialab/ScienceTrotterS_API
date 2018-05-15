@@ -43,7 +43,7 @@ class UserAuthMiddleware extends Controller
 
 		$user = Users::where('id', $tokenMdl->user)->first();
 		if (!$user) {
-    		var_dump("No User");
+    		var_dump("No User Found");
 			return response()->json(['error' => 'Unauthorized'], 401);
 		}
 
@@ -51,10 +51,9 @@ class UserAuthMiddleware extends Controller
     	$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
     	$validationData->setAudience('http://'.$_SERVER['HTTP_HOST']);
     	$validationData->setId(UsersToken::idfyUser($user));
-    	var_dump("Generated ID: ".Self::idfyUser($user));
 
     	if (!$token->validate($validationData)) {
-    		var_dump("Token Invalid");
+    		var_dump("Bad Token");
     		return response()->json(['error' => 'Invalid Token'], 401);
     	}
 
@@ -62,9 +61,6 @@ class UserAuthMiddleware extends Controller
     		var_dump("Token Expired");
     		return response()->json(['error' => 'Token Expired'], 401);
     	}
-
-		var_dump("AUTH Header: ".$auth);
-		UsersToken::generateToken($user, $tokenMdl);
 
 		return $oNext($oRequest);
     }

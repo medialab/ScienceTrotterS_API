@@ -67,7 +67,7 @@ class UsersController extends Controller
 	    	}
 
     		var_dump("Generating Updated Token");
-			$tokenMdl = UsersToken::generateToken($user);
+			$tokenMdl = UsersToken::generateToken($user, $token);
 
 			return response()->json(['status' => 'success','token' => $tokenMdl->key]);
 		}
