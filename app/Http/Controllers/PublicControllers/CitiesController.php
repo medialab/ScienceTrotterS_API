@@ -9,16 +9,14 @@ use App\Models\Cities;
 
 class CitiesController extends Controller
 {
+	public function list(Request $oRequest)
+	{
+		$aCities = Cities::all();
+		return $this->sendResponse($oUsers->toArray(), null);
+	}
 
-    public function list() {
-      $aCities = Cities::where('state', 1)
-        ->get()
-        ->makeHidden('state')
-        ->makeHidden('created_at')
-        ->makeHidden('updated_at')
-        ->toArray();
-
-      return $this->sendResponse($aCities, null);
-    }
-
+	public function get($id) {
+		$oCity = Cities::where('id', $id)->first();
+		return $this->sendResponse($oCity->toArray(), null);
+	}
 }
