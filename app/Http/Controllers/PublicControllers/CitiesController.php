@@ -11,7 +11,7 @@ class CitiesController extends Controller
 {
 	public function list(Request $oRequest)
 	{
-		$aCities = Cities::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'));
+		$aCities = Cities::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
 		var_dump($aCities);
 		return $this->sendResponse($aCities->toArray(), null);
 	}
