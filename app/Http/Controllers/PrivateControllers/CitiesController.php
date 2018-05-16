@@ -24,12 +24,8 @@ class CitiesController extends Controller
 		return $this->sendResponse($oCity->toArray(), null);
 	}
 
-	public function find(Request $oRequest) {
-		$this->validate($request, [
-			'id' => 'required',
-		]);
-
-		$oCity = Cities::where('id', $oRequest->input('id'))->first();
+	public function find($id) {
+		$oCity = Cities::where('id', $id)->first();
 		return $this->sendResponse($oCity->toArray(), null);
 	}
 }
