@@ -4,7 +4,7 @@ use App\Models\Cities;
 
 $router->get('/list', 'CitiesController@list');
 
-$router->get('/id', 'CitiesController@testinAName');
+$router->get('/id', 'CitiesController@test');
 
 
 $router->get('/{id:[a-z0-9-]+}', function($id) use ($router) {
