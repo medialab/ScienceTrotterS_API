@@ -50,7 +50,7 @@ class UsersController extends Controller
 			'password' => 'required'
 		]);
 
-		var_dump("Getting User");
+		//var_dump("Getting User");
 		$user = Users::where('email', $request->input('email'))->first();
 		
 		if (!$user) {
@@ -58,19 +58,19 @@ class UsersController extends Controller
 		}
 
 	    if($request->input('password') === $user->password){
-			var_dump("Getting Token");
+			//var_dump("Getting Token");
 			$token = false;
 	    	$tokenMdl = UsersToken::where('user', $user->id)->first();
 
 	    	if (!empty($tokenMdl)) {
-    			var_dump("Parsing TokenMdl");
+    			//var_dump("Parsing TokenMdl");
 	    		$token = (new TokenParser())->parse($tokenMdl->key);
 	    	}
 	    	else{
-    			var_dump("New Token");
+    			//var_dump("New Token");
 	    	}
 
-    		var_dump("Generating Updated Token");
+    		//var_dump("Generating Updated Token");
 			$token = UsersToken::generateToken($user, $tokenMdl);
 
 			return response()->json(['status' => 'success','token' => $token]);
