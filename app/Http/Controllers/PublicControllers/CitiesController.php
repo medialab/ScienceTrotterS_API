@@ -12,7 +12,7 @@ class CitiesController extends Controller
 	public function list(Request $oRequest)
 	{
 		$aCities = Cities::all();
-		return $this->sendResponse($oUsers->toArray(), null);
+		return $this->sendResponse($aCities->toArray(), null);
 	}
 
 	public function get($id) {
