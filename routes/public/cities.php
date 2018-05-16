@@ -8,7 +8,7 @@ $router->get('/{id:[a-z0-9-]+}', function($id) use ($router) {
 		'id' => 'required',
 	]);
 
-	$oCity = Cities::where('id', $oRequest->input('id'))->first();
+	$oCity = Cities::where('id', $id)->first();
 	echo json_encode($oCity->toArray());
 	exit;
 });
