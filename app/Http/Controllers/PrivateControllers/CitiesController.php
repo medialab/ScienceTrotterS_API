@@ -25,7 +25,7 @@ class CitiesController extends Controller
 	}
 
 	public function find($id) {
-		$oCity = Cities::where('id', $id)->first();
+		$oCity = Cities::where('id', 'ca3e834d-c717-4832-ab8b-c50ebd1bd3d6')->first();
 		return $this->sendResponse($oCity->toArray(), null);
 	}
 }
