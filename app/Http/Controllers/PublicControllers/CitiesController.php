@@ -11,7 +11,7 @@ class CitiesController extends Controller
 {
 	public function list(Request $oRequest)
 	{
-		$aCities = Cities::all();
+		$aCities = Cities::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'));
 		return $this->sendResponse($aCities->toArray(), null);
 	}
 
