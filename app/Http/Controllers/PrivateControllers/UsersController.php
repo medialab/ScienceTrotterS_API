@@ -54,7 +54,7 @@ class UsersController extends Controller
 		$user = Users::where('email', $request->input('email'))->first();
 		
 		if (!$user) {
-			return response()->json(['status' => 'fail'], 401);
+			return response()->json([['status' => false], 401);
 		}
 
 	    if($request->input('password') === $user->password){
@@ -73,21 +73,21 @@ class UsersController extends Controller
     		//var_dump("Generating Updated Token");
 			$token = UsersToken::generateToken($user, $tokenMdl);
 
-			return response()->json(['status' => 'success','token' => $token]);
+			return response()->json(['status' => true,'token' => $token]);
 		}
 		else{
-			return response()->json(['status' => 'fail'], 401);
+			return response()->json([['status' => false], 401);
 		}
 	}
 
 	public function logout(Request $request) {
 		$tokenMdl = UsersToken::getFromHeader($request);
 		if (!$tokenMdl) {
-			return response()->json(['status' => 'fail'], 401);
+			return response()->json([['status' => false], 401);
 		}
 
 		$tokenMdl->delete();
 
-		return response()->json(['status' => 'success'], 200);
+		return response()->json(['status' => true], 200);
 	}
 }

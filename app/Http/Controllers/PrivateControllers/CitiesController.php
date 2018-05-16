@@ -52,10 +52,10 @@ class UsersController extends Controller
 
 			Users::where('email', $request->input('email'))->update(['token' => $token]);;
 
-			return response()->json(['status' => 'success','token' => $token]);
+			return response()->json(['status' => true,'token' => $token]);
 		}
 		else{
-			return response()->json(['status' => 'fail'],401);
+			return response()->json([['status' => false],401);
 		}
 	}
 }
