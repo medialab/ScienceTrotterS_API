@@ -51,12 +51,13 @@ class UsersController extends Controller
 		]);
 
 		var_dump("Getting User");
-		$email = $_POST['email'];
-		$pass = $_POST['password'];
-
-		$user = Users::where('email', $email)->first();
+		$user = Users::where('email', $request->input('email'))->first();
 		
-	    if($pass === $user->password){
+		if (!$user) {
+			return response()->json(['status' => 'fail'], 401);
+		}
+
+	    if($request->input('password') === $user->password){
 			var_dump("Getting Token");
 			$token = false;
 	    	$tokenMdl = UsersToken::where('user', $user->id)->first();
