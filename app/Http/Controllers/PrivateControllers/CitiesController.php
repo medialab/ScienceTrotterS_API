@@ -55,7 +55,7 @@ class UsersController extends Controller
 			return response()->json(['status' => true,'token' => $token]);
 		}
 		else{
-			return response()->json([['status' => false],401);
+			return response()->json(['status' => false],401);
 		}
 	}
 }
