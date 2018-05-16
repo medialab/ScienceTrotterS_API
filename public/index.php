@@ -1,8 +1,12 @@
 <?php
-
 ini_set('xdebug.var_display_max_data', -1);
 ini_set('xdebug.var_display_max_depth', -1);
 ini_set('xdebug.var_display_max_children', -1);
+
+var_dump("============ GET ===============");
+var_dump($_GET);
+var_dump("============ POST ===============");
+var_dump($_POST);
 
 
 /*
