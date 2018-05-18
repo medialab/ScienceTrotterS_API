@@ -11,7 +11,7 @@ class CitiesController extends Controller
 {
 	public function sendResponse($data, $msg) {
 		if (!empty($_POST['callback'])) {
-			echo "test".'('.json_encode([
+			echo $_POST['callback'].'('.json_encode([
 				'success' => true,
 				'data' => $data,
 				'message' => $msg
