@@ -3,7 +3,6 @@ $p = dirname(__FILE__).'/../../app/Http/Controllers/PublicControllers/TestContro
 require_once($p);
 
 use App\Http\Controllers;
-use App\Http\Controllers\ParcoursController as ParcoursController;
 
 
 
