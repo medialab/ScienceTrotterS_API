@@ -1,6 +1,6 @@
 <?php
 
-class TestController extends Controller
+class TestController 
 {
 	public function list(Request $oRequest)
 	{
