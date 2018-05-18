@@ -9,8 +9,7 @@ use App\Models\Cities;
 
 class CitiesController extends Controller
 {
-
-	private function sendResponse($data, $msg) {
+	public function sendResponse($data, $msg) {
 		if (!empty($_POST['callback'])) {
 			echo $_POST['callback'].'('.json_encode([
 				'success' => true,
