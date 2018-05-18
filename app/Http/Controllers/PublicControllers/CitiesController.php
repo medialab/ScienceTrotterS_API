@@ -11,7 +11,6 @@ class CitiesController extends Controller
 {
 	public function sendResponse($data, $msg) {
 		if (!empty($_POST['callback'])) {
-		}
 			echo "test".'('.json_encode([
 				'success' => true,
 				'data' => $data,
@@ -19,6 +18,7 @@ class CitiesController extends Controller
 			]).')';
 
 			exit;
+		}
 
 		return Parent::sendResponse($data, $msg);
 	}
