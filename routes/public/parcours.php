@@ -9,7 +9,7 @@ use App\Http\Controllers;
 var_dump($p);
 var_dump(file_exists($p));
 
-var_dump(class_exists("Test"));
+var_dump(class_exists("TestController"));
 exit;
 
 $router->get('/list', 'ParcoursController@list');
