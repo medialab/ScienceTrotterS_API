@@ -16,6 +16,9 @@ class CitiesController extends Controller
 		elseif (!empty($_GET['callback'])) {
 			$cl = $_GET['callback'];
 		}
+		else{
+			$cl = false;
+		}
 
 		if ($cl) {
 			echo $cl.'('.json_encode([
