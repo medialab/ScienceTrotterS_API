@@ -9,6 +9,21 @@ use App\Models\Cities;
 
 class CitiesController extends Controller
 {
+
+	private function sendResponse($data, $msg) {
+		if (!empty($_POST['callback'])) {
+			echo $_POST['callback'].'('.json_encode([
+				'success' => true,
+				'data' => $aCities->toArray(),
+				'message' => $msg
+			]).')';
+
+			exit;
+		}
+
+		Parent::sendResponse($data, $msg);
+	}
+
 	public function list(Request $oRequest)
 	{
 		$aCities = Cities::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
