@@ -3,13 +3,14 @@ $p = dirname(__FILE__).'/../../app/Http/Controllers/PublicControllers/TestContro
 require_once($p);
 
 use App\Http\Controllers;
+use App\Http\Controllers\ParcoursController as ParcoursController;
 
 
 
 var_dump($p);
 var_dump(file_exists($p));
 
-var_dump(class_exists("TestController"));
+var_dump(class_exists("ParcoursController"));
 exit;
 
 $router->get('/list', 'ParcoursController@list');
