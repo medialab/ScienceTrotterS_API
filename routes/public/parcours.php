@@ -8,7 +8,7 @@ class ParcoursController extends Controller
 {
 	public function list()
 	{
-		$aParcours = Parcours::where('state', true)->take((int)$_GET['limit'])->skip((int)$_GET['offset'])->get();
+		$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		return $this->sendResponse($aParcours->toArray(), null);
 	}
 
@@ -19,7 +19,7 @@ class ParcoursController extends Controller
 }
 
 
-var_dump($_GET);
+var_dump($GET);
 var_dump($_POST);
 exit;
 
