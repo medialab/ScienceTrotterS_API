@@ -38,7 +38,39 @@ PG_PREFIX=
 PG_SCHEMA=
 ```
 
-4) Usage
+4) Nginx Vhost
+server {
+	listen 80;
+	listen [::]:80;
+
+	server_name api-sts.actu.com;
+	root {$site_path}/api/public;
+	index index.html index.htm index.nginx-debian.html index.php;
+
+	location / {
+		try_files $uri $uri/ /index.php?$query_string;
+	}
+
+	location ~ \.php$ {
+	
+		# With php7.2-cgi alone:
+		#fastcgi_pass 127.0.0.1:9000;
+		# With php7.2-fpm:
+		include snippets/fastcgi-php.conf;
+		fastcgi_pass unix:{$php_soket};
+	}
+
+    listen [::]:443 ssl; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate {$ssl_path}/live/api-sts.actu.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key {$ssl_path}/live/api-sts.actu.com/privkey.pem; # managed by Certbot
+    include {$ssl_path}/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam {$ssl_path}/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+
+5) Usage
 
 The main entry url is `your_site_name.your_domain_name/public`
 
