@@ -39,6 +39,8 @@ PG_SCHEMA=
 ```
 
 4) Nginx Vhost
+
+
 server {
 	listen 80;
 	listen [::]:80;
