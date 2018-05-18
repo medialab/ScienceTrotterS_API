@@ -4,17 +4,18 @@ use App\Utils\RequestUtil as Request;
 use App\Utils\ValidatorUtil as Validator;
 use App\Models\Parcours;
 
-global $GET;
 
 class ParcoursController extends Controller
 {
 	public function list()
 	{
+		global $GET;
 		$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		return $this->sendResponse($aParcours->toArray(), null);
 	}
 
 	public function get($id) {
+		global $GET;
 		$oCity = Parcours::where('id', $id)->first();
 		return $this->sendResponse($oCity->toArray(), null);
 	}
