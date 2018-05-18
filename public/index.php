@@ -1,6 +1,6 @@
 <?php
 global $GET;
-$GET = json_decode(file_get_contents("php://input"));
+$GET = json_decode(file_get_contents("php://input"), true);
 
 ini_set('xdebug.var_display_max_data', -1);
 ini_set('xdebug.var_display_max_depth', -1);
