@@ -1,5 +1,5 @@
 <?php
-$p = dirname(__FILE__).'/../../app/Http/Controllers/PublicControllers/ParcoursController.php';
+$p = dirname(__FILE__).'/../../app/Http/Controllers/PublicControllers/TestController.php';
 require_once($p);
 
 use App\Http\Controllers;
