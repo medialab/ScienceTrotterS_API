@@ -11,6 +11,7 @@ class CitiesController extends Controller
 {
 	public function sendResponse($data, $msg) {
 		if (!empty($_POST['callback'])) {
+		}
 			echo $_POST['callback'].'('.json_encode([
 				'success' => true,
 				'data' => $aCities->toArray(),
@@ -18,9 +19,8 @@ class CitiesController extends Controller
 			]).')';
 
 			exit;
-		}
 
-		Parent::sendResponse($data, $msg);
+		return Parent::sendResponse($data, $msg);
 	}
 
 	public function list(Request $oRequest)
