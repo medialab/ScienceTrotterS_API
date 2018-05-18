@@ -5,6 +5,9 @@ $POST = $_POST;
 global $GET;
 $GET = $_GET;
 
+var_dump(file_get_contents("php://input"));
+exit;
+
 
 var_dump($_GET);
 var_dump($_POST);
