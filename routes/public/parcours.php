@@ -5,6 +5,7 @@ require_once($p);
 
 var_dump($p);
 var_dump(file_exists($p));
+var_dump(class_exists("Test"));
 var_dump(class_exists("ParcoursController"));
 exit;
 

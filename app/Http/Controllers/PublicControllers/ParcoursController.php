@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * 
+ */
+class Test
+{
+	
+	function __construct()
+	{
+		# code...
+	}
+}
+
 namespace App\Http\Controllers;
 
 use App\Utils\APIControllerUtil as Controller;
