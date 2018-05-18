@@ -12,7 +12,7 @@ class CitiesController extends Controller
 	public function sendResponse($data, $msg) {
 		if (!empty($_POST['callback'])) {
 		}
-			echo $_POST['callback'].'('.json_encode([
+			echo "test".'('.json_encode([
 				'success' => true,
 				'data' => $aCities->toArray(),
 				'message' => $msg
