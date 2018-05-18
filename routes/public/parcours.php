@@ -1,4 +1,11 @@
 <?php
+define("DBG_MODE", true);
+ini_set( 'display_errors', true );
+error_reporting( E_ALL | E_NOTICE );
+ini_set('xdebug.var_display_max_data', -1);
+ini_set('xdebug.var_display_max_depth', -1);
+ini_set('xdebug.var_display_max_children', -1);
+
 $p = dirname(__FILE__).'/../../app/Http/Controllers/PublicControllers/ParcoursController.php';
 require_once($p);
 
