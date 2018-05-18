@@ -11,13 +11,13 @@ class ParcoursController extends Controller
 	{
 		global $GET;
 		$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
-		return $this->sendResponse($aParcours->toArray(), null);
+		return $this->sendResponse($aParcours->toArray(), null)->content();
 	}
 
 	public function get($id) {
 		global $GET;
 		$oCity = Parcours::where('id', $id)->first();
-		return $this->sendResponse($oCity->toArray(), null);
+		return $this->sendResponse($oCity->toArray(), null)->content();
 	}
 }
 
