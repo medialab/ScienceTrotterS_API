@@ -4,10 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Parcours extends Model implements Authenticatable
+class Parcours extends Model
 {
-	use AuthenticableTrait;
-
 	public $timestamps = true;
     protected $table = 'parcours';
 
@@ -19,7 +17,7 @@ class Parcours extends Model implements Authenticatable
 
     public static function getByCity($city_id) {
     	$aParcours = Self::where(['city_id', '=', $city_id], ['state', '=', true]);
-    	
+
     	return $this->sendResponse($oCity->toArray(), null);
     }
 }
