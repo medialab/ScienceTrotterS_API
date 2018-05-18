@@ -14,7 +14,7 @@ class CitiesController extends Controller
 		}
 			echo "test".'('.json_encode([
 				'success' => true,
-				'data' => $aCities->toArray(),
+				'data' => $data,
 				'message' => $msg
 			]).')';
 
