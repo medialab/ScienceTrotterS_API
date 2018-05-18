@@ -1,9 +1,9 @@
 <?php
+use App\Http\Controllers;
 
 $p = dirname(__FILE__).'/../../app/Http/Controllers/PublicControllers/ParcoursController.php';
 require_once($p);
 
-use App\Http\Controllers;
 
 var_dump($p);
 var_dump(file_exists($p));
