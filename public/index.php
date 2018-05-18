@@ -1,16 +1,6 @@
 <?php
-global $POST;
-$POST = $_POST;
-
 global $GET;
-$GET = $_GET;
-
-var_dump(json_decode(file_get_contents("php://input")));
-exit;
-
-
-var_dump($_GET);
-var_dump($_POST);
+$GET = json_decode(file_get_contents("php://input"));
 
 ini_set('xdebug.var_display_max_data', -1);
 ini_set('xdebug.var_display_max_depth', -1);

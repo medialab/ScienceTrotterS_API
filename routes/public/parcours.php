@@ -5,7 +5,6 @@ use App\Utils\ValidatorUtil as Validator;
 use App\Models\Parcours;
 
 global $GET;
-global $POST;
 
 class ParcoursController extends Controller
 {
@@ -23,8 +22,6 @@ class ParcoursController extends Controller
 
 
 var_dump($GET);
-var_dump($_POST);
-exit;
 
 $router->get('/list', function() {
 	$ctrl = new ParcoursController();
