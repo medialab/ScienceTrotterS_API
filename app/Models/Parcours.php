@@ -1,7 +1,10 @@
 <?php
 
+namespace App\Models;
 
-class Parcours 
+use Illuminate\Database\Eloquent\Model;
+
+class Parcours extends Model
 {
 	public $timestamps = true;
     protected $table = 'parcours';
