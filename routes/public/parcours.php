@@ -9,6 +9,8 @@ use App\Http\Controllers\Test as Test;
 
 var_dump($p);
 var_dump(file_exists($p));
+
+new Test();
 var_dump(class_exists("Test"));
 var_dump(class_exists("ParcoursController"));
 exit;
