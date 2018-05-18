@@ -13,7 +13,7 @@ class Parcours extends Model
         'id' => 'string',
     ];
 
-    protected $fillable = ['title','time','aud_uid','desc_uid'];
+    protected $fillable = ['title','time','audio','description', 'city_id', 'state'];
 
     public static function getByCity($city_id) {
     	$aParcours = Self::where(['city_id', '=', $city_id], ['state', '=', true]);
