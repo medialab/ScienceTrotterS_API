@@ -4,6 +4,9 @@ use App\Utils\RequestUtil as Request;
 use App\Utils\ValidatorUtil as Validator;
 use App\Models\Parcours;
 
+global $GET;
+global $POST;
+
 class ParcoursController extends Controller
 {
 	public function list()
