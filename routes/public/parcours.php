@@ -5,7 +5,7 @@ use App\Utils\ValidatorUtil as Validator;
 
 class ParcoursController extends Controller
 {
-	public function list(Request $oRequest)
+	public function list()
 	{
 		$aParcours = Parcours::where('state', true)->take((int)$_GET['limit'])->skip((int)$_GET['offset'])->get();
 		return $this->sendResponse($aParcours->toArray(), null);
