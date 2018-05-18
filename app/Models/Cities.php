@@ -15,5 +15,4 @@ class Cities extends Model
         'id' => 'string',
     ];
     protected $primaryKey = "id";
-
 }
