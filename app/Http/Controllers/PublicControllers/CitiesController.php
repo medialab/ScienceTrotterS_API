@@ -11,13 +11,19 @@ class CitiesController extends Controller
 {
 	public function sendResponse($data, $msg) {
 		if (!empty($_POST['callback'])) {
-			echo $_POST['callback'].'('.json_encode([
+			$cl = $_POST['callback'];
+		}
+		elseif (!empty($_GET['callback'])) {
+			$cl = $_GET['callback'];
+		}
+
+		if ($cl) {
+			echo $cl.'('.json_encode([
 				'success' => true,
 				'data' => $data,
 				'message' => $msg
 			]).')';
-
-			exit;
+			exit;	
 		}
 
 		return Parent::sendResponse($data, $msg);
