@@ -16,6 +16,6 @@ $aConfig = [
     'prefix' => 'cities',
 ];
 $router->group($aConfig, function () use ($router) {
-    $router->post('/add', 'CitiesController@add');
-    $router->post('/update', 'CitiesController@update');
+    $router->post('/add', 'CitiesAdminController@add');
+    $router->post('/update', 'CitiesAdminController@update');
 });
