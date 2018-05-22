@@ -34,6 +34,7 @@ class CitiesAdminController extends CitiesController
 		}
 
 		if (!empty($aErrors)) {
+			var_dump(get_class_vars($oCity));
 			return $this->sendError('Fail To Update', $aErrors, 400);
 		}
 
