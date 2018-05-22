@@ -9,5 +9,9 @@ use App\Models\Cities;
 
 class CitiesAdminController extends CitiesController
 {
-	
+	public function update(Request $oRequest) {
+		var_dump('label', $oRequest->input('label'));
+		var_dump('geoloc', $oRequest->input('geoloc'));
+		exit;
+	}
 }
