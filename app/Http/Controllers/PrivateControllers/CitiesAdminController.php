@@ -12,7 +12,7 @@ class CitiesAdminController extends CitiesController
 	public function update(Request $oRequest) {
 		$id = $oRequest->input('id');
 
-		$oCity = Cities::where('id', $id)->fisrt();
+		$oCity = Cities::where('id', $id)->first();
 		if (!$oCity) {
 			return $this->sendError('Not Found', ['Can\'t found City With ID:'.$id], 404);
 		}
