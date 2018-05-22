@@ -51,7 +51,7 @@ class UsersToken extends Model
 			->setId(Self::idfyUser($user), true)
 			->set('uid', $user->id)
 			->setIssuedAt(time())
-			->setNotBefore(time() + 20)
+			->setNotBefore(time())
 			->setExpiration(time() + Self::$expireDelay)
 			->getToken()
 		;

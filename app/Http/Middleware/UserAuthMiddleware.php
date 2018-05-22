@@ -21,8 +21,6 @@ class UserAuthMiddleware extends Controller
 
     public function handle(Request $oRequest, Closure $oNext)
     {
-    	var_dump("Verifying");
-        exit;
 		$auth = $oRequest->header("Authorization");
     	if (!$auth) {
     		// var_dump("No Auth Header");
@@ -52,7 +50,7 @@ class UserAuthMiddleware extends Controller
     	$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
     	$validationData->setAudience('http://'.$_SERVER['HTTP_HOST']);
     	$validationData->setId(UsersToken::idfyUser($user));
-    	$validationData->setCurrentTime(time() + 60);
+    	$validationData->setCurrentTime(time());
 
     	// var_dump("Generated ID: ".UsersToken::idfyUser($user));
 
