@@ -37,8 +37,5 @@ $router->get('/{id:[a-z0-9-]+}', function() {
 });*/
 
 
-
-
-
 $router->get('/list', 'ParcoursController@list');
 
