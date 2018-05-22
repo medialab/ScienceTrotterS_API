@@ -32,12 +32,12 @@ class CitiesAdminController extends CitiesController
 
 			$aUpdates[$key] = $value;
 		}
-
+/*
 		if (!empty($aErrors)) {
 			var_dump(get_class_vars($oCity));
 			return $this->sendError('Fail To Update', $aErrors, 400);
 		}
-
+*/
 		if ($oCity->update($aUpdates)) {
 			return $this->sendResponse([], null);
 		}
