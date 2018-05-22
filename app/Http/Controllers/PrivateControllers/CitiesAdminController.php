@@ -24,11 +24,11 @@ class CitiesAdminController extends CitiesController
 			if (in_array($key, ['id', 'created_at', 'updated_at'])) {
 				continue;
 			}
-
+/*
 			if (!property_exists($oCity, $key)) {
 				$aErrors = ['Bad Property: '.$key];
 				continue;
-			}
+			}*/
 
 			$aUpdates[$key] = $value;
 		}
