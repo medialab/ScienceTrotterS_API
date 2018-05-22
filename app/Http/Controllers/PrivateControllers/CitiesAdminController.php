@@ -21,7 +21,7 @@ class CitiesAdminController extends CitiesController
 		$aUpdates = [];
 		$aData = $oRequest->input('data');
 		foreach ($aData as $key => $value) {
-			if ($key === 'id') {
+			if (in_array($key, ['id', 'created_at', 'updated_at'])) {
 				continue;
 			}
 
