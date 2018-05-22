@@ -50,7 +50,7 @@ class UserAuthMiddleware extends Controller
     	$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
     	$validationData->setAudience('http://'.$_SERVER['HTTP_HOST']);
     	$validationData->setId(UsersToken::idfyUser($user));
-    	$validationData->setCurrentTime(time());
+    	$validationData->setCurrentTime(time() + 60);
 
     	// var_dump("Generated ID: ".UsersToken::idfyUser($user));
 
