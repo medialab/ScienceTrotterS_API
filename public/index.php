@@ -1,4 +1,6 @@
 <?php
+header('Access-Control-Allow-Headers: Authorization');
+
 global $GET;
 $GET = json_decode(file_get_contents("php://input"), true);
 
