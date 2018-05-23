@@ -44,4 +44,17 @@ class CitiesAdminController extends CitiesController
 
 		return $this->sendError('Fail To Query Update', ['Fail To Query Update'], 400);
 	}
+
+	public function insert(Request $oRequest) {
+		$aData->input('data');
+		$oCity = new City;
+		
+		$oCity->save();
+
+		if ($oCity->update($aData)) {
+			return $this->sendResponse(['id' => $oCity->id], null);
+		}
+
+		return $this->sendError('Fail To Query Insert', ['Fail To Query Insert'], 400);
+	}
 }
