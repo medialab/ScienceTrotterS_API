@@ -28,3 +28,11 @@ $router->get('/', function () use ($router) {
 	$router->group($aConfig, function () use ($router) {
 	    require __DIR__.'/cities.php';
 	});
+
+/* Interrests */
+	$aConfig = [
+	    'prefix' => 'interrests',
+	];
+	$router->group($aConfig, function () use ($router) {
+	    require __DIR__.'/interrests.php';
+	});
