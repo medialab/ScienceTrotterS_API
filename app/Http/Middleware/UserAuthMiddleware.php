@@ -23,7 +23,7 @@ class UserAuthMiddleware extends Controller
     {
 		$auth = $oRequest->header("Authorization");
     	if (!$auth) {
-            $auth = $request->input("token");
+            $auth = $oRequest->input("token");
             if (!$auth) {
         		// var_dump("No Auth Header");
         		return response()->json(['error' => 'No Token Specified'], 401);
