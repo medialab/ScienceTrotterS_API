@@ -12,6 +12,7 @@ define(ADMIN_URL, 'https://admin-sts.actu.com/');
 define(UPLOAD_PATH, realpath('.').'/ressources/upload/');
 
 if ($_SERVER['REQUEST_METHOD'] === "OPTIONS") {
+    http_response_code(204);
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Max-Age: 604800');
     //if you need special headers
