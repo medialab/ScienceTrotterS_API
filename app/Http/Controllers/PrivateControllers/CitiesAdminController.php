@@ -39,7 +39,7 @@ class CitiesAdminController extends CitiesController
 				mkdir($dir, 0775, true);
 			}
 
-			file_put_contents(UPLOAD_PATH, fopen(ADMIN_URL.'upload/'.$aUpdates['image'], 'r'));
+			file_put_contents($dir, fopen(ADMIN_URL.'upload/'.$aUpdates['image'], 'r'));
 		}
 
 		if ($oCity->update($aUpdates)) {
