@@ -46,7 +46,7 @@ class CitiesAdminController extends CitiesController
 	}
 
 	public function insert(Request $oRequest) {
-		$aData->input('data');
+		$aData = $oRequest->input('data');
 		$oCity = new City;
 		
 		$oCity->save();
