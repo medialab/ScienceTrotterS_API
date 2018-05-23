@@ -9,6 +9,12 @@ use App\Models\Cities;
 
 class CitiesAdminController extends CitiesController
 {
+	public function list(Request $oRequest)
+	{
+		$aCities = Cities::take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
+		return $this->sendResponse($aCities->toArray(), null);
+	}
+	
 	public function update(Request $oRequest) {
 		$id = $oRequest->input('id');
 
