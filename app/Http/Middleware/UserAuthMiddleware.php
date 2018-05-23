@@ -52,9 +52,9 @@ class UserAuthMiddleware extends Controller
     	$validationData->setId(UsersToken::idfyUser($user));
     	$validationData->setCurrentTime(time() + 60);
 
-    	// var_dump("Generated ID: ".UsersToken::idfyUser($user));
+    	var_dump("Generated ID: ".UsersToken::idfyUser($user));
 
-    	if (true || $token->isExpired()) {
+    	if (true/* || $token->isExpired()*/) {
     		// var_dump("Token Expired");
             $tokenMdl->delete();
             return response()->json(['error' => 'Token Expired'], 440);
