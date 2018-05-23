@@ -65,7 +65,7 @@ class CitiesAdminController extends CitiesController
 		if (empty($aUpdates['geoloc']) || (empty($aUpdates['image']) && empty($oCity->image))) {
 			$aUpdates['state'] = false;
 		}
-		elseif(!empty($aUpdates['image'])) {
+		elseif(!empty($aUpdates['image']) && $aUpdates['image'] !== $oCity->image) {
 			$this->downloadImage($aUpdates['image']);
 		}
 
