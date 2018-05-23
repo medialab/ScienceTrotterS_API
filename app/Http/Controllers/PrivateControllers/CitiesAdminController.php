@@ -36,11 +36,11 @@ class CitiesAdminController extends CitiesController
 		elseif(!empty($aUpdates['image'])) {
 			$dir = dirname(UPLOAD_PATH.$aUpdates['image']);
 			if (!is_dir($dir)) {
-				var_dump("CREATE DIR: ". $dir);
+				//var_dump("CREATE DIR: ". $dir);
 				mkdir($dir, 0775, true);
 			}
 
-			var_dump($dir.'/'.$aUpdates['image']);
+			//var_dump($dir.'/'.$aUpdates['image']);
 			file_put_contents(UPLOAD_PATH.$aUpdates['image'], fopen(ADMIN_URL.'upload/'.$aUpdates['image'], 'r'));
 		}
 
