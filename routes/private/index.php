@@ -17,5 +17,7 @@ $aConfig = [
 ];
 $router->group($aConfig, function () use ($router) {
     $router->post('/add', 'CitiesAdminController@add');
+    $router->post('/get', 'CitiesAdminController@get');
+    $router->post('/list', 'CitiesAdminController@list');
     $router->post('/update', 'CitiesAdminController@update');
 });
