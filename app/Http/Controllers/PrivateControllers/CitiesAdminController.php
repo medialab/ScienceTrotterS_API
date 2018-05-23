@@ -41,6 +41,7 @@ class CitiesAdminController extends CitiesController
 			}
 
 			var_dump($dir.'/'.$aUpdates['image']);
+			var_dump(ADMIN_URL.'upload/'.$aUpdates['image']);
 			file_put_contents(UPLOAD_PATH.$aUpdates['image'], fopen(ADMIN_URL.'upload/'.$aUpdates['image'], 'r'));
 		}
 
