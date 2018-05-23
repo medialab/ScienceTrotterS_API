@@ -57,8 +57,13 @@ class UsersController extends Controller
 		}
 
 	    if($request->input('password') === $user->password){
-			// Si un token existe déjà on le supprime
-	    	$this->logout($request);
+			
+			// Si un token existe déjà on le remplace
+			$token = UsersToken::generateToken($user, $tokenMdl);
+			$tokenMdl = UsersToken::getFromHeader($request):
+			if (!$tokenMdl) {
+				$tokenMdl = new UsersToken();
+			}
 
 			/*$token = false;
 			if (!empty($auth)) {
@@ -69,7 +74,6 @@ class UsersController extends Controller
 	    		}
 			}*/
 
-			$token = UsersToken::generateToken($user, $tokenMdl);
 
 			return response()->json(['status' => true,'token' => $token]);
 		}
