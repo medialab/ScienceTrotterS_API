@@ -9,8 +9,31 @@ use App\Models\Cities;
 
 class CitiesAdminController extends CitiesController
 {
-	public function list(Request $oRequest)
-	{
+	/**
+	 * Télécharge l'image de la ville depuis le serveur d'Admin
+	 * @param  String $sName Nom de l'image
+	 */
+	private function downloadImage($sName) {
+		/* On crée le dossier de l'image */
+		$dir = dirname(UPLOAD_PATH.$sName);
+		if (!is_dir($dir)) {
+			var_dump("CREATE DIR: ". $dir);
+			mkdir($dir, 0775, true);
+		}
+
+		/* Url De téléchargement de l'image */
+		$imgUrl = ADMIN_URL.'upload/'.$sName;
+
+		/* si l'image existe on la remplace */
+		$sPath = UPLOAD_PATH.$sName;
+		if (file_exists($sPath)) {
+			unlink($sPath);
+		}
+
+		file_put_contents($sPath, fopen($imgUrl, 'r'));
+	}
+
+	public function list(Request $oRequest) {
 		$aCities = Cities::take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
 		return $this->sendResponse($aCities->toArray(), null);
 	}
@@ -27,35 +50,23 @@ class CitiesAdminController extends CitiesController
 		$aUpdates = [];
 		$aData = $oRequest->input('data');
 		foreach ($aData as $key => $value) {
+			/* Données à Ignorer lors de l'update */
 			if (in_array($key, ['id', 'created_at', 'updated_at'])) {
 				continue;
 			}
 			elseif ($key === 'image' && empty($value)) {
 				continue;
 			}
+
 			$aUpdates[$key] = $value;
 		}
 
-		if (empty($aUpdates['image']) || empty($aUpdates['geoloc'])) {
+		/* La ville ne peut être activée que si tout les champs sont remplis */
+		if (empty($aUpdates['geoloc']) || (empty($aUpdates['image']) && empty($oCity->image))) {
 			$aUpdates['state'] = false;
 		}
 		elseif(!empty($aUpdates['image'])) {
-			$dir = dirname(UPLOAD_PATH.$aUpdates['image']);
-			if (!is_dir($dir)) {
-				var_dump("CREATE DIR: ". $dir);
-				mkdir($dir, 0775, true);
-			}
-
-			$imgUrl = ADMIN_URL.'upload/'.$aUpdates['image'];
-			var_dump(UPLOAD_PATH.$aUpdates['image']);
-			var_dump($imgUrl);
-
-			$sPath = UPLOAD_PATH.$aUpdates['image'];
-			if (file_exists($sPath)) {
-				unlink($sPath);
-			}
-
-			file_put_contents($sPath, fopen($imgUrl, 'r'));
+			$this->downloadImage($aUpdates['image']);
 		}
 
 		if ($oCity->update($aUpdates)) {
@@ -77,8 +88,12 @@ class CitiesAdminController extends CitiesController
 		$oCity->label = $aData['label'];
 		$oCity->save();
 
+		/* La ville ne peut être activée que si tout les champs sont remplis */
 		if (empty($aData['image']) || empty($aData['geoloc'])) {
 			$aData['state'] = false;
+		}
+		elseif (!empty($aData['image'])) {
+			$this->downloadImage($aData['image']);
 		}
 
 		if ($oCity->update($aData)) {
