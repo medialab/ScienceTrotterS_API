@@ -21,6 +21,8 @@ class AuthMiddleware extends Controller
 
     public function handle(Request $oRequest, Closure $oNext)
     {
+        var_dump("LOOOOOOOOL");
+        exit;
 		$auth = $oRequest->header("Authorization");
     	if (!$auth) {
     		// var_dump("No Auth Header");
