@@ -53,6 +53,7 @@ class CitiesAdminController extends CitiesController
 		}
 
 		$oCity = new Cities;
+		$oCity->state = false;
 		$oCity->label = $aData['label'];
 		$oCity->save();
 
