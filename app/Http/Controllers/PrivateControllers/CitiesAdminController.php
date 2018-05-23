@@ -53,7 +53,7 @@ class CitiesAdminController extends CitiesController
 		$oCity->label = $aData['label'];
 		$oCity->save();
 
-		if (empty($aData['image']) || empty($aData['geoloc']))) {
+		if (empty($aData['image']) || empty($aData['geoloc'])) {
 			$aData['state'] = false;
 		}
 
