@@ -24,26 +24,26 @@ class UserAuthMiddleware extends Controller
 		$auth = $oRequest->header("Authorization");
     	if (!$auth) {
     		// var_dump("No Auth Header");
-    		return response()->json(['error' => 'Unauthorized'], 401);
+    		return response()->json(['error' => 'No Token Specified'], 401);
     	}
 
     	// var_dump($auth);
     	$token = (new TokenParser())->parse($auth);    	
     	if (!$token) {
     		// var_dump("Bad Token");
-    		return response()->json(['error' => 'Unauthorized'], 401);
+    		return response()->json(['error' => 'Bad Token'], 401);
     	}
 
 		$tokenMdl = UsersToken::where('key', $auth)->first();
 		if (!$tokenMdl) {
     		// var_dump("Token Not Registerd");
-			return response()->json(['error' => 'Unauthorized'], 401);
+			return response()->json(['error' => 'Token Not Found'], 401);
 		}
 
 		$user = Users::where('id', $tokenMdl->user)->first();
 		if (!$user) {
     		// var_dump("No User Found");
-			return response()->json(['error' => 'Unauthorized'], 401);
+			return response()->json(['error' => 'User Not Found'], 401);
 		}
 
     	$validationData = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
