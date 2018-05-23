@@ -59,7 +59,7 @@ class CitiesAdminController extends CitiesController
 		}
 
 		if ($oCity->update($aUpdates)) {
-			return $this->sendResponse([$oCity], null);
+			return $this->sendResponse($oCity, null);
 		}
 
 		return $this->sendError('Fail To Query Update', ['Fail To Query Update'], 400);
@@ -82,7 +82,7 @@ class CitiesAdminController extends CitiesController
 		}
 
 		if ($oCity->update($aData)) {
-			return $this->sendResponse([$oCity], null);
+			return $this->sendResponse($oCity, null);
 		}
 
 		return $this->sendError('Fail To Query Insert', ['Fail To Query Insert'], 400);
