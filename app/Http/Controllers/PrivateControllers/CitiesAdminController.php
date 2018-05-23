@@ -40,7 +40,7 @@ class CitiesAdminController extends CitiesController
 				mkdir($dir, 0775, true);
 			}
 
-			var_dump($dir.'/'.$aUpdates['image']);
+			var_dump(UPLOAD_PATH.$aUpdates['image']);
 			var_dump(ADMIN_URL.'upload/'.$aUpdates['image']);
 
 			$sPath = UPLOAD_PATH.$aUpdates['image'];
