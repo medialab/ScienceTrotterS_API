@@ -30,7 +30,7 @@ class CitiesAdminController extends CitiesController
 			$aUpdates[$key] = $value;
 		}
 
-		if (empty($aUpdates['image']) || empty($aUpdates['geoloc']))) {
+		if (empty($aUpdates['image']) || empty($aUpdates['geoloc'])) {
 			$aUpdates['state'] = false;
 		}
 
