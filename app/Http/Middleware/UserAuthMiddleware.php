@@ -54,7 +54,7 @@ class UserAuthMiddleware extends Controller
 
     	//var_dump("Generated ID: ".UsersToken::idfyUser($user));
 
-    	if (true/* || $token->isExpired()*/) {
+    	if ($token->isExpired()) {
     		// var_dump("Token Expired");
             $tokenMdl->delete();
             return response()->json(['error' => 'Token Expired'], 440);
