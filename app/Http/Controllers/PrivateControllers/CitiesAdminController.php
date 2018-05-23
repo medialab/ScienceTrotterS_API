@@ -33,6 +33,9 @@ class CitiesAdminController extends CitiesController
 		if (empty($aUpdates['image']) || empty($aUpdates['geoloc'])) {
 			$aUpdates['state'] = false;
 		}
+		elseif(!empty($aUpdates['image'])) {
+			file_put_contents(UPLOAD_PATH, fopen(ADMIN_URL.'upload/'.$aUpdates['image'], 'r'));
+		}
 
 		if ($oCity->update($aUpdates)) {
 			return $this->sendResponse(['data' => $oCity], null);

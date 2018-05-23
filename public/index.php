@@ -6,6 +6,8 @@ ini_set('xdebug.var_display_max_data', -1);
 ini_set('xdebug.var_display_max_depth', -1);
 ini_set('xdebug.var_display_max_children', -1);
 
+define(ADIM_URL, 'https://admin-sts.actu.com/');
+define(UPLOAD_PATH, realpath('.').'/ressources/upload/');
 
 /*
 |--------------------------------------------------------------------------
