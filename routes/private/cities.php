@@ -5,3 +5,4 @@ $router->get('/list', 'CitiesAdminController@list');
 
 $router->post('/add', 'CitiesAdminController@insert');
 $router->post('/update', 'CitiesAdminController@update');
+$router->post('/delete', 'CitiesAdminController@delete');

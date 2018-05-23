@@ -87,4 +87,20 @@ class CitiesAdminController extends CitiesController
 
 		return $this->sendError('Fail To Query Insert', ['Fail To Query Insert'], 400);
 	}
+
+	public function delete(Request $oRequest) {
+		$this->validate($request, [
+			'id' => 'required',
+		]);
+
+		$id = $oRequest->input('id');
+
+		$oCity = Cities::where('id', $id);
+
+		if ($oCity->delete()) {
+			return $this->sendResponse(true, null);
+		}
+
+		return $this->sendError('Fail To Query Delete', ['Fail To Query Delete'], 400);
+	}
 }
