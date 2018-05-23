@@ -40,15 +40,16 @@ class CitiesAdminController extends CitiesController
 				mkdir($dir, 0775, true);
 			}
 
+			$imgUrl = ADMIN_URL.'upload/'.$aUpdates['image'];
 			var_dump(UPLOAD_PATH.$aUpdates['image']);
-			var_dump(ADMIN_URL.'upload/'.$aUpdates['image']);
+			var_dump($imgUrl);
 
 			$sPath = UPLOAD_PATH.$aUpdates['image'];
 			if (file_exists($sPath)) {
 				unlink($sPath);
 			}
-			
-			file_put_contents($sPath, fopen(ADMIN_URL.'upload/'.$aUpdates['image'], 'r'));
+
+			file_put_contents($sPath, fopen($imgUrl, 'r'));
 		}
 
 		if ($oCity->update($aUpdates)) {
