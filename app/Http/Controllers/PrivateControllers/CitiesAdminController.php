@@ -47,8 +47,13 @@ class CitiesAdminController extends CitiesController
 
 	public function insert(Request $oRequest) {
 		$aData = $oRequest->input('data');
+
+		if (empty($aData['label'])) {
+			return $this->sendError('Error: Missing City Label', ['Error: Missing City Label'], 400);
+		}
+
 		$oCity = new Cities;
-		
+		$oCity->label = $aData['label'];
 		$oCity->save();
 
 		if ($oCity->update($aData)) {
