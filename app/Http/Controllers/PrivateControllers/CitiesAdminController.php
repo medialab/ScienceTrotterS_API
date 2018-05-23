@@ -24,22 +24,18 @@ class CitiesAdminController extends CitiesController
 			if (in_array($key, ['id', 'created_at', 'updated_at'])) {
 				continue;
 			}
-/*
-			if (!property_exists($oCity, $key)) {
-				$aErrors = ['Bad Property: '.$key];
+			elseif ($key === 'image' && empty($value)) {
 				continue;
-			}*/
-
+			}
 			$aUpdates[$key] = $value;
 		}
-/*
-		if (!empty($aErrors)) {
-			var_dump(get_class_vars($oCity));
-			return $this->sendError('Fail To Update', $aErrors, 400);
+
+		if (empty($aUpdates['image']) || empty($aUpdates['geoloc']))) {
+			$aUpdates['state'] = false;
 		}
-*/
+
 		if ($oCity->update($aUpdates)) {
-			return $this->sendResponse([], null);
+			return $this->sendResponse(['data' => $oCity], null);
 		}
 
 		return $this->sendError('Fail To Query Update', ['Fail To Query Update'], 400);
@@ -57,8 +53,12 @@ class CitiesAdminController extends CitiesController
 		$oCity->label = $aData['label'];
 		$oCity->save();
 
+		if (empty($aData['image']) || empty($aData['geoloc']))) {
+			$aData['state'] = false;
+		}
+
 		if ($oCity->update($aData)) {
-			return $this->sendResponse(['id' => $oCity->id], null);
+			return $this->sendResponse(['data' => $oCity], null);
 		}
 
 		return $this->sendError('Fail To Query Insert', ['Fail To Query Insert'], 400);
