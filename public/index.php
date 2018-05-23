@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === "OPTIONS") {
     header('Access-Control-Max-Age: 604800');
     //if you need special headers
     header('Access-Control-Allow-Headers: Authorization');
+    exit;
 }
 
 /*
