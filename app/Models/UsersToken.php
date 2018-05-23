@@ -69,7 +69,10 @@ class UsersToken extends Model
 	public static function getFromHeader($request) {
 		$auth = $request->header("Authorization");
     	if (!$auth) {
-    		return false;
+			$auth = $request->input("token");
+	    	if (!$auth) {
+	    		return false;
+	    	}
     	}
 
     	$token = (new TokenParser())->parse($auth);
