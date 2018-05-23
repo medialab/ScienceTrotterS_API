@@ -34,7 +34,7 @@ class UserAuthMiddleware extends Controller
     		return response()->json(['error' => 'Unauthorized'], 401);
     	}
 
-		$tokenMdl = UsersToken::where('user', $token->getClaim('uid'))->first();
+		$tokenMdl = UsersToken::where('key', $auth)->first();
 		if (!$tokenMdl) {
     		// var_dump("Token Not Registerd");
 			return response()->json(['error' => 'Unauthorized'], 401);
@@ -54,15 +54,17 @@ class UserAuthMiddleware extends Controller
 
     	// var_dump("Generated ID: ".UsersToken::idfyUser($user));
 
-    	if (!$token->validate($validationData)) {
-    		// var_dump("Bad Token");
-    		return response()->json(['error' => 'Invalid Token'], 401);
-    	}
-
-    	if ($token->isExpired()) {
+    	if (true || $token->isExpired()) {
     		// var_dump("Token Expired");
-    		return response()->json(['error' => 'Token Expired'], 401);
-    	}
+            $tokenMdl->delete();
+            return response()->json(['error' => 'Token Expired'], 440);
+        }
+
+        if (!$token->validate($validationData)) {
+            // var_dump("Bad Token");
+            $tokenMdl->delete();
+            return response()->json(['error' => 'Invalid Token'], 401);
+        }
 
 		return $oNext($oRequest);
     }
