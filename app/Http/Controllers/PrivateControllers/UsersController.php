@@ -60,7 +60,7 @@ class UsersController extends Controller
 			
 			// Si un token existe déjà on le remplace
 			$token = UsersToken::generateToken($user, $tokenMdl);
-			$tokenMdl = UsersToken::getFromHeader($request):
+			$tokenMdl = UsersToken::getFromHeader($request);
 			if (!$tokenMdl) {
 				$tokenMdl = new UsersToken();
 			}
