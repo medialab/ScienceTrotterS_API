@@ -89,7 +89,7 @@ class CitiesAdminController extends CitiesController
 	}
 
 	public function delete(Request $oRequest) {
-		$this->validate($request, [
+		$this->validate($oRequest, [
 			'id' => 'required',
 		]);
 
