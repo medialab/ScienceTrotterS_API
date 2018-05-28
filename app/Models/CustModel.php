@@ -113,21 +113,22 @@ class CustModel extends Model
         $aResult = [];
         $sLang = $this->sCurLang;
 
-        foreach ($this->attribues as $sVar) {
+        var_dump($this->attributes);
+        foreach ($this->attributes as $sVar) {
             if (in_array($sVar, $this->hidden)) {
                 continue;
             }
 
             if ($sLang) {
                 if (in_array($sVar, $this->aTranslateVars)) {
-                    $aResult[$sVar] = $this->attribues[$sVar][$sLang];
+                    $aResult[$sVar] = $this->attributes[$sVar][$sLang];
                 }
                 else{
-                    $aResult[$sVar] = $this->attribues[$sVar];
+                    $aResult[$sVar] = $this->attributes[$sVar];
                 }
             }
             else{
-                $aResult[$sVar] = $this->attribues[$sVar];
+                $aResult[$sVar] = $this->attributes[$sVar];
             }
         }
 
