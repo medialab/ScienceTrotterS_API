@@ -30,7 +30,7 @@ class ParcoursController extends Controller
 			}
 		}
 		else{
-			$oParcours = Parcours->take($limit)->skip($skip)->get();
+			$oParcours = Parcours::take($limit)->skip($skip)->get();
 		}
 
 		return $this->sendResponse($oParcours->toArray(), null)->content();
