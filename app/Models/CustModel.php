@@ -110,7 +110,13 @@ class CustModel extends Model
     }
 
     public function toArray() {
-        var_dump("test");
-        exit;
+        if ($this->sCurLang) {
+            $sLang = $this->sCurLang;
+            foreach ($this->aTranslateVars as $svar) {
+                $this->attribues[$sVar] = $this->attribues[$sVar][$sLang];
+            }
+        }
+
+        return Parent::toArray();
     }
 }
