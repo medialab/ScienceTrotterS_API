@@ -15,6 +15,8 @@ class Parcours extends CustModel
 
     protected $fillable = ['title','time','audio','description', 'city_id', 'state'];
 
+    protected $aTranslateVars = ['title','time','audio','description'];
+
     public static function getByCity($city_id) {
     	$aParcours = Self::where(['city_id', '=', $city_id], ['state', '=', true]);
 
