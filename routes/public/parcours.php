@@ -13,15 +13,17 @@ class ParcoursController extends Controller
 		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		
 		//$aParcours = Parcours::take(10)->get();
-		$oParcours = Parcours::take(10)->first();
+		$oParcours = Parcours::take(10)->get();
+
+		$sLang = empty($GET['lang']) ? : false : $GET['lang'];
 
 		var_dump($oParcours);
-		var_dump($oParcours->title);
+		/*var_dump($oParcours->title);
 		var_dump($oParcours->setLang('fr'));
 		var_dump($oParcours->title);
 		var_dump($oParcours->setLang('en'));
 		var_dump($oParcours->title);
-		var_dump($oParcours->setLang());
+		var_dump($oParcours->setLang());*/
 		exit;
 
 		return $this->sendResponse($aParcours->toArray(), null)->content();
