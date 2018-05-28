@@ -15,7 +15,7 @@ class ParcoursController extends Controller
 		//$aParcours = Parcours::take(10)->get();
 		$oParcours = Parcours::take(10)->get();
 
-		$sLang = empty($GET['lang']) ? : false : $GET['lang'];
+		$sLang = empty($GET['lang']) ? false : $GET['lang'];
 
 		var_dump($oParcours);
 		/*var_dump($oParcours->title);
