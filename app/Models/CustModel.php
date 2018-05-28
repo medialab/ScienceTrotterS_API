@@ -115,7 +115,6 @@ class CustModel extends Model
         $aResult = [];
         $sLang = $this->sCurLang;
 
-        var_dump($this->attributes);
         foreach ($this->attributes as $sVar => $value) {
             if (in_array($sVar, $this->hidden)) {
                 continue;
