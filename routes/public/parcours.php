@@ -24,7 +24,7 @@ class ParcoursController extends Controller
 
 		$sLang = $oRequest->input('lang');
 		if ($sLang) {
-			$oParcours = Parcours::where('state->'.$sLang, true)->take($limit)->skip($skip)->get();
+			$oParcours = Parcours::where('state->'.$sLang, 'true')->take($limit)->skip($skip)->get();
 
 			foreach ($oParcours as $key => &$oParc) {
 				$oParc->setLang($sLang);
