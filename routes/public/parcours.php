@@ -46,6 +46,7 @@ class ParcoursController extends Controller
 
 $router->get('/list', function() {
 	$ctrl = new ParcoursController();
+	header('Content-Type: application/json');
 	echo ($ctrl->list());
 	exit;
 });
@@ -55,6 +56,7 @@ $router->get('/{id:[a-z0-9-]+}', function() {
 	$arr = explode('/', $_SERVER['REQUEST_URI']);
 	$id = $arr[count($arr)-1];
 
+	header('Content-Type: application/json');
 	echo ($ctrl->get($id));
 	exit;
 });
