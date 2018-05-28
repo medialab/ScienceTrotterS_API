@@ -13,7 +13,7 @@ class ParcoursController extends Controller
 		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		
 		//$aParcours = Parcours::take(10)->get();
-		var_dump("TEST: ", RequestO::instance());
+		var_dump("TEST: ", Request::instance());
 		$oParcours = Parcours::take(10)->first();
 /*
 		$sLang = empty($_GET['lang']) ? false : $_GET['lang'];
