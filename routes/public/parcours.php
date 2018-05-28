@@ -29,10 +29,10 @@ class ParcoursController extends Controller
 		var_dump($oParcours->setLang('en'));
 		var_dump($oParcours->title);
 		var_dump($oParcours->setLang());*/
-		var_dump($aParcours->toArray());
+		var_dump($oParcours->toArray());
 		exit;
 
-		return $this->sendResponse($aParcours->toArray(), null)->content();
+		return $this->sendResponse($oParcours->toArray(), null)->content();
 	}
 
 	public function get($id) {
