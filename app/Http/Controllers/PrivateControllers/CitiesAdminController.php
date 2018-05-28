@@ -62,7 +62,7 @@ class CitiesAdminController extends CitiesController
 		}
 
 		/* La ville ne peut être activée que si tout les champs sont remplis */
-		if (empty($aUpdates['geoloc']) || (empty($aUpdates['image']) && empty($oCity->image))) {
+		if (empty($aUpdates['geoloc']) || empty($aUpdates['image']) && empty($oCity->image)) {
 			$aUpdates['state'] = false;
 		}
 		elseif(!empty($aUpdates['image']) && $aUpdates['image'] !== $oCity->image) {
