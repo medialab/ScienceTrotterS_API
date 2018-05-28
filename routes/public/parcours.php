@@ -4,7 +4,7 @@ use App\Utils\RequestUtil as Request;
 use App\Utils\ValidatorUtil as Validator;
 use App\Models\Parcours;
 
-use Illuminate\Http\Request as Request;
+use Illuminate\Http\Request as RequestO;
 
 class ParcoursController extends Controller
 {
@@ -13,7 +13,7 @@ class ParcoursController extends Controller
 		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		
 		//$aParcours = Parcours::take(10)->get();
-		var_dump("TEST: ", Request::instance());
+		var_dump("TEST: ", RequestO::instance());
 		$oParcours = Parcours::take(10)->first();
 /*
 		$sLang = empty($_GET['lang']) ? false : $_GET['lang'];
