@@ -12,7 +12,13 @@ class ParcoursController extends Controller
 	public function list(Request $oRequest)
 	{
 		//$aParcours = Parcours::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
-		$aParcours = Parcours::take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
+		
+		$limit = $oRequest->input('limit');
+		$skip = $oRequest->input('skip');
+
+		$limit = 10;
+		$skip = 0;
+		$aParcours = Parcours::take($limit)->skip($skip)->get();
 
 		var_dump($aParcours->toArray());
 		exit;
