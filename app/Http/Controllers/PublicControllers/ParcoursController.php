@@ -11,8 +11,8 @@ class ParcoursController extends Controller
 {
 	public function list(Request $oRequest)
 	{
-		$aParcours = Parcours::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
-//		$aParcours = Parcours::take((int)$oRequest->input('limit'))->skip((int)$oRequest->input('offset'))->get();
+		//$aParcours = Parcours::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
+		$aParcours = Parcours::take((int)$oRequest->input('limit'))->skip((int)$oRequest->input('offset'))->get();
 
 		var_dump($aParcours->toArray());
 		exit;
