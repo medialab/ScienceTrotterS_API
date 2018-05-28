@@ -147,6 +147,6 @@ class CustModel extends Model
             }
         }
 
-        return $ares;
+        return $aResult;
     }
 }
