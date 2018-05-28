@@ -17,7 +17,10 @@ class ParcoursController extends Controller
 
 		$sLang = empty($GET['lang']) ? false : $GET['lang'];
 
-		var_dump($oParcours);
+		foreach ($oParcours as $key => &$oParc) {
+			var_dump($key);
+			var_dump($oParc);
+		}
 		/*var_dump($oParcours->title);
 		var_dump($oParcours->setLang('fr'));
 		var_dump($oParcours->title);
