@@ -10,36 +10,28 @@ class ParcoursController extends Controller
 {
 	public function list()
 	{
-		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
+		$oRequest = Request::capture();
 		
-		//$aParcours = Parcours::take(10)->get();
-		var_dump("TEST: ", Request::capture()->input('limit'));
-		$oParcours = Parcours::take(10)->first();
-/*
-		$sLang = empty($_GET['lang']) ? false : $_GET['lang'];
-		var_dump($_GET);
+		$limit = (int)$oRequest->input('limit');
+		if (!$limit) {
+			$limit = false;
+		}
+		
+		$skip = (int)$oRequest->input('skip');
+		if (!$skip) {
+			$skip = false;
+		}
 
 		if ($sLang) {
+			$oParcours = Parcours::where('state->'.$sLang, true)->take($limit)->skip($skip)->get();
+
 			foreach ($oParcours as $key => &$oParc) {
 				$oParc->setLang($sLang);
-				var_dump($oParc->title);
 			}
-		}*/
-
-
-		var_dump($oParcours->title);
-		$oParcours->setLang('fr');
-		var_dump($oParcours->title);
-		
-		$oParcours->title = "TESTING";
-		var_dump($oParcours->title);
-		$oParcours->setLang();
-		var_dump($oParcours->title);
-
-		$oParcours->setLang('en');
-		var_dump($oParcours->title);
-		$oParcours->setLang();
-		exit;
+		}
+		else{
+			$oParcours = Parcours->take($limit)->skip($skip)->get();
+		}
 
 		return $this->sendResponse($oParcours->toArray(), null)->content();
 	}
