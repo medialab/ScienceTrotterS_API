@@ -10,28 +10,29 @@ class CustModel extends Model
     protected $aTranslateVars = [];
 
     function __get($sVar) {
-        if (in_array($sVar, $this->aTranslateVars)) {
-            $var = $this->$sVar;
+        if (array_key_exists($sVar, $this->attributes)) {
+            if (in_array($sVar, $this->aTranslateVars)) {
+                $var = $this->attributes[$sVar];
 
-            if (is_string($var)) {
-                $var = json_decode($var);
-                if (!is_null($var)) {
-                    return null;
+                if (is_string($var)) {
+                    $var = json_decode($var);
+                    if (!is_null($var)) {
+                        return null;
+                    }
+
+                    $this->attributes[$sVar] = $var;
                 }
 
-                $this->$sVar = $var;
-            }
+                if ($this->sCurLang) {
+                    $sLang = $this->sCurLang;
+                    return empty($var->$sLang) ? null : $var->$sLang;
+                }
 
-            if ($this->sCurLang) {
-                $sLang = $this->sCurLang;
-                return empty($var->$sLang) ? null : $var->$sLang;
+                return $var;
             }
-
-            return $var;
         }
-        else{
-            return empty($this->$sVar) ? null : $this->$sVar;
-        }
+        
+        return empty($this->$sVar) ? null : $this->$sVar;
     }
 
     private function setValueByLang($sVar, $value) {
