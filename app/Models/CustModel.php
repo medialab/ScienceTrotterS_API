@@ -125,7 +125,7 @@ class CustModel extends Model
                         $value = json_decode($value);
                     }
 
-                    if (empty($value)) {
+                    if (empty($value) || empty($value->$sLang)) {
                         $value = null;
                     }
                     else{
