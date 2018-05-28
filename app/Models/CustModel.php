@@ -112,7 +112,7 @@ class CustModel extends Model
     public function toArray() {
         if ($this->sCurLang) {
             $sLang = $this->sCurLang;
-            foreach ($this->aTranslateVars as $svar) {
+            foreach ($this->aTranslateVars as $sVar) {
                 $this->attribues[$sVar] = $this->attribues[$sVar][$sLang];
             }
         }
