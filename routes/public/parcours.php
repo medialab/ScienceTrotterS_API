@@ -4,16 +4,16 @@ use App\Utils\RequestUtil as Request;
 use App\Utils\ValidatorUtil as Validator;
 use App\Models\Parcours;
 
+use Illuminate\Http\Request as Request;
 
 class ParcoursController extends Controller
 {
-	public function list($request)
+	public function list()
 	{
 		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		
 		//$aParcours = Parcours::take(10)->get();
-		var_dump("TEST: ", $request->input('limit'));
-		exit;
+		var_dump("TEST: ", Request::instance());
 		$oParcours = Parcours::take(10)->first();
 /*
 		$sLang = empty($_GET['lang']) ? false : $_GET['lang'];
@@ -51,8 +51,8 @@ class ParcoursController extends Controller
 	}
 }
 
-$router->get('/list', function() use ($router) {
-	$ctrl = new ParcoursController($router);
+$router->get('/list', function($request) {
+	$ctrl = new ParcoursController($request);
 	echo ($ctrl->list($router));
 	exit;
 });
