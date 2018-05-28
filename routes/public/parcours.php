@@ -15,6 +15,7 @@ class ParcoursController extends Controller
 		//$aParcours = Parcours::take(10)->get();
 		$oParcours = Parcours::take(10)->first();
 
+		var_dump($oParcours);
 		var_dump($oParcours->title);
 		var_dump($oParcours->setLang('fr'));
 		var_dump($oParcours->title);
