@@ -66,6 +66,7 @@ class CitiesAdminController extends CitiesController
 			var_dump("GEO: ", empty($aUpdates['geoloc']));
 			var_dump("UPD IMG: ", empty($aUpdates['image']));
 			var_dump("CITY IMG: ", empty($oCity->image));
+			exit;
 
 			$aUpdates['state'] = false;
 		}
