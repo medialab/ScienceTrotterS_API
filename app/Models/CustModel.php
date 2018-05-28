@@ -10,7 +10,7 @@ class CustModel extends Model
     protected $aTranslateVars = [];
 
     function __get($sVar) {
-        if (in_array($sVar, $this->$aTranslateVars)) {
+        if (in_array($sVar, $this->aTranslateVars)) {
             $var = $this->$sVar;
 
             if (is_string($var)) {
@@ -79,7 +79,7 @@ class CustModel extends Model
     }
 
     function __set($sVar, $value) {
-        if (in_array($sVar, $this->$aTranslateVars)) {
+        if (in_array($sVar, $this->aTranslateVars)) {
             $var = $this->$sVar;
             
             if ($this->sCurLang) {
