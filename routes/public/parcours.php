@@ -10,7 +10,11 @@ class ParcoursController extends Controller
 	public function list()
 	{
 		global $GET;
-		$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
+		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
+		
+		$aParcours = Parcours::take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
+		var_dump($aParcours);
+		exit;
 		return $this->sendResponse($aParcours->toArray(), null)->content();
 	}
 
