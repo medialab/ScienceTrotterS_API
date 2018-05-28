@@ -10,6 +10,9 @@ class CustModel extends Model
     protected $aTranslateVars = [];
 
     function __get($sVar) {
+        var_dump("Variable: ".$sVar);
+        var_dump("Attrs: ", $this->attributes);
+
         if (array_key_exists($sVar, $this->attributes)) {
             if (in_array($sVar, $this->aTranslateVars)) {
                 $var = $this->attributes[$sVar];
