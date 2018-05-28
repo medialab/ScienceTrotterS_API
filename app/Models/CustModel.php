@@ -108,4 +108,9 @@ class CustModel extends Model
     public function setLang($l = false) {
         $this->sCurLang = $l;
     }
+
+    public function toArray() {
+        var_dump("test");
+        exit;
+    }
 }
