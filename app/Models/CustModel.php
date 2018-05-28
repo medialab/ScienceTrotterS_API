@@ -14,8 +14,12 @@ class CustModel extends Model
         var_dump("Attrs: ", $this->attributes);
 
         if (array_key_exists($sVar, $this->attributes)) {
+            var_dump("SQL VAR");
             if (in_array($sVar, $this->aTranslateVars)) {
+                var_dump("TRANSLATE VAR");
+                
                 $var = $this->attributes[$sVar];
+                var_dump("Cur Value: ", $var);
 
                 if (is_string($var)) {
                     $var = json_decode($var);
