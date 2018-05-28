@@ -22,11 +22,14 @@ class CustModel extends Model
                 var_dump("Cur Value: ", $var);
 
                 if (is_string($var)) {
+                    var_dump("Décoding Cur Value");
                     $var = json_decode($var);
                     if (!is_null($var)) {
+                        var_dump("Fail To Décode");
                         return null;
                     }
 
+                    var_dump("Décoded: ", $var);
                     $this->attributes[$sVar] = $var;
                 }
 
