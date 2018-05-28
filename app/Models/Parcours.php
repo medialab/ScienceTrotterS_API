@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\CustModel;
+use Illuminate\Database\Eloquent\Model;
 
-class Parcours extends Model
+class Parcours extends CustModel
 {
 	public $timestamps = true;
     protected $table = 'parcours2';
