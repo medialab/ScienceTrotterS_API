@@ -93,4 +93,8 @@ class CustModel extends Model
             $this->$sVar = $value;
         }
     }
+
+    public function setLang($l = false) {
+        $this->sCurLang = $l;
+    }
 }
