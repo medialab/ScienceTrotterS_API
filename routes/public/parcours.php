@@ -22,6 +22,7 @@ class ParcoursController extends Controller
 			$skip = false;
 		}
 
+		$sLang = (int)$oRequest->input('lang');
 		if ($sLang) {
 			$oParcours = Parcours::where('state->'.$sLang, true)->take($limit)->skip($skip)->get();
 
