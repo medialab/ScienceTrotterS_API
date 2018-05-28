@@ -9,15 +9,14 @@ class ParcoursController extends Controller
 {
 	public function list()
 	{
-		global $GET;
 		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		
 		//$aParcours = Parcours::take(10)->get();
 		$oParcours = Parcours::take(10)->get();
 
-		$sLang = empty($GET['lang']) ? false : $GET['lang'];
-		var_dump($GET);
-		
+		$sLang = empty($_GET['lang']) ? false : $_GET['lang'];
+		var_dump($_GET);
+
 		if ($sLang) {
 			foreach ($oParcours as $key => &$oParc) {
 				$oParc->setLang($sLang);
