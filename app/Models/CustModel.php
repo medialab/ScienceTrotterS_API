@@ -24,7 +24,7 @@ class CustModel extends Model
                 if (is_string($var)) {
                     var_dump("Décoding Cur Value");
                     $var = json_decode($var);
-                    if (!is_null($var)) {
+                    if (is_null($var)) {
                         var_dump("Fail To Décode");
                         return null;
                     }
