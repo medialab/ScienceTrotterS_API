@@ -47,7 +47,7 @@ class CustModel extends Model
 
     private function setValueByLang($sVar, $value) {
         $sLang = $this->sCurLang;
-        $var = $this->$sVar;
+        $var = $this->attributes[$sVar];
         
         if (empty($value)) {
             $value = '';
@@ -65,10 +65,12 @@ class CustModel extends Model
         }
 
         $var->$sLang = $value;
-        $this->$sVar = $var;
+        $this->attributes[$sVar] = $var;
     }
 
     private function setValueAsJson($sVar, $value) {        
+        $var = $this->attributes[$sVar];
+
         if (empty($value)) {
             $var = new StdClass;
         }
@@ -86,7 +88,7 @@ class CustModel extends Model
             throw new Exception("Error: Can't Set Parcours::$sVar Due to Invalid Data Type. Accepted StdClass, Array, String (json) OR null", 1);
         }
 
-        $this->$sVar = $var;
+        $this->attributes[$sVar] = $var;
     }
 
     function __set($sVar, $value) {
@@ -119,8 +121,8 @@ class CustModel extends Model
                 continue;
             }
 
-            if ($sLang) {
-                if (in_array($sVar, $this->aTranslateVars)) {
+            if (in_array($sVar, $this->aTranslateVars)) {
+                if ($sLang) {
                     if (is_string($value)) {
                         $value = json_decode($value);
                     }
@@ -133,6 +135,10 @@ class CustModel extends Model
                     }
                 }
                 else{
+                    if (is_string($value)) {
+                        $value = json_decode($value);
+                    }
+
                     $aResult[$sVar] = $value;
                 }
             }
@@ -141,8 +147,6 @@ class CustModel extends Model
             }
         }
 
-        var_dump($aResult);
-        exit;
         return $ares;
     }
 }
