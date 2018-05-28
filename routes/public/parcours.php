@@ -12,7 +12,7 @@ class ParcoursController extends Controller
 		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		
 		//$aParcours = Parcours::take(10)->get();
-		var_dump("TEST: ", $request);
+		var_dump("TEST: ", $request->input('limit'));
 		exit;
 		$oParcours = Parcours::take(10)->first();
 /*
