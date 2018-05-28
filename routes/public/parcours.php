@@ -21,6 +21,7 @@ class ParcoursController extends Controller
 		var_dump($oParcours->setLang('en'));
 		var_dump($oParcours->title);
 		var_dump($oParcours->setLang());
+		exit;
 
 		return $this->sendResponse($aParcours->toArray(), null)->content();
 	}
