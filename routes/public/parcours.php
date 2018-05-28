@@ -51,8 +51,8 @@ class ParcoursController extends Controller
 	}
 }
 
-$router->get('/list', function($request) {
-	$ctrl = new ParcoursController($request);
+$router->get('/list', function() {
+	$ctrl = new ParcoursController();
 	echo ($ctrl->list($router));
 	exit;
 });
