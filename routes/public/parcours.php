@@ -16,7 +16,8 @@ class ParcoursController extends Controller
 		$oParcours = Parcours::take(10)->get();
 
 		$sLang = empty($GET['lang']) ? false : $GET['lang'];
-
+		var_dump($GET);
+		
 		if ($sLang) {
 			foreach ($oParcours as $key => &$oParc) {
 				$oParc->setLang($sLang);
