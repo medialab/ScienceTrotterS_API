@@ -7,11 +7,13 @@ use App\Models\Parcours;
 
 class ParcoursController extends Controller
 {
-	public function list()
+	public function list($request)
 	{
 		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		
 		//$aParcours = Parcours::take(10)->get();
+		var_dump("TEST: ", $request);
+		exit;
 		$oParcours = Parcours::take(10)->first();
 /*
 		$sLang = empty($_GET['lang']) ? false : $_GET['lang'];
@@ -26,17 +28,17 @@ class ParcoursController extends Controller
 
 
 		var_dump($oParcours->title);
-		var_dump($oParcours->setLang('fr'));
+		$oParcours->setLang('fr');
 		var_dump($oParcours->title);
 		
 		$oParcours->title = "TESTING";
 		var_dump($oParcours->title);
-		var_dump($oParcours->setLang());
+		$oParcours->setLang();
 		var_dump($oParcours->title);
 
-		var_dump($oParcours->setLang('en'));
+		$oParcours->setLang('en');
 		var_dump($oParcours->title);
-		var_dump($oParcours->setLang());
+		$oParcours->setLang();
 		exit;
 
 		return $this->sendResponse($oParcours->toArray(), null)->content();
@@ -49,9 +51,9 @@ class ParcoursController extends Controller
 	}
 }
 
-$router->get('/list', function() {
-	$ctrl = new ParcoursController();
-	echo ($ctrl->list());
+$router->get('/list', function($request) {
+	$ctrl = new ParcoursController($request);
+	echo ($ctrl->list($router));
 	exit;
 });
 
