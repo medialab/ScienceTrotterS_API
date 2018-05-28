@@ -30,7 +30,7 @@ class CustModel extends Model
             return $var;
         }
         else{
-            return $this->$sVar;
+            return empty($this->$sVar) ? null : $this->$sVar;
         }
     }
 
