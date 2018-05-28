@@ -12,7 +12,7 @@ class ParcoursController extends Controller
 		global $GET;
 		//$aParcours = Parcours::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
 		
-		$aParcours = Parcours::take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
+		$aParcours = Parcours::take(10)->get();
 		var_dump($aParcours->toArray());
 		exit;
 		return $this->sendResponse($aParcours->toArray(), null)->content();
