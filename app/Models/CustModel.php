@@ -10,26 +10,26 @@ class CustModel extends Model
     protected $aTranslateVars = [];
 
     function __get($sVar) {
-        var_dump("Variable: ".$sVar);
-        var_dump("Attrs: ", $this->attributes);
+        //var_dump("Variable: ".$sVar);
+        //var_dump("Attrs: ", $this->attributes);
 
         if (array_key_exists($sVar, $this->attributes)) {
-            var_dump("SQL VAR");
+            //var_dump("SQL VAR");
             if (in_array($sVar, $this->aTranslateVars)) {
-                var_dump("TRANSLATE VAR");
+                //var_dump("TRANSLATE VAR");
                 
                 $var = $this->attributes[$sVar];
-                var_dump("Cur Value: ", $var);
+                //var_dump("Cur Value: ", $var);
 
                 if (is_string($var)) {
-                    var_dump("Décoding Cur Value");
+                    //var_dump("Décoding Cur Value");
                     $var = json_decode($var);
                     if (is_null($var)) {
-                        var_dump("Fail To Décode");
+                        //var_dump("Fail To Décode");
                         return null;
                     }
 
-                    var_dump("Décoded: ", $var);
+                    //var_dump("Décoded: ", $var);
                     $this->attributes[$sVar] = $var;
                 }
 
@@ -114,24 +114,35 @@ class CustModel extends Model
         $sLang = $this->sCurLang;
 
         var_dump($this->attributes);
-        foreach ($this->attributes as $sVar) {
+        foreach ($this->attributes as $sVar => $value) {
             if (in_array($sVar, $this->hidden)) {
                 continue;
             }
 
             if ($sLang) {
                 if (in_array($sVar, $this->aTranslateVars)) {
-                    $aResult[$sVar] = $this->attributes[$sVar][$sLang];
+                    if (is_string($value)) {
+                        $value = json_decode($value);
+                    }
+
+                    if (empty($value)) {
+                        $value = null;
+                    }
+                    else{
+                        $aResult[$sVar] = $value->$sLang;
+                    }
                 }
                 else{
-                    $aResult[$sVar] = $this->attributes[$sVar];
+                    $aResult[$sVar] = $value;
                 }
             }
             else{
-                $aResult[$sVar] = $this->attributes[$sVar];
+                $aResult[$sVar] = $value;
             }
         }
 
+        var_dump($aResult);
+        exit;
         return $ares;
     }
 }
