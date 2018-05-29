@@ -88,6 +88,10 @@ class CitiesAdminController extends CitiesController
 
 		/* La ville ne peut être activée que si tout les champs sont remplis */
 		if (!strlen($oCity->image) || !strlen($oCity->geoloc)) {
+			var_dump("FORCE FALSE STAT");
+			var_dump("IMAGE", strlen($oCity->image));
+			var_dump("GEOLOC", strlen($oCity->geoloc));
+			
 			$oCity->state = false;
 		}
 
