@@ -187,13 +187,18 @@ class CustModel extends Model
     }
 
     public function save(Array $options=[]) {
-        foreach ($this->aTranslateVars as $sVar) {
-            $var = $this->attributes[$sVar];
+        var_dump("PEPARE SAVE");
+        foreach ($this->aTranslateVars as $sVar => &$value) {
+            var_dump("=== $sVar ===");
+            var_dump($value);
             
-            if (!is_string($var)) {
-                $this->attributes[$sVar] = json_encode($this->attributes[$sVar]);
+            if (!is_string($value)) {
+                $value = json_encode($value);
+                var_dump($value);
             }
         }
+        
+        var_dump("DATA TO SAVE", $aResult);
 
         return Parent::save($options);
     }
