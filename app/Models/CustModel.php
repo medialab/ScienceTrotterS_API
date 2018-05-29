@@ -182,7 +182,7 @@ class CustModel extends Model
         return $aResult;
     }
 
-    public function save($options) {
+    public function save(Array $options = [])) {
         foreach ($this->aTranslateVars as $sVar) {
             $var = $this->attributes[$sVar];
             
