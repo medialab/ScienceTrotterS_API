@@ -10,9 +10,28 @@ class ParcoursAdminController extends Controller
 {
 	public function list()
 	{
-		global $GET;
-		$aParcours = Parcours::take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
-		return $this->sendResponse($aParcours->toArray(), null)->content();
+		$oRequest = Request::capture();
+		
+		$limit = (int)$oRequest->input('limit');
+		if (!$limit) {
+			$limit = false;
+		}
+		
+		$skip = (int)$oRequest->input('skip');
+		if (!$skip) {
+			$skip = false;
+		}
+
+		$oParcours = Parcours::take($limit)->skip($skip)->get();
+	
+		$sLang = $oRequest->input('lang');
+		if ($sLang) {
+			foreach ($oParcours as $key => &$oParc) {
+				$oParc->setLang($sLang);
+			}
+		}
+
+		return $this->sendResponse($oParcours->toArray(), null)->content();
 	}
 
 	public function get($id) {
