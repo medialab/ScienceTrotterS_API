@@ -137,7 +137,7 @@ class CustModel extends Model
             $this->$sVar = $value;
         }
 
-        throw new Exception("Error: Try To Set $sVar In Model", 1);
+        throw new \Exception("Error: Try To Set $sVar In Model", 1);
     }
 
     // Définis la langue de l'objet
