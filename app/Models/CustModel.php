@@ -130,7 +130,7 @@ class CustModel extends Model
                 $this->setValueAsJson($sVar, $value);
             }
         }
-        elseif(in_array($sVar, $this->attributes)){
+        elseif(in_array($sVar, $this->attributes) || in_array($sVar, $this->fillable)){
             $this->attributes[$sVar] = $value;
         }
         elseif(property_exists($this, $sVar)){
