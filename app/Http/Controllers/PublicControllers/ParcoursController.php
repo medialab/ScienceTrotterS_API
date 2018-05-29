@@ -11,13 +11,33 @@ class ParcoursController extends Controller
 {
 	public function list(Request $oRequest)
 	{
-		var_dump("FEZFEZFZFEZF");
-		$aParcours = Parcours::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
-		return $this->sendResponse($aParcours->toArray(), null);
+		$limit = (int)$oRequest->input('limit');
+		if (!$limit) {
+			$limit = false;
+		}
+		
+		$skip = (int)$oRequest->input('skip');
+		if (!$skip) {
+			$skip = false;
+		}
+
+		$sLang = $oRequest->input('lang');
+		if ($sLang) {
+			$oParcours = Parcours::where('state->'.$sLang, 'true')->take($limit)->skip($skip)->get();
+
+			foreach ($oParcours as $key => &$oParc) {
+				$oParc->setLang($sLang);
+			}
+		}
+		else{
+			$oParcours = Parcours::take($limit)->skip($skip)->get();
+		}
+
+		return $this->sendResponse($oParcours->toArray(), null)->content();
 	}
 
 	public function get($id) {
 		$oCity = Parcours::where('id', $id)->first();
-		return $this->sendResponse($oCity->toArray(), null);
+		return $this->sendResponse($oCity->toArray(), null)->content();
 	}
 }

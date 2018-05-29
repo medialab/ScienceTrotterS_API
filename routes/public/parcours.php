@@ -38,7 +38,6 @@ class ParcoursController extends Controller
 	}
 
 	public function get($id) {
-		global $GET;
 		$oCity = Parcours::where('id', $id)->first();
 		return $this->sendResponse($oCity->toArray(), null)->content();
 	}
@@ -49,8 +48,8 @@ $router->get('/list', function() {
 	header('Content-Type: application/json');
 	echo ($ctrl->list());
 	exit;
-});
-
+});*/
+/*
 $router->get('/{id:[a-z0-9-]+}', function() {
 	$ctrl = new ParcoursController();
 	$arr = explode('/', $_SERVER['REQUEST_URI']);
@@ -59,8 +58,8 @@ $router->get('/{id:[a-z0-9-]+}', function() {
 	header('Content-Type: application/json');
 	echo ($ctrl->get($id));
 	exit;
-});*/
-
+});
+*/
 
 $router->get('/list', 'ParcoursController@list');
 $router->get('/{id:[a-z0-9-]+}', 'ParcoursController@get');
