@@ -136,6 +136,8 @@ class CustModel extends Model
         elseif(property_exists($this, $sVar)){
             $this->$sVar = $value;
         }
+
+        throw new Exception("Error: Try To Set $sVar In Model", 1);
     }
 
     // Définis la langue de l'objet
