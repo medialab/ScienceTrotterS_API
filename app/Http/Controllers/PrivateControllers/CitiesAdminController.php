@@ -129,6 +129,8 @@ class CitiesAdminController extends CitiesController
 			$oCity->state = false;
 		}
 
+		var_dump("RESULT", $oCity->toArray());
+
 		if ($oCity->save()) {
 			return $this->sendResponse($oCity, null);
 		}
