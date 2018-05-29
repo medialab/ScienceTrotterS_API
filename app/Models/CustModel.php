@@ -6,33 +6,31 @@ use Illuminate\Database\Eloquent\Model;
 
 class CustModel extends Model
 {
-    private $sCurLang = false;
-    protected $aTranslateVars = [];
+    private $sCurLang = false; // Langue Séléctionnée
+    protected $aTranslateVars = []; // les Variables à traduire
+
 
     function __get($sVar) {
-        //var_dump("Variable: ".$sVar);
-        //var_dump("Attrs: ", $this->attributes);
-
+        // Si il s'agit d'une variable De la BDD
         if (array_key_exists($sVar, $this->attributes)) {
-            //var_dump("SQL VAR");
-            if (in_array($sVar, $this->aTranslateVars)) {
-                //var_dump("TRANSLATE VAR");
-                
-                $var = $this->attributes[$sVar];
-                //var_dump("Cur Value: ", $var);
 
+            // Si il s'agit d'une variable à traduire
+            if (in_array($sVar, $this->aTranslateVars)) {                
+                $var = $this->attributes[$sVar];
+
+                // Si la valeur actuelle est une string on la décode
                 if (is_string($var)) {
-                    //var_dump("Décoding Cur Value");
                     $var = json_decode($var);
+
+                    // En cas d'échec on retourne NULL
                     if (is_null($var)) {
-                        //var_dump("Fail To Décode");
                         return null;
                     }
 
-                    //var_dump("Décoded: ", $var);
                     $this->attributes[$sVar] = $var;
                 }
 
+                // Si une langue est séléctionnée
                 if ($this->sCurLang) {
                     $sLang = $this->sCurLang;
                     return empty($var->$sLang) ? null : $var->$sLang;
@@ -41,25 +39,28 @@ class CustModel extends Model
                 return $var;
             }
         }
-        
         return empty($this->$sVar) ? null : $this->$sVar;
     }
 
+    /**
+     * Mets à jour une variable traductible pour une langue
+     * @param String $sVar  Nom de la variable
+     * @param mixed $value valeur de la variable
+     */
     private function setValueByLang($sVar, $value) {
         $sLang = $this->sCurLang;
         $var = $this->attributes[$sVar];
         
         if (empty($value)) {
-            $value = '';
-        }
-        elseif (!is_string($value)) {            
-            throw new Exception("Error: Can't Set Parcours::{$sVar} for Language: '{$sLang}'. Data must be string", 1);
+            $value = null;
         }
 
+        // Si la valeur actuelle est une string on la décode
         if(is_string($var)) {
             $var = json_decode($var);
         }
 
+        // Initialisation par défaut
         if (empty($var)) {
             $var = new StdClass;
         }
@@ -68,11 +69,16 @@ class CustModel extends Model
         $this->attributes[$sVar] = $var;
     }
 
+    /**
+     * Mets à jour une variable traductible pour toutes les langues
+     * @param String $sVar  Nom de la variable
+     * @param mixed $value Valeur de la variable
+     */
     private function setValueAsJson($sVar, $value) {        
         $var = $this->attributes[$sVar];
 
         if (empty($value)) {
-            $var = new StdClass;
+            $var = null;
         }
         elseif (is_string($value)) {            
             $var = json_decode($value);
@@ -92,12 +98,15 @@ class CustModel extends Model
     }
 
     function __set($sVar, $value) {
+        // Si il s'agit d'une variable à traduire
         if (in_array($sVar, $this->aTranslateVars)) {
             $var = $this->$sVar;
             
+            // Si une langue est choisie on met à jour que celle ci
             if ($this->sCurLang) {
                 $this->setValueByLang($sVar, $value);
             }
+            // Si aucune langue est choisie on les met toutes à jour
             else{
                 $this->setValueAsJson($sVar, $value);
             }
@@ -107,10 +116,15 @@ class CustModel extends Model
         }
     }
 
+    // Définis la langue de l'objet
     public function setLang($l = false) {
         $this->sCurLang = $l;
     }
 
+    /**
+     * Override de la fonction afin d'implémenter les traductions
+     * @return Array données de l'objet
+     */
     public function toArray() {
         $aResult = [];
         $sLang = $this->sCurLang;
@@ -146,6 +160,7 @@ class CustModel extends Model
             }
         }
 
+        $aResult['sCurLang'] = $sLang;
         return $aResult;
     }
 }
