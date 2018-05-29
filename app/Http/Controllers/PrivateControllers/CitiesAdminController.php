@@ -69,6 +69,9 @@ class CitiesAdminController extends CitiesController
 		$aErrors = [];
 		$aUpdates = [];
 		$aData = $oRequest->input('data');
+
+		var_dump("UPDATING CITY", $aData);
+
 		foreach ($aData as $key => $value) {
 			/* Données à Ignorer lors de l'update */
 			if (in_array($key, ['id', 'created_at', 'updated_at'])) {
@@ -78,19 +81,20 @@ class CitiesAdminController extends CitiesController
 				continue;
 			}
 
-			$aUpdates[$key] = $value;
+			var_dump("UPDATING CITY", $aData);
+			$oCity->$key = $value;
 		}
-
-		/* La ville ne peut être activée que si tout les champs sont remplis */
-		if (empty($aUpdates['geoloc']) || empty($aUpdates['image']) && empty($oCity->image)) {
-
-			$aUpdates['state'] = false;
-		}
-		elseif(!empty($aUpdates['image']) && $aUpdates['image'] !== $oCity->image) {
+		
+		if(!empty($aUpdates['image']) && $aUpdates['image'] !== $oCity->image) {
 			$this->downloadImage($aUpdates['image']);
 		}
 
-		if ($oCity->update($aUpdates)) {
+		/* La ville ne peut être activée que si tout les champs sont remplis */
+		if (!strlen($oCity->image) || !strlen($oCity->geoloc)) {
+			$oCity->state = false;
+		}
+
+		if ($oCity->save()) {
 			return $this->sendResponse($oCity, null);
 		}
 
