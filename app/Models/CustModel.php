@@ -117,6 +117,7 @@ class CustModel extends Model
     }
 
     function __set($sVar, $value) {
+        var_dump("#### TRANSLATEBLE VARS ####");
         var_dump($this->aTranslateVars);
 
         // Si il s'agit d'une variable à traduire
