@@ -126,7 +126,10 @@ class CustModel extends Model
                 $this->setValueAsJson($sVar, $value);
             }
         }
-        elseif(in_array($sVar, haystack)){
+        elseif(in_array($sVar, $this->attributes)){
+            $this->attributes[$sVar] = $value;
+        }
+        else{
             $this->$sVar = $value;
         }
     }
