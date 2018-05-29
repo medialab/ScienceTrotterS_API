@@ -185,7 +185,6 @@ class CustModel extends Model
         foreach ($this->aTranslateVars as $sVar) {
             $value = &$this->attributes[$sVar];
             
-            
             if (!is_string($value)) {
                 $value = json_encode($value);
             }
