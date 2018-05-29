@@ -105,7 +105,7 @@ class CitiesAdminController extends CitiesController
 			return $this->sendError('Error: Missing City Label', ['Error: Missing City Label'], 400);
 		}
 
-		$sLang = $aData = $oRequest->input('lang');
+		$sLang = $oRequest->input('lang');
 		if (!$sLang) {
 			return $this->sendError('Fail To Query Insert', ['Lang Param is Requested'], 400);
 		}
