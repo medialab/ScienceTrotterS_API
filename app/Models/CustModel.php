@@ -15,8 +15,13 @@ class CustModel extends Model
         if (array_key_exists($sVar, $this->attributes)) {
 
             // Si il s'agit d'une variable à traduire
-            if (in_array($sVar, $this->aTranslateVars)) {                
-                $var = $this->attributes[$sVar];
+            if (in_array($sVar, $this->aTranslateVars)) {
+                if (empty($this->attributes[$sVar])) {
+                    $var = new \StdClass;
+                }
+                else{
+                    $var = $this->attributes[$sVar];
+                }
 
                 // Si la valeur actuelle est une string on la décode
                 if (is_string($var)) {
@@ -49,7 +54,12 @@ class CustModel extends Model
      */
     private function setValueByLang($sVar, $value) {
         $sLang = $this->sCurLang;
-        $var = $this->attributes[$sVar];
+        if (empty($this->attributes[$sVar])) {
+            $var = new \StdClass;
+        }
+        else{
+            $var = $this->attributes[$sVar];
+        }
         
         if (empty($value)) {
             $value = null;
@@ -78,7 +88,9 @@ class CustModel extends Model
         if (empty($this->attributes[$sVar])) {
             $var = new \StdClass;
         }
-        $var = $this->attributes[$sVar];
+        else{
+            $var = $this->attributes[$sVar];
+        }
 
         if (empty($value)) {
             $var = null;
