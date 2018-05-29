@@ -1,5 +1,5 @@
 <?php
-use App\Utils\APIControllerUtil as Controller;
+/*use App\Utils\APIControllerUtil as Controller;
 use App\Utils\RequestUtil as Request;
 use App\Utils\ValidatorUtil as Validator;
 use App\Models\Parcours;
@@ -42,8 +42,8 @@ class ParcoursController extends Controller
 		$oCity = Parcours::where('id', $id)->first();
 		return $this->sendResponse($oCity->toArray(), null)->content();
 	}
-}
-
+}*/
+/*
 $router->get('/list', function() {
 	$ctrl = new ParcoursController();
 	header('Content-Type: application/json');
@@ -59,4 +59,8 @@ $router->get('/{id:[a-z0-9-]+}', function() {
 	header('Content-Type: application/json');
 	echo ($ctrl->get($id));
 	exit;
-});
+});*/
+
+
+$router->get('/list', 'ParcoursController@list');
+$router->get('/{id:[a-z0-9-]+}', 'ParcoursController@get');
