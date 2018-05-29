@@ -46,6 +46,8 @@ class CustModel extends Model
 
                 return $var;
             }
+
+            return $this->attributes[$sVar];
         }
         elseif(in_array($sVar, $this->fillable)){
             var_dump("EMPTY VAR");
