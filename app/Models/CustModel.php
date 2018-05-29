@@ -61,7 +61,7 @@ class CustModel extends Model
             $var = $this->attributes[$sVar];
         }
         
-        if (empty($value)) {
+        if ($value !== false && empty($value)) {
             $value = null;
         }
 
