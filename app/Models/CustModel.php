@@ -151,13 +151,10 @@ class CustModel extends Model
      * @return Array données de l'objet
      */
     public function toArray() {
-        var_dump("TO ARRAY");
         $aResult = [];
         $sLang = $this->sCurLang;
 
-        var_dump($this->attributes);
         foreach ($this->attributes as $sVar => $value) {
-            var_dump("==== $sVar ====");
 
             if (in_array($sVar, $this->hidden)) {
                 continue;
@@ -174,16 +171,6 @@ class CustModel extends Model
                 else{
                     $aResult[$sVar] = $value->$sLang;
                 }
-
-                /*if ($sLang) {
-                }
-                else{
-                    if (is_string($value)) {
-                        $value = json_decode($value);
-                    }
-
-                    $aResult[$sVar] = $value;
-                }*/
             }
             else{
                 $aResult[$sVar] = $value;
@@ -195,21 +182,15 @@ class CustModel extends Model
     }
 
     public function save(Array $options=[]) {
-        var_dump("PEPARE SAVE");
         foreach ($this->aTranslateVars as $sVar) {
-            var_dump("=== $sVar ===");
             $value = &$this->attributes[$sVar];
             
-            var_dump($value);
             
             if (!is_string($value)) {
                 $value = json_encode($value);
-                var_dump($value);
             }
         }
-        
-        var_dump("DATA TO SAVE", $this->attributes);
-
+    
         return Parent::save($options);
     }
 }
