@@ -11,11 +11,14 @@ class CustModel extends Model
 
 
     function __get($sVar) {
+        var_dump("GETTING $sVar");
         // Si il s'agit d'une variable De la BDD
         if (array_key_exists($sVar, $this->attributes)) {
+            var_dump("SQL VAR");
 
             // Si il s'agit d'une variable à traduire
             if (in_array($sVar, $this->aTranslateVars)) {
+                var_dump("TRANSLATE VAR");
                 if (empty($this->attributes[$sVar])) {
                     $var = new \StdClass;
                 }
@@ -44,6 +47,11 @@ class CustModel extends Model
                 return $var;
             }
         }
+        elseif(in_array($sVar, $this->fillable)){
+            var_dump("EMPTY VAR");
+            return null;
+        }
+
         return empty($this->$sVar) ? null : $this->$sVar;
     }
 
