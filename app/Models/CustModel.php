@@ -117,10 +117,6 @@ class CustModel extends Model
     }
 
     function __set($sVar, $value) {
-        var_dump("#### TRANSLATEBLE VARS ####");
-        var_dump($this->aTranslateVars);
-        exit;
-
         // Si il s'agit d'une variable à traduire
         if (in_array($sVar, $this->aTranslateVars)) {
             $var = $this->$sVar;
@@ -140,8 +136,9 @@ class CustModel extends Model
         elseif(property_exists($this, $sVar)){
             $this->$sVar = $value;
         }
-
-        throw new \Exception("Error: Try To Set $sVar In Model", 1);
+        else{
+            throw new \Exception("Error: Try To Set $sVar In Model", 1);
+        }
     }
 
     // Définis la langue de l'objet
