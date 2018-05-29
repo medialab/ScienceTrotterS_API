@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\CustModel;
+use Illuminate\Database\Eloquent\Model;
 
-class Cities extends Model
+class Cities extends CustModel
 {
 
     public $timestamps = true;
