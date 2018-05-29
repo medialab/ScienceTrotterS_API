@@ -11,8 +11,29 @@ class CitiesController extends Controller
 {
 	public function list(Request $oRequest)
 	{
-		$aCities = Cities::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
-		return $this->sendResponse($aCities->toArray(), null);
+		$limit = (int)$oRequest->input('limit');
+		if (!$limit) {
+			$limit = false;
+		}
+		
+		$skip = (int)$oRequest->input('skip');
+		if (!$skip) {
+			$skip = false;
+		}
+
+		$sLang = $oRequest->input('lang');
+		if ($sLang) {
+			$oCities = Cities::where('state->'.$sLang, 'true')->take($limit)->skip($skip)->get();
+
+			foreach ($oCities as $key => &$oCity) {
+				$oCity->setLang($sLang);
+			}
+		}
+		else{
+			$oCities = Cities::take($limit)->skip($skip)->get();
+		}
+
+		return $this->sendResponse($oCities->toArray(), null)->content();
 	}
 
 	public function get($id) {

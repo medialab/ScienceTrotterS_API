@@ -34,8 +34,26 @@ class CitiesAdminController extends CitiesController
 	}
 
 	public function list(Request $oRequest) {
-		$aCities = Cities::take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
-		return $this->sendResponse($aCities->toArray(), null);
+		$limit = (int)$oRequest->input('limit');
+		if (!$limit) {
+			$limit = false;
+		}
+		
+		$skip = (int)$oRequest->input('skip');
+		if (!$skip) {
+			$skip = false;
+		}
+
+		$oCities = Cities::take($limit)->skip($skip)->get();
+
+		$sLang = $oRequest->input('lang');
+		if ($sLang) {
+			foreach ($oCities as $key => &$oCity) {
+				$oCity->setLang($sLang);
+			}
+		}
+
+		return $this->sendResponse($oCities->toArray(), null)->content();
 	}
 	
 	public function update(Request $oRequest) {
