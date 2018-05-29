@@ -71,21 +71,17 @@ class CitiesAdminController extends CitiesController
 		$aData = $oRequest->input('data');
 
 		foreach ($aData as $key => $value) {
-			var_dump($key);
-			var_dump($value);
 			
 			/* Données à Ignorer lors de l'update */
 			if (in_array($key, ['id', 'created_at', 'updated_at'])) {
 				continue;
 			}
 			elseif ($key === 'image' && empty($value)) {
-				var_dump("SKIP¨Empty Image");
 				continue;
 			}
 
 
 			$oCity->$key = $value;
-			var_dump("Result: ", $oCity->$key);
 		}
 		
 		if(!empty($aUpdates['image']) && $aUpdates['image'] !== $oCity->image) {
@@ -94,9 +90,6 @@ class CitiesAdminController extends CitiesController
 
 		/* La ville ne peut être activée que si tout les champs sont remplis */
 		if (!strlen($oCity->image) || !strlen($oCity->geoloc)) {
-			var_dump("FORCE FALSE STAT");
-			var_dump("IMAGE", strlen($oCity->image));
-			var_dump("GEOLOC", strlen($oCity->geoloc));
 
 			$oCity->state = false;
 		}
