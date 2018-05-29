@@ -79,11 +79,13 @@ class CitiesAdminController extends CitiesController
 				continue;
 			}
 			elseif ($key === 'image' && empty($value)) {
+				var_dump("SKIP¨Empty Image");
 				continue;
 			}
 
 
 			$oCity->$key = $value;
+			var_dump("Result: ", $oCity->$key);
 		}
 		
 		if(!empty($aUpdates['image']) && $aUpdates['image'] !== $oCity->image) {
