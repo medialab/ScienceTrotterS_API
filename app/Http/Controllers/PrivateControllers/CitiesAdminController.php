@@ -17,7 +17,6 @@ class CitiesAdminController extends CitiesController
 		/* On crée le dossier de l'image */
 		$dir = dirname(UPLOAD_PATH.$sName);
 		if (!is_dir($dir)) {
-			//var_dump("CREATE DIR: ". $dir);
 			mkdir($dir, 0775, true);
 		}
 
@@ -100,8 +99,6 @@ class CitiesAdminController extends CitiesController
 
 	public function insert(Request $oRequest) {
 		$aData = $oRequest->input('data');
-
-		var_dump("UPDATE DATA", $aData);
 
 		if (empty($aData['label'])) {
 			return $this->sendError('Error: Missing City Label', ['Error: Missing City Label'], 400);
