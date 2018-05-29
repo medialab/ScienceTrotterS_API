@@ -148,10 +148,14 @@ class CustModel extends Model
      * @return Array données de l'objet
      */
     public function toArray() {
+        var_dump("TO ARRAY");
         $aResult = [];
         $sLang = $this->sCurLang;
 
+        var_dump($this->attributes);
         foreach ($this->attributes as $sVar => $value) {
+            var_dump("==== $sVar ====");
+
             if (in_array($sVar, $this->hidden)) {
                 continue;
             }
