@@ -70,8 +70,6 @@ class CitiesAdminController extends CitiesController
 		$aUpdates = [];
 		$aData = $oRequest->input('data');
 
-		var_dump("UPDATING CITY", $aData);
-
 		foreach ($aData as $key => $value) {
 			/* Données à Ignorer lors de l'update */
 			if (in_array($key, ['id', 'created_at', 'updated_at'])) {
@@ -81,7 +79,6 @@ class CitiesAdminController extends CitiesController
 				continue;
 			}
 
-			var_dump("UPDATING CITY", $aData);
 			$oCity->$key = $value;
 		}
 		
