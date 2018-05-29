@@ -43,13 +43,12 @@ class CitiesAdminController extends CitiesController
 		if (!$skip) {
 			$skip = false;
 		}
-		
+
 		$oCities = Cities::take($limit)->skip($skip)->get();
 
 		$sLang = $oRequest->input('lang');
 		if ($sLang) {
 			foreach ($oCities as $key => &$oCity) {
-				var_dump($oCity);
 				$oCity->setLang($sLang);
 			}
 		}
