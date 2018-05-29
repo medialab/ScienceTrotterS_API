@@ -52,6 +52,7 @@ class CitiesAdminController extends CitiesController
 				var_dump($oCity);
 				//$oCity->setLang($sLang);
 			}
+			exit;
 		}
 
 		return $this->sendResponse($oCities->toArray(), null)->content();
