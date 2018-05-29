@@ -53,29 +53,33 @@ class CustModel extends Model
      * @param mixed $value valeur de la variable
      */
     private function setValueByLang($sVar, $value) {
+        var_dump("SETTING VALUE: $sVar", $value);
         $sLang = $this->sCurLang;
+        
+        if ($value !== false && empty($value)) {
+            $value = null;
+        }
+        var_dump("new Value", $value);
+        
         if (empty($this->attributes[$sVar])) {
+            var_dump("Current Is Empty");
             $var = new \StdClass;
         }
         else{
             $var = $this->attributes[$sVar];
         }
-        
-        if ($value !== false && empty($value)) {
-            $value = null;
-        }
 
         // Si la valeur actuelle est une string on la décode
         if(is_string($var)) {
+            var_dump("Décoding Current");
             $var = json_decode($var);
         }
 
-        // Initialisation par défaut
-        if (empty($var)) {
-            $var = new \StdClass;
-        }
+        var_dump("Current Value", $var);
 
         $var->$sLang = $value;
+        
+        var_dump("Updated Value", $var);
         $this->attributes[$sVar] = $var;
     }
 
