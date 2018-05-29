@@ -133,7 +133,7 @@ class CustModel extends Model
         elseif(in_array($sVar, $this->attributes)){
             $this->attributes[$sVar] = $value;
         }
-        else{
+        elseif(property_exists($this, $sVar)){
             $this->$sVar = $value;
         }
     }
