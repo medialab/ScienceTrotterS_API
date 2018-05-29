@@ -64,6 +64,9 @@ class CitiesAdminController extends CitiesController
 			return $this->sendError('Not Found', ['Can\'t found City With ID:'.$id], 404);
 		}
 
+		$sLang = $aData = $oRequest->input('lang');
+		$oCity->setLang($sLang);
+
 		$aErrors = [];
 		$aUpdates = [];
 		$aData = $oRequest->input('data');
@@ -102,20 +105,29 @@ class CitiesAdminController extends CitiesController
 			return $this->sendError('Error: Missing City Label', ['Error: Missing City Label'], 400);
 		}
 
+		$sLang = $aData = $oRequest->input('lang');
+		if (!$sLang) {
+			return $this->sendError('Fail To Query Insert', ['Lang Param is Requested'], 400);
+		}
+
 		$oCity = new Cities;
+		$oCity->setLang($sLang);
 		$oCity->state = false;
 		$oCity->label = $aData['label'];
-		$oCity->save();
+
+		$oCity->geoloc = $aData['geoloc'];
+
+		if (!empty($aData['image'])) {
+			$this->downloadImage($aData['image']);
+			$oCity->image = $aData['image'];
+		}
 
 		/* La ville ne peut être activée que si tout les champs sont remplis */
-		if (empty($aData['image']) || empty($aData['geoloc'])) {
-			$aData['state'] = false;
-		}
-		elseif (!empty($aData['image'])) {
-			$this->downloadImage($aData['image']);
+		if (!strlen($oCity->image) || !strlen($oCity->geoloc)) {
+			$oCity->state = false;
 		}
 
-		if ($oCity->update($aData)) {
+		if ($oCity->save()) {
 			return $this->sendResponse($oCity, null);
 		}
 

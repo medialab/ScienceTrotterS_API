@@ -62,7 +62,7 @@ class CustModel extends Model
 
         // Initialisation par défaut
         if (empty($var)) {
-            $var = new StdClass;
+            $var = new \StdClass;
         }
 
         $var->$sLang = $value;
@@ -74,7 +74,10 @@ class CustModel extends Model
      * @param String $sVar  Nom de la variable
      * @param mixed $value Valeur de la variable
      */
-    private function setValueAsJson($sVar, $value) {        
+    private function setValueAsJson($sVar, $value) {
+        if (empty($this->attributes[$sVar])) {
+            $var = new \StdClass;
+        }
         $var = $this->attributes[$sVar];
 
         if (empty($value)) {
@@ -111,7 +114,7 @@ class CustModel extends Model
                 $this->setValueAsJson($sVar, $value);
             }
         }
-        else{
+        elseif(in_array($sVar, haystack)){
             $this->$sVar = $value;
         }
     }
