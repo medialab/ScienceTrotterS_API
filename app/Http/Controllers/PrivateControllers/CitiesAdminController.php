@@ -71,6 +71,9 @@ class CitiesAdminController extends CitiesController
 		$aData = $oRequest->input('data');
 
 		foreach ($aData as $key => $value) {
+			var_dump($key);
+			var_dump($value);
+			
 			/* Données à Ignorer lors de l'update */
 			if (in_array($key, ['id', 'created_at', 'updated_at'])) {
 				continue;
@@ -78,6 +81,7 @@ class CitiesAdminController extends CitiesController
 			elseif ($key === 'image' && empty($value)) {
 				continue;
 			}
+
 
 			$oCity->$key = $value;
 		}
@@ -91,7 +95,7 @@ class CitiesAdminController extends CitiesController
 			var_dump("FORCE FALSE STAT");
 			var_dump("IMAGE", strlen($oCity->image));
 			var_dump("GEOLOC", strlen($oCity->geoloc));
-			
+
 			$oCity->state = false;
 		}
 
