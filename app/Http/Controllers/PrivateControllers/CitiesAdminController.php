@@ -50,7 +50,7 @@ class CitiesAdminController extends CitiesController
 		if ($sLang) {
 			foreach ($oCities as $key => &$oCity) {
 				var_dump($oCity);
-				$oCity->setLang($sLang);
+				//$oCity->setLang($sLang);
 			}
 		}
 
