@@ -181,4 +181,16 @@ class CustModel extends Model
         $aResult['sCurLang'] = $sLang;
         return $aResult;
     }
+
+    public function save($options) {
+        foreach ($this->aTranslateVars as $sVar) {
+            $var = $this->attributes[$sVar];
+            
+            if (!is_string($var)) {
+                $this->attributes[$sVar] = json_encode($this->attributes[$sVar]);
+            }
+        }
+
+        return Parent::save($options);
+    }
 }
