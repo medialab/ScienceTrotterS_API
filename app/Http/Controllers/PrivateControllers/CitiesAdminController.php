@@ -49,6 +49,7 @@ class CitiesAdminController extends CitiesController
 		$sLang = $oRequest->input('lang');
 		if ($sLang) {
 			foreach ($oCities as $key => &$oCity) {
+				var_dump($oCity);
 				$oCity->setLang($sLang);
 			}
 		}
