@@ -111,8 +111,11 @@ class CustModel extends Model
     }
 
     function __set($sVar, $value) {
+        var_dump("SETTING $sVar");
         // Si il s'agit d'une variable à traduire
         if (in_array($sVar, $this->aTranslateVars)) {
+            var_dump("SETTING TRANSLATE VAR");
+            
             $var = $this->$sVar;
             
             // Si une langue est choisie on met à jour que celle ci
@@ -125,9 +128,11 @@ class CustModel extends Model
             }
         }
         elseif(in_array($sVar, $this->attributes) || in_array($sVar, $this->fillable)){
+            var_dump("SETTING SQL VAR");
             $this->attributes[$sVar] = $value;
         }
         elseif(property_exists($this, $sVar)){
+            var_dump("SETTING OBJECT VAR");
             $this->$sVar = $value;
         }
         else{
