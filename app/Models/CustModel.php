@@ -159,16 +159,21 @@ class CustModel extends Model
                 continue;
             }
 
-            if ($sLang && in_array($sVar, $this->aTranslateVars)) {
+            if (in_array($sVar, $this->aTranslateVars)) {
                 if (is_string($value)) {
                     $value = json_decode($value);
                 }
 
-                if (empty($value) || (empty($value->$sLang) && $value->$sLang !== false)) {
-                    $value = null;
+                if ($sLang) {
+                    if (empty($value) || (empty($value->$sLang) && $value->$sLang !== false)) {
+                        $value = null;
+                    }
+                    else{
+                        $aResult[$sVar] = $value->$sLang;
+                    }
                 }
                 else{
-                    $aResult[$sVar] = $value->$sLang;
+                    $aResult[$sVar] = $value;
                 }
             }
             else{
@@ -178,7 +183,7 @@ class CustModel extends Model
 
         $aResult['sCurLang'] = $sLang;
         $aResult['force_lang'] = empty($this->attributes['force_lang']) ? null : $this->attributes['force_lang'];
-        
+        var_dump($aResult);
         return $aResult;
     }
 
