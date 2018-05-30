@@ -1,22 +1,46 @@
 <?php
+
 use App\Utils\APIControllerUtil as Controller;
 use App\Utils\RequestUtil as Request;
 use App\Utils\ValidatorUtil as Validator;
 use App\Models\Interrests;
 
 
-class InterrestsController extends Controller
+class InterrestsAdminController extends Controller
 {
-	public function list()
+	public function list(Request $oRequest=null)
 	{
-		global $GET;
-		$aInterrests = Interrests::where('state', true)->take((int)$GET['limit'])->skip((int)$GET['offset'])->get();
-		return $this->sendResponse($aInterrests->toArray(), null)->content();
+		if (is_null($oRequest)) {
+			return $this->sendResponse([], null)->content();
+		}
+		
+		$limit = (int)$oRequest->input('limit');
+		if (!$limit) {
+			$limit = false;
+		}
+		
+		$skip = (int)$oRequest->input('skip');
+		if (!$skip) {
+			$skip = false;
+		}
+
+		$sLang = $oRequest->input('lang');
+		if ($sLang) {
+			$oInterests = Interrests::where('state->'.$sLang, 'true')->take($limit)->skip($skip)->get();
+
+			foreach ($oInterests as $key => &$oInt) {
+				$oInt->setLang($sLang);
+			}
+		}
+		else{
+			$oInterests = Interrests::take($limit)->skip($skip)->get();
+		}
+
+		return $this->sendResponse($oInterests->toArray(), null)->content();
 	}
 
 	public function get($id) {
-		global $GET;
-		$oCity = Interrests::where('id', $id)->first();
+		$oCity = Parcours::where('id', $id)->first();
 		return $this->sendResponse($oCity->toArray(), null)->content();
 	}
 }
