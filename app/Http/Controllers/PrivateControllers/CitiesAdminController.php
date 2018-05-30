@@ -9,5 +9,4 @@ use App\Models\Cities;
 
 class CitiesAdminController extends CitiesController
 {
-
 }

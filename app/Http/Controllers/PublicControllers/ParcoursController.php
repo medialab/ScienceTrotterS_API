@@ -10,9 +10,4 @@ use App\Models\Parcours;
 class ParcoursController extends Controller
 {
 	protected $sModelClass = 'Parcours';
-
-	public function get($id) {
-		$oCity = Parcours::where('id', $id)->first();
-		return $this->sendResponse($oCity->toArray(), null)->content();
-	}
 }

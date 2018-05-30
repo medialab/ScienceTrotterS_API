@@ -234,4 +234,11 @@ class APIControllerUtil extends BaseController
             return $this->sendError('Fail To Query Delete', ['Fail To Find '.$class.' with ID: '.$id], 400);
         }
     }
+
+    public function get($id) {
+        $class = $this->getClass();
+        $oModel = call_user_func($class.'::where', 'id', $id)->first();
+        
+        return $this->sendResponse($oModel->toArray(), null)->content();
+    }
 }

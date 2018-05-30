@@ -9,10 +9,4 @@ use App\Models\Interests;
 
 class InterestsController extends Controller
 {
-	protected $sModelClass = 'Interests';
-
-	public function get($id) {
-		$oCity = Parcours::where('id', $id)->first();
-		return $this->sendResponse($oCity->toArray(), null)->content();
-	}
 }
