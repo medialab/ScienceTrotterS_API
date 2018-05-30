@@ -35,7 +35,7 @@ class CitiesAdminController extends CitiesController
 	public function list(Request $oRequest) {
 		$limit = (int)$oRequest->input('limit');
 		if (!$limit) {
-			$limit = false;
+			$limit = 15;
 		}
 		
 		$skip = (int)$oRequest->input('skip');

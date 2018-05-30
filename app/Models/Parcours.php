@@ -13,7 +13,7 @@ class Parcours extends CustModel
         'id' => 'string',
     ];
 
-    protected $fillable = ['title','time','audio','description','city_id','state','updated_at','created_at'];
+    protected $fillable = ['title','time','audio','description','city_id','state','force_lang','updated_at','created_at'];
 
     protected $aTranslateVars = ['title','time','audio','description','state'];
 

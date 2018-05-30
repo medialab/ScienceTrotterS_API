@@ -13,10 +13,10 @@ class InterrestsAdminController extends Controller
 		if (is_null($oRequest)) {
 			return $this->sendResponse([], null)->content();
 		}
-		
+
 		$limit = (int)$oRequest->input('limit');
 		if (!$limit) {
-			$limit = false;
+			$limit = 15;
 		}
 		
 		$skip = (int)$oRequest->input('skip');

@@ -8,7 +8,6 @@ class CustModel extends Model
     private $sCurLang = false; // Langue Séléctionnée
     protected $aTranslateVars = []; // les Variables à traduire
 
-
     function __get($sVar) {
         // Si il s'agit d'une variable De la BDD
         if (array_key_exists($sVar, $this->attributes)) {
@@ -178,6 +177,8 @@ class CustModel extends Model
         }
 
         $aResult['sCurLang'] = $sLang;
+        $aResult['force_lang'] = empty($this->attributes['force_lang']) ? null : $this->attributes['force_lang'];
+        
         return $aResult;
     }
 

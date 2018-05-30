@@ -10,12 +10,11 @@ class Cities extends CustModel
     public $timestamps = true;
     protected $table = 'cities2';
 
-    protected $fillable = ['label','image','state','geoloc','updated_at','created_at'];
+    protected $fillable = ['label','image','state','geoloc','force_lang','updated_at','created_at'];
     protected $casts = [
         'id' => 'string',
     ];
 
     protected $primaryKey = "id";
     protected $aTranslateVars = ['label','state'];
-
 }

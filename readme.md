@@ -10,17 +10,13 @@
 
 ## Getting Started
 
-1) Prerequisites
-First of all you need an installation of Node JS.
-https://getcomposer.org/
-
-2) Dependencies 
+1) Dependencies 
 
 Install all dependencies
 ```
 composer install
 ```
-3) Configuration
+2) Configuration
 
 Copy the file `.env.example` and past it to a new file `.env`
 Then edit the Postgres configuration.
@@ -38,7 +34,7 @@ PG_PREFIX=
 PG_SCHEMA=
 ```
 
-4) Nginx Vhost
+3) Nginx Vhost
 
 
 server {
@@ -72,7 +68,7 @@ server {
 }
 
 
-5) Usage
+4) Usage
 
 The main entry url is `your_site_name.your_domain_name/public`
 
