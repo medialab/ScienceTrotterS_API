@@ -9,32 +9,7 @@ use App\Models\Cities;
 
 class CitiesController extends Controller
 {
-	public function list(Request $oRequest)
-	{
-		$limit = (int)$oRequest->input('limit');
-		if (!$limit) {
-			$limit = 15;
-		}
-		
-		$skip = (int)$oRequest->input('skip');
-		if (!$skip) {
-			$skip = false;
-		}
-
-		$sLang = $oRequest->input('lang');
-		if ($sLang) {
-			$oCities = Cities::where('state->'.$sLang, 'true')->take($limit)->skip($skip)->get();
-
-			foreach ($oCities as $key => &$oCity) {
-				$oCity->setLang($sLang);
-			}
-		}
-		else{
-			$oCities = Cities::take($limit)->skip($skip)->get();
-		}
-
-		return $this->sendResponse($oCities->toArray(), null)->content();
-	}
+	protected $sModelClass = 'Cities';
 
 	public function get($id) {
 		$oCity = Cities::where('id', $id)->first();

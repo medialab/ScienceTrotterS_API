@@ -183,7 +183,6 @@ class CustModel extends Model
 
         $aResult['sCurLang'] = $sLang;
         $aResult['force_lang'] = empty($this->attributes['force_lang']) ? null : $this->attributes['force_lang'];
-        var_dump($aResult);
         return $aResult;
     }
 
