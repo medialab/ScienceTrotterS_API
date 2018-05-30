@@ -6,7 +6,7 @@ use App\Utils\ValidatorUtil as Validator;
 use App\Models\Interrests;
 
 
-class InterrestsAdminController extends Controller
+class InterrestsController extends Controller
 {
 	public function list(Request $oRequest=null)
 	{
