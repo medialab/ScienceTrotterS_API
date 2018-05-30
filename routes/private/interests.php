@@ -3,10 +3,10 @@
 use App\Utils\APIControllerUtil as Controller;
 use App\Utils\RequestUtil as Request;
 use App\Utils\ValidatorUtil as Validator;
-use App\Models\Interrests;
+use App\Models\Interests;
 
 
-class InterrestsAdminController extends Controller
+class InterestsAdminController extends Controller
 {
 	public function list(Request $oRequest=null)
 	{
@@ -26,14 +26,14 @@ class InterrestsAdminController extends Controller
 
 		$sLang = $oRequest->input('lang');
 		if ($sLang) {
-			$oInterests = Interrests::where('state->'.$sLang, 'true')->take($limit)->skip($skip)->get();
+			$oInterests = Interests::where('state->'.$sLang, 'true')->take($limit)->skip($skip)->get();
 
 			foreach ($oInterests as $key => &$oInt) {
 				$oInt->setLang($sLang);
 			}
 		}
 		else{
-			$oInterests = Interrests::take($limit)->skip($skip)->get();
+			$oInterests = Interests::take($limit)->skip($skip)->get();
 		}
 
 		return $this->sendResponse($oInterests->toArray(), null)->content();
@@ -46,13 +46,13 @@ class InterrestsAdminController extends Controller
 }
 
 $router->get('/list', function() {
-	$ctrl = new InterrestsAdminController();
+	$ctrl = new InterestsAdminController();
 	echo ($ctrl->list());
 	exit;
 });
 
 $router->get('/{id:[a-z0-9-]+}', function() {
-	$ctrl = new InterrestsAdminController();
+	$ctrl = new InterestsAdminController();
 	$arr = explode('/', $_SERVER['REQUEST_URI']);
 	$id = $arr[count($arr)-1];
 

@@ -23,14 +23,14 @@ class InterestsAdminController extends InterestsController
 
 		$sLang = $oRequest->input('lang');
 		if ($sLang) {
-			$oInterests = Interrests::take($limit)->skip($skip)->get();
+			$oInterests = Interests::take($limit)->skip($skip)->get();
 
 			foreach ($oInterests as $key => &$oInt) {
 				$oInt->setLang($sLang);
 			}
 		}
 		else{
-			$oInterests = Interrests::take($limit)->skip($skip)->get();
+			$oInterests = Interests::take($limit)->skip($skip)->get();
 		}
 
 		return $this->sendResponse($oInterests->toArray(), null)->content();

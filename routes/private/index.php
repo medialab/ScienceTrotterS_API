@@ -29,10 +29,10 @@ $router->get('/', function () use ($router) {
 	    require __DIR__.'/cities.php';
 	});
 
-/* Interrests */
+/* Interests */
 	$aConfig = [
-	    'prefix' => 'interrests',
+	    'prefix' => 'interests',
 	];
 	$router->group($aConfig, function () use ($router) {
-	    require __DIR__.'/interrests.php';
+	    require __DIR__.'/interests.php';
 	});
