@@ -28,7 +28,7 @@ $router->group($aPublicConfig, function () use ($router) {
 */
 $aPrivateConfig = [
   'prefix' => 'private',
-  'middleware' => 'auth'
+  //'middleware' => 'auth'
 ];
 
 $router->group($aPrivateConfig, function () use ($router) {

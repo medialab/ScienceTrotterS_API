@@ -101,14 +101,14 @@ class CustModel extends Model
             $var = json_decode($value);
             
             if (is_null($var)) {
-                throw new Exception("Error: Can't Set Parcours::$sVar Due to Invalid Json: '$value'", 1);
+                throw new \Exception("Error: Can't Set Parcours::$sVar Due to Invalid Json: '$value'", 1);
             }
         }
         elseif (is_array($value)) {
             $var = (object) $value;
         }
         elseif(!is_object($value)) {
-            throw new Exception("Error: Can't Set Parcours::$sVar Due to Invalid Data Type. Accepted StdClass, Array, String (json) OR null", 1);
+            throw new \Exception("Error: Can't Set Parcours::$sVar Due to Invalid Data Type. Accepted StdClass, Array, String (json) OR null", 1);
         }
 
         $this->attributes[$sVar] = $var;
@@ -165,7 +165,7 @@ class CustModel extends Model
                 }
 
                 if ($sLang) {
-                    if (empty($value) || (empty($value->$sLang) && $value->$sLang !== false)) {
+                    if (empty($value) || (!isset($value->$sLang))) {
                         $value = null;
                     }
                     else{
