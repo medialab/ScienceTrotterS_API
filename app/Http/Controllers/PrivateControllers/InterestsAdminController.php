@@ -8,4 +8,5 @@ use App\Models\Interests;
 
 class InterestsAdminController extends InterestsController
 {
+	protected $bAdmin = true;
 }

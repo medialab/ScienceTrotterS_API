@@ -10,9 +10,4 @@ use App\Models\Cities;
 class CitiesController extends Controller
 {
 	protected $sModelClass = 'Cities';
-
-	public function get($id) {
-		$oCity = Cities::where('id', $id)->first();
-		return $this->sendResponse($oCity->toArray(), null);
-	}
 }

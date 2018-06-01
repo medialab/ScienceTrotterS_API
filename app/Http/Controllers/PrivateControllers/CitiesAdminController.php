@@ -9,4 +9,5 @@ use App\Models\Cities;
 
 class CitiesAdminController extends CitiesController
 {
+	protected $bAdmin = true;
 }

@@ -9,4 +9,5 @@ use App\Models\Parcours;
 
 class ParcoursAdminController extends ParcoursController
 {
+	protected $bAdmin = true;
 }

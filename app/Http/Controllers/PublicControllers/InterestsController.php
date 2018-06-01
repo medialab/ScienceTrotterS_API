@@ -9,4 +9,5 @@ use App\Models\Interests;
 
 class InterestsController extends Controller
 {
+	protected $sModelClass = 'Interests';
 }

@@ -6,6 +6,7 @@ use App\Utils\RequestUtil as Request;
 
 class APIControllerUtil extends BaseController
 {
+    protected $bAdmin = false;
     protected $sModelClass;
 
     public function getClass() {
@@ -15,7 +16,7 @@ class APIControllerUtil extends BaseController
     public function list(Request $oRequest) {
         $limit = (int)$oRequest->input('limit');
         if (!$limit) {
-            $limit = 15;
+            $limit = 5000;
         }
         
         $skip = (int)$oRequest->input('skip');
@@ -23,20 +24,24 @@ class APIControllerUtil extends BaseController
             $skip = false;
         }
 
+        $columns = $oRequest->input('columns');
+
         $sLang = $oRequest->input('lang');
         $class = $this->getClass();
-        if ($sLang) {
 
-            $oModelList = call_user_func($class.'::where', 'state->'.$sLang, 'true');
-            $oModelList = $oModelList->take($limit)->skip($skip)->get();
-
-            foreach ($oModelList as $key => &$oModel) {
-                $oModel->setLang($sLang);
-            }
+        if (!$this->bAdmin) {
+            $oModelList = call_user_func($class.'::where', 'state', 'true');
+            $oModelList = $oModelList->take($limit)->skip($skip)->get($columns);
         }
         else{
             $oModelList = call_user_func($class.'::take', $limit);
-            $oModelList = $oModelList->skip($skip)->get();
+            $oModelList = $oModelList->skip($skip)->get($columns);
+        }
+
+        if ($sLang) {
+            foreach ($oModelList as $key => &$oModel) {
+                $oModel->setLang($sLang);
+            }
         }
 
         return $this->sendResponse($oModelList->toArray(), null)->content();
@@ -64,6 +69,8 @@ class APIControllerUtil extends BaseController
             exit;   
         }
 
+
+        header('Content-Type: application/json');
         return response()->json($aResponse, 200);
     }
     
@@ -158,7 +165,6 @@ class APIControllerUtil extends BaseController
 
         /* La ville ne peut être activée que si tout les champs sont remplis */
         if (!strlen($oModel->image) || !strlen($oModel->geoloc)) {
-
             $oModel->state = false;
         }
 
@@ -173,8 +179,8 @@ class APIControllerUtil extends BaseController
         $class = $this->getClass();
         $aData = $oRequest->input('data');
 
-        if (empty($aData['label'])) {
-            return $this->sendError('Error: Missing '.$class.' Label', ['Error: Missing '.$class.' Label'], 400);
+        if (empty($aData['title'])) {
+            return $this->sendError('Error: Missing '.$class.' title', ['Error: Missing '.$class.' Title'], 400);
         }
 
         $sLang = $oRequest->input('lang');
@@ -235,10 +241,33 @@ class APIControllerUtil extends BaseController
         }
     }
 
-    public function get($id) {
+    public function get($id, Request $oRequest) {
+        $columns = $oRequest->input('columns');
+
         $class = $this->getClass();
-        $oModel = call_user_func($class.'::where', 'id', $id)->first();
+        $oModel = call_user_func($class.'::where', 'id', $id)->get($columns)->first();
+        return $this->sendResponse($oModel->toArray(), null)->content();
+    }
+
+    public function getByCity($id, Request $oRequest) {
+        $columns = $oRequest->input('columns');
+
+        if (!$this->bAdmin) {
+            $oModelList = call_user_func($class.'::where', 'state', 'true');
+            $oModelList = $oModelList->take($limit)->skip($skip)->get($columns);
+        }
+        else{
+            $oModelList = call_user_func($class.'::take', $limit);
+            $oModelList = $oModelList->skip($skip)->get($columns);
+        }
+
+        if ($sLang) {
+            foreach ($oModelList as $key => &$oModel) {
+                $oModel->setLang($sLang);
+            }
+        }
         
+
         return $this->sendResponse($oModel->toArray(), null)->content();
     }
 }

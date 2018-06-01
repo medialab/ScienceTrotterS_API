@@ -177,6 +177,14 @@ class CustModel extends Model
                 }
             }
             else{
+                if ($sVar === "geoloc") {
+                    $aGeo = explode(';', $value);
+                    $aResult['geo'] = [
+                        'latitude' => empty($aGeo[0]) ? 0 : $aGeo[0],
+                        'longitude' => empty($aGeo[1]) ? 0 : $aGeo[1]
+                    ];
+                }
+                
                 $aResult[$sVar] = $value;
             }
         }
