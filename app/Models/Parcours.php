@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Parcours extends CustModel
 {
 	public $timestamps = true;
-    protected $table = 'parcours2';
+    protected $table = 'parcours';
 
     protected $casts = [
         'id' => 'string',

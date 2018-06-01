@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Interests extends CustModel
 {
 	public $timestamps = true;
-    protected $table = 'interests2';
+    protected $table = 'interests';
 
     protected $casts = [
         'id' => 'string',

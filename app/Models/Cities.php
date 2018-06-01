@@ -8,7 +8,7 @@ class Cities extends CustModel
 {
 
     public $timestamps = true;
-    protected $table = 'cities2';
+    protected $table = 'cities';
 
     protected $fillable = ['title','image','state','geoloc','force_lang','updated_at','created_at'];
     
