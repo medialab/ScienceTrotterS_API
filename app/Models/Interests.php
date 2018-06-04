@@ -2,30 +2,57 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Utils\ModelUtil;
 
-class Interests extends CustModel
+class Interests extends ModelUtil
 {
-	public $timestamps = true;
     protected $table = 'interests';
+
+    public $timestamps = true;
+
+    protected $fillable = [
+      'id',
+      'cities_id',
+      'parcours_id',
+      'header_image',
+      'title',
+      'address',
+      'geoloc',
+      'schedule',
+      'price',
+      'audio',
+      'transport',
+      'audio_script',
+      'galery_image',
+      'bibliography',
+      'force_lang',
+      'state'
+    ];
 
     protected $casts = [
         'id' => 'string',
         'title' => 'json',
-        'transports' => 'json',
-        'description' => 'json',
-        'bibliography' => 'json',
+        'address' => 'json',
+        'schedule' => 'json',
+        'price' => 'json',
         'audio' => 'json',
-        'prices' => 'json',
-        'schedules' => 'json',
+        'transport' => 'json',
+        'audio_script' => 'json',
+        'galery_image' => 'json',
+        'bibliography' => 'json',
+        'geoloc' => 'json'
     ];
 
-    protected $fillable = ['title','geoloc', 'address', 'image', 'transports', 'description', 'bibliography', 'audio', 'schedules','prices','city_id','par_id','created_at','updated_at'];
+    protected $primaryKey = 'id';
 
-    protected $aTranslateVars = ['title','transports','description','bibliography', 'audio', 'schedules', 'prices'];
-
-    public static function getByParcours($par_id) {
-        $aInterests = Self::where(['par_uid', '=', $par_id], ['state', '=', true]);
-        return $this->sendResponse($oCity->toArray(), null);
-    }
+    protected $aTranslateVars = [
+      'title', 
+      'address', 
+      'schedule', 
+      'price', 
+      'audio', 
+      'transport',
+      'audio_script',
+      'bibliography'
+    ];
 }

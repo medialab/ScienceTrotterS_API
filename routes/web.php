@@ -1,6 +1,5 @@
 <?php
 
-
 $router->post('/login', 'UsersController@login');
 $router->get('/logout', 'UsersController@logout');
 
@@ -36,8 +35,3 @@ $router->group($aPrivateConfig, function () use ($router) {
     require __DIR__.'/private/index.php';
 
 });
-
-
-
-$router->get('/initialize_database', 'HomeController@initialize_database');
-$router->get('/initialize_database_mockup', 'HomeController@initialize_database_mockup');

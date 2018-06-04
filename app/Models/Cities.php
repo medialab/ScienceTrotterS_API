@@ -2,21 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Utils\ModelUtil;
 
-class Cities extends CustModel
+class Cities extends ModelUtil
 {
-
-    public $timestamps = true;
     protected $table = 'cities';
 
-    protected $fillable = ['title','image','state','geoloc','force_lang','updated_at','created_at'];
-    
-    protected $casts = [
-        'id' => 'string',
-        'title' => 'json',
+    public $timestamps = true;
+
+    protected $fillable = [
+      'id',
+      'title',
+      'image',
+      'geoloc',
+      'force_lang',
+      'state'
     ];
 
-    protected $primaryKey = "id";
-    protected $aTranslateVars = ['title'];
+    protected $casts = [
+      'id' => 'string',
+      'title' => 'json',
+      'geoloc' => 'json'
+    ];
+
+    protected $primaryKey = 'id';
+
+    protected $aTranslateVars = [
+      'title'
+    ];
 }

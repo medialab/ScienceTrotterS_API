@@ -13,7 +13,7 @@ class APIControllerUtil extends BaseController
         return 'App\Models\\'.$this->sModelClass;
     }
 
-    public function list(Request $oRequest) {
+    public function _list(Request $oRequest) {
         $limit = (int)$oRequest->input('limit');
         if (!$limit) {
             $limit = 5000;
@@ -47,7 +47,7 @@ class APIControllerUtil extends BaseController
         return $this->sendResponse($oModelList->toArray(), null)->content();
     }
 
-    public function sendResponse($result, $message)
+    public function sendResponse($result, $message = null)
     {
         if (!empty($_POST['callback'])) {
             $cl = $_POST['callback'];
