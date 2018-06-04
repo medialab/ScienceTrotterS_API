@@ -10,6 +10,7 @@ use App\Utils\CheckerUtil;
 
 class InterestsController extends Controller
 {
+  protected $bAdmin = false;
   protected $sModelClass = 'Interests';
   /*public function list() {
     $aData = Interests::where('state', '=', 'true')

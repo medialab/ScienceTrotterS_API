@@ -26,7 +26,9 @@ class Interests extends ModelUtil
       'galery_image',
       'bibliography',
       'force_lang',
-      'state'
+      'state',
+      'created_at',
+      'updated_at'
     ];
 
     protected $casts = [

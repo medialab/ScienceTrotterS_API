@@ -16,7 +16,9 @@ class Cities extends ModelUtil
       'image',
       'geoloc',
       'force_lang',
-      'state'
+      'state',
+      'created_at',
+      'updated_at'
     ];
 
     protected $casts = [

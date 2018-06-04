@@ -52,7 +52,7 @@ class UsersController extends Controller
 
 		$pass = $request->input('password');
 		$user = Users::where('email', $request->input('email'))->first();
-		
+
 		if (!$user) {
 			return response()->json(['status' => false], 401);
 		}

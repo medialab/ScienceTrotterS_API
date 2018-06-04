@@ -2,6 +2,7 @@
 
 namespace Database\Mockup;
 
+use App\Models\Users;
 use App\Models\Cities;
 use App\Models\Parcours;
 use App\Models\Interests;
@@ -17,6 +18,7 @@ class DefaultMockup
     $this->table_cities();
     $this->table_parcours();
     $this->table_interests();
+    $this->table_users();
   }
 
   public function table_cities() {
@@ -85,6 +87,22 @@ class DefaultMockup
       $oInterest->force_lang = $iData->force_lang;
       $oInterest->state = $iData->state;
       $oInterest->save();
+    }
+  }
+
+  public function table_users() {
+    $aData = $this->getFile('users');
+
+    Users::truncate();
+
+    foreach ($aData as $iData) {
+      $oUsers = new Users;
+
+      foreach ($iData as $sKey => $sData) {
+        $oUsers->$sKey = $sData;
+      }
+
+      $oUsers->save();
     }
   }
 }

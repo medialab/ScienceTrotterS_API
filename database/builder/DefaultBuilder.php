@@ -57,9 +57,9 @@ class DefaultBuilder
             Schema::create('cities', function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->json('title');
-                $table->text('image');
-                $table->json('geoloc');
-                $table->text('force_lang');
+                $table->text('image')->nullable();
+                $table->json('geoloc')->nullable();
+                $table->text('force_lang')->nullable();
                 $table->boolean('state');
                 $table->timestamps();
             });
@@ -72,11 +72,11 @@ class DefaultBuilder
         if (!Schema::hasTable('parcours')) {
             Schema::create('parcours', function (Blueprint $table) {
                 $table->uuid('id')->primary();
-                $table->uuid('cities_id');
+                $table->uuid('cities_id')->nullable();
                 $table->json('title');
-                $table->json('time');
-                $table->json('audio');
-                $table->json('description');
+                $table->json('time')->nullable();
+                $table->json('audio')->nullable();
+                $table->json('description')->nullable();
                 $table->text('force_lang');
                 $table->boolean('state');
                 $table->timestamps();
@@ -90,19 +90,19 @@ class DefaultBuilder
         if (!Schema::hasTable('interests')) {
             Schema::create('interests', function (Blueprint $table) {
                 $table->uuid('id')->primary();
-                $table->uuid('cities_id');
-                $table->uuid('parcours_id');
-                $table->text('header_image');
+                $table->uuid('cities_id')->nullable();
+                $table->uuid('parcours_id')->nullable();
+                $table->text('header_image')->nullable();
                 $table->json('title');
-                $table->text('address');
-                $table->json('geoloc');
-                $table->json('schedule');
-                $table->json('price');
-                $table->json('audio');
-                $table->json('transport');
-                $table->json('audio_script');
-                $table->json('galery_image');
-                $table->json('bibliography');
+                $table->text('address')->nullable();
+                $table->json('geoloc')->nullable();
+                $table->json('schedule')->nullable();
+                $table->json('price')->nullable();
+                $table->json('audio')->nullable();
+                $table->json('transport')->nullable();
+                $table->json('audio_script')->nullable();
+                $table->json('galery_image')->nullable();
+                $table->json('bibliography')->nullable();
                 $table->text('force_lang');
                 $table->boolean('state');
                 $table->timestamps();

@@ -21,13 +21,17 @@ class RequestUtil extends Request
            static::$sLang = strtolower($this->getParam('lang'));
        }
        // ==> Set limit.
-       if (is_numeric($this->getParam('limit'))) {
-           static::$dLimit = intval($this->getParam('limit'));
+       $limit = (int)$this->getParam('limit');
+       if (!$limit) {
+       	$limit = 5000;
        }
+       static::$dLimit = $limit;
        // ==> Set limit.
-       if (is_numeric($this->getParam('skip'))) {
-           static::$dSkip = intval($this->getParam('skip'));
+       $skip = (int)$this->getParam('skip');
+       if (!$skip) {
+       	$skip = 0;
        }
+       static::$dSkip = $skip;
    }
 
    public function getParam($sKey) {

@@ -6,8 +6,8 @@ use App\Utils\RequestUtil as Request;
 
 class APIControllerUtil extends BaseController
 {
-    protected $bAdmin = false;
     protected $sModelClass;
+    protected $bAdmin = false;
 
     public function getClass() {
         return 'App\Models\\'.$this->sModelClass;
@@ -38,14 +38,14 @@ class APIControllerUtil extends BaseController
             $oModelList = call_user_func($class.'::take', $limit);
 
             if ($sLang) {
-                $oModelList->where(function($query) use ($sLang){
-                    $query->where('force_lang', $sLang)
-                          ->orWhere('force_lang', '')
-                    ;
-                });
+                $oModelList
+                    ->where('force_lang', $sLang)
+                    ->orWhere('force_lang', '')
+                 //   ->take($limit)->skip($skip)
+                ;
             }
 
-            $oModelList = $oModelList->skip($skip)->get($columns);
+            $oModelList = $oModelList->take($limit)->skip($skip)->get($columns);
         }
 
         if ($sLang) {
@@ -54,6 +54,7 @@ class APIControllerUtil extends BaseController
             }
         }
 
+        ModelUtil::$bAdmin = $this->bAdmin;
         return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
     }
 
@@ -173,12 +174,15 @@ class APIControllerUtil extends BaseController
             $this->downloadImage($aUpdates['image']);
         }
 
-        /* La ville ne peut être activée que si tout les champs sont remplis */
-        if (!strlen($oModel->image) || !strlen($oModel->geoloc)) {
-            $oModel->state = false;
+        if (property_exists($oModel, 'geoloc')) {
+            /* La ville ne peut être activée que si tout les champs sont remplis */
+            if (!strlen($oModel->image) || is_null($oCity->geoloc) || count(get_object_vars($oModel->geoloc)) != 2) {
+                $oModel->state = false;
+            }
         }
 
         if ($oModel->save()) {
+            ModelUtil::$bAdmin = true;
             return $this->sendResponse($oModel, null);
         }
 
@@ -218,11 +222,12 @@ class APIControllerUtil extends BaseController
         }
 
         /* La ville ne peut être activée que si tout les champs sont remplis */
-        if (!strlen($oModel->image) || !strlen($oModel->geoloc)) {
+        if (!strlen($oModel->image) || is_null($oCity->geoloc) || count(get_object_vars($oModel->geoloc)) != 2) {
             $oModel->state = false;
         }
 
         if ($oModel->save()) {
+            ModelUtil::$bAdmin = true;
             return $this->sendResponse($oModel, null);
         }
 
@@ -253,10 +258,38 @@ class APIControllerUtil extends BaseController
 
     public function get($id, Request $oRequest) {
         $columns = $oRequest->input('columns');
-
+        $sLang = $oRequest->input('lang');
         $class = $this->getClass();
-        $oModel = call_user_func($class.'::where', 'id', $id)->get($columns)->first();
-        return $this->sendResponse($oModel->toArray(), null)->content();
+
+        if (!$this->bAdmin) {
+            $oModelList = 
+                ($class)::Where([['state', '=', true], ['id', '=', $id]])->where(function($query) use ($sLang){
+                    $query->where('force_lang', $sLang)
+                          ->orWhere('force_lang', '')
+                    ;
+                })
+            ;
+        }
+        else{
+            $oModelList = $class::Where('id', $id);
+
+            if ($sLang) {
+                $oModelList->where(function($query) use ($sLang){
+                        $query->where('force_lang', $sLang)
+                              ->orWhere('force_lang', '')
+                        ;
+                    })
+                ;
+            }
+
+            $oModel = $oModelList->get($columns)->first;
+            if ($sLang) {
+                $oModel->setLang($sLang);
+            }
+        }
+
+        ModelUtil::$bAdmin = $this->bAdmin;
+        return $this->sendResponse($oModel->toArray($this->bAdmin), null)->content();
     }
 
     public function getByCity($id, Request $oRequest) {

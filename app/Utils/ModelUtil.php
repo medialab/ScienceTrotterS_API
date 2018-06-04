@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ModelUtil extends Model
 {
+	public static $bAdmin = false; // Langue Séléctionnée
 	private $sCurLang = false; // Langue Séléctionnée
 	protected $aTranslateVars = []; // les Variables à traduire
 	protected $aSkipPublic = ['created_at', 'state', 'sCurLang'];
@@ -167,7 +168,7 @@ class ModelUtil extends Model
 
 	    foreach ($this->attributes as $sVar => $value) {
 
-	        if (in_array($sVar, $this->hidden) || (!$bAdmin && in_array($sVar, $this->aSkipPublic))) {
+	        if (in_array($sVar, $this->hidden) || ((!$bAdmin && !static::$bAdmin) && in_array($sVar, $this->aSkipPublic))) {
 	            continue;
 	        }
 
@@ -181,7 +182,7 @@ class ModelUtil extends Model
 		                if (empty($value) || (!isset($value->$sLang))) {
 		                    $value = null;
 		                }
-		                elseif ($bAdmin){
+		                elseif ($bAdmin || static::$bAdmin){
 		                    $aResult[$sVar] = $value->$sLang;
 		                }
 		                else{
@@ -209,7 +210,7 @@ class ModelUtil extends Model
 	        }
 	    }
 
-	    if ($bAdmin) {
+	    if ($bAdmin || static::$bAdmin) {
 	    	$aResult['sCurLang'] = $sLang;
 	    	$aResult['force_lang'] = empty($this->attributes['force_lang']) ? null : $this->attributes['force_lang'];
 	    }

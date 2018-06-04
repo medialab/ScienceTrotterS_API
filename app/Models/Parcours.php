@@ -18,7 +18,9 @@ class Parcours extends ModelUtil
       'audio',
       'description',
       'force_lang',
-      'state'
+      'state',
+      'created_at',
+      'updated_at'
     ];
 
     protected $casts = [
