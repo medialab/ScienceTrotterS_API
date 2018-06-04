@@ -76,8 +76,9 @@ class DefaultBuilder
                 $table->json('title');
                 $table->json('time')->nullable();
                 $table->json('audio')->nullable();
+                $table->text('color')->nullable();
                 $table->json('description')->nullable();
-                $table->text('force_lang');
+                $table->text('force_lang')->nullable();
                 $table->boolean('state');
                 $table->timestamps();
             });
@@ -103,7 +104,7 @@ class DefaultBuilder
                 $table->json('audio_script')->nullable();
                 $table->json('galery_image')->nullable();
                 $table->json('bibliography')->nullable();
-                $table->text('force_lang');
+                $table->text('force_lang')->nullable();
                 $table->boolean('state');
                 $table->timestamps();
             });

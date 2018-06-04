@@ -19,6 +19,7 @@ class Parcours extends ModelUtil
       'description',
       'force_lang',
       'state',
+      'color',
       'created_at',
       'updated_at'
     ];

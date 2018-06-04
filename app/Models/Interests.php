@@ -23,7 +23,7 @@ class Interests extends ModelUtil
       'audio',
       'transport',
       'audio_script',
-      'galery_image',
+      'gallery_image',
       'bibliography',
       'force_lang',
       'state',
@@ -55,6 +55,6 @@ class Interests extends ModelUtil
       'audio', 
       'transport',
       'audio_script',
-      'bibliography'
+      'bibliography',
     ];
 }

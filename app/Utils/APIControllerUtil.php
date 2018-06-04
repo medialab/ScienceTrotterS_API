@@ -27,6 +27,7 @@ class APIControllerUtil extends BaseController
                 ($class)::Where('state', true)->where(function($query) use ($sLang){
                     $query->where('force_lang', $sLang)
                           ->orWhere('force_lang', '')
+                          ->orWhereNull('force_lang')
                     ;
                 })
                 ->take($limit)
@@ -41,6 +42,7 @@ class APIControllerUtil extends BaseController
                 $oModelList
                     ->where('force_lang', $sLang)
                     ->orWhere('force_lang', '')
+                    ->orWhereNull('force_lang')
                  //   ->take($limit)->skip($skip)
                 ;
             }
@@ -120,22 +122,32 @@ class APIControllerUtil extends BaseController
      * @param  String $sName Nom de l'image
      */
     private function downloadImage($sName) {
+        //var_dump("Downloading", $sName);
         /* On crée le dossier de l'image */
         $dir = dirname(UPLOAD_PATH.$sName);
         if (!is_dir($dir)) {
+            //var_dump("Dir Not Exists");
             mkdir($dir, 0775, true);
         }
 
         /* Url De téléchargement de l'image */
         $imgUrl = ADMIN_URL.'upload/'.$sName;
+        //var_dump("url", $imgUrl);
 
         /* si l'image existe on la remplace */
         $sPath = UPLOAD_PATH.$sName;
+        //var_dump("path", $sPath);
+        //var_dump("path", realpath($sPath));
+
+        
         if (file_exists($sPath)) {
+            //var_dump("Delete Existing");
             unlink($sPath);
         }
 
-        file_put_contents($sPath, fopen($imgUrl, 'r'));
+        $b = file_put_contents($sPath, fopen($imgUrl, 'r'));
+        //var_dump("Result", $b);
+        //exit;
     }
 
 
@@ -156,22 +168,31 @@ class APIControllerUtil extends BaseController
         $aUpdates = [];
         $aData = $oRequest->input('data');
 
+        //var_dump("Adatas", $aData);
         foreach ($aData as $key => $value) {
+            //var_dump("===Key: $key");
+            //var_dump(strpos($key, 'image'));
             
             /* Données à Ignorer lors de l'update */
             if (in_array($key, ['id', 'created_at', 'updated_at'])) {
                 continue;
             }
-            elseif ($key === 'image' && empty($value)) {
-                continue;
+            elseif (strpos($key, 'image') !== false) {
+                //var_dump("Image $key", $value);
+                if (empty($value)) {
+                    //var_dump("Image Empty");
+                    continue;
+                }
+                
+                //var_dump("TEST", !empty($value), $value !== $oModel->$key);
+                if(!empty($value) && $value !== $oModel->$key) {
+                    //var_dump("downloading");
+                    $this->downloadImage($value);
+                }
             }
 
 
             $oModel->$key = $value;
-        }
-        
-        if(!empty($aUpdates['image']) && $aUpdates['image'] !== $oModel->image) {
-            $this->downloadImage($aUpdates['image']);
         }
 
         if (property_exists($oModel, 'geoloc')) {
@@ -209,8 +230,18 @@ class APIControllerUtil extends BaseController
             if (in_array($key, ['id', 'created_at', 'updated_at'])) {
                 continue;
             }
-            elseif ($key === 'image' && empty($value)) {
-                continue;
+            if (empty($value)) {
+                if (strpos($key, 'image') !== false) {
+                    continue;
+                }
+                elseif(strpos($key, 'id')) {
+                    continue;
+                }
+            }
+            elseif (strpos($key, 'image') !== false) {
+                if(!empty($aUpdates[$key]) && $aUpdates[$key] !== $oModel->image) {
+                    $this->downloadImage($aUpdates[$key]);
+                }
             }
 
             $oModel->$key = $value;
@@ -266,9 +297,12 @@ class APIControllerUtil extends BaseController
                 ($class)::Where([['state', '=', true], ['id', '=', $id]])->where(function($query) use ($sLang){
                     $query->where('force_lang', $sLang)
                           ->orWhere('force_lang', '')
+                          ->orWhereNull('force_lang')
                     ;
                 })
             ;
+
+            $oModel = $oModelList->get($columns)->first();
         }
         else{
             $oModelList = $class::Where('id', $id);
@@ -277,18 +311,23 @@ class APIControllerUtil extends BaseController
                 $oModelList->where(function($query) use ($sLang){
                         $query->where('force_lang', $sLang)
                               ->orWhere('force_lang', '')
+                              ->orWhereNull('force_lang')
                         ;
                     })
                 ;
             }
 
-            $oModel = $oModelList->get($columns)->first;
+            $oModel = $oModelList->get($columns)->first();
             if ($sLang) {
                 $oModel->setLang($sLang);
             }
         }
 
         ModelUtil::$bAdmin = $this->bAdmin;
+        if (is_null($oModel)) {
+            return $this->sendError('Not Found', ['Model introuvable'], 404);
+        }
+
         return $this->sendResponse($oModel->toArray($this->bAdmin), null)->content();
     }
 

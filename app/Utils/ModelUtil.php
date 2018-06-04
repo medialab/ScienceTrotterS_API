@@ -229,8 +229,7 @@ class ModelUtil extends Model
 				$this->attributes[$skey] = json_encode($iAttr);
 			}
 		}
-	    
-	
+
 	    return Parent::save($options);
 	}
 }
