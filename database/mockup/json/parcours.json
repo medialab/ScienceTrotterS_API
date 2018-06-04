@@ -18,7 +18,7 @@
       "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
       "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
     },
-    "force_lang": false,
+    "force_lang": "",
     "state": true
   },
   {
@@ -39,7 +39,7 @@
       "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
       "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
     },
-    "force_lang": false,
+    "force_lang": "",
     "state": true
   },
   {
@@ -60,7 +60,7 @@
       "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
       "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
     },
-    "force_lang": false,
+    "force_lang": "",
     "state": true
   },
   {
@@ -81,7 +81,7 @@
       "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
       "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
     },
-    "force_lang": false,
+    "force_lang": "",
     "state": true
   },
   {
@@ -102,7 +102,7 @@
       "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
       "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
     },
-    "force_lang": false,
+    "force_lang": "",
     "state": true
   }
 ]

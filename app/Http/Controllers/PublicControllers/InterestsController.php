@@ -10,13 +10,13 @@ use App\Utils\CheckerUtil;
 
 class InterestsController extends Controller
 {
-
-  public function list() {
+  protected $sModelClass = 'Interests';
+  /*public function list() {
     $aData = Interests::where('state', '=', 'true')
       ->get()
       ->toArray();
     return $this->sendResponse($aData);
-  }
+  }*/
 
   public function byParcourId($sParcourId) {
     $aData = [];

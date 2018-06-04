@@ -11,7 +11,7 @@
     },
     "image": "/cities/placeholder.png",
     "state": true,
-    "force_lang": false
+    "force_lang": ""
   },
   {
     "title": {
@@ -24,7 +24,7 @@
     },
     "image": "/cities/placeholder.png",
     "state": true,
-    "force_lang": false
+    "force_lang": ""
   },
   {
     "title": {
@@ -37,7 +37,7 @@
     },
     "image": "/cities/placeholder.png",
     "state": true,
-    "force_lang": false
+    "force_lang": ""
   },
   {
     "title": {
@@ -50,7 +50,7 @@
     },
     "image": "/cities/placeholder.png",
     "state": true,
-    "force_lang": false
+    "force_lang": ""
   },
   {
     "title": {
@@ -63,7 +63,7 @@
     },
     "image": "/cities/placeholder.png",
     "state": true,
-    "force_lang": false
+    "force_lang": ""
   },
   {
     "title": {
@@ -76,7 +76,7 @@
     },
     "image": "/cities/placeholder.png",
     "state": true,
-    "force_lang": false
+    "force_lang": ""
   },
   {
     "title": {
@@ -89,6 +89,6 @@
     },
     "image": "/cities/placeholder.png",
     "state": true,
-    "force_lang": false
+    "force_lang": ""
   }
 ]

@@ -13,28 +13,38 @@ class APIControllerUtil extends BaseController
         return 'App\Models\\'.$this->sModelClass;
     }
 
-    public function _list(Request $oRequest) {
-        $limit = (int)$oRequest->input('limit');
-        if (!$limit) {
-            $limit = 5000;
-        }
-        
-        $skip = (int)$oRequest->input('skip');
-        if (!$skip) {
-            $skip = false;
-        }
+    public function list(Request $oRequest) {
+        $skip = $oRequest->getSkip();
+        $limit = $oRequest->getLimit();
+        $sLang = $oRequest->input('lang');
 
         $columns = $oRequest->input('columns');
 
-        $sLang = $oRequest->input('lang');
         $class = $this->getClass();
 
         if (!$this->bAdmin) {
-            $oModelList = call_user_func($class.'::where', 'state', 'true');
-            $oModelList = $oModelList->take($limit)->skip($skip)->get($columns);
+            $oModelList = 
+                ($class)::Where('state', true)->where(function($query) use ($sLang){
+                    $query->where('force_lang', $sLang)
+                          ->orWhere('force_lang', '')
+                    ;
+                })
+                ->take($limit)
+                ->skip($skip)
+                ->get($columns)
+            ;
         }
         else{
             $oModelList = call_user_func($class.'::take', $limit);
+
+            if ($sLang) {
+                $oModelList->where(function($query) use ($sLang){
+                    $query->where('force_lang', $sLang)
+                          ->orWhere('force_lang', '')
+                    ;
+                });
+            }
+
             $oModelList = $oModelList->skip($skip)->get($columns);
         }
 
@@ -44,7 +54,7 @@ class APIControllerUtil extends BaseController
             }
         }
 
-        return $this->sendResponse($oModelList->toArray(), null)->content();
+        return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
     }
 
     public function sendResponse($result, $message = null)

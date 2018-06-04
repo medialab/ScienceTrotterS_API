@@ -9,12 +9,13 @@ use App\Utils\CheckerUtil;
 
 class ParcoursController extends Controller
 {
-  public function list() {
+  protected $sModelClass = 'Parcours';
+  /*public function list() {
     $aData = Parcours::where('state', '=', 'true')
       ->get()
       ->toArray();
     return $this->sendResponse($aData);
-  }
+  }*/
 
   public function byCityId($sCityId) {
     $aData = [];
