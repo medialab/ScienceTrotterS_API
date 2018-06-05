@@ -7,3 +7,5 @@ Homestead.yaml
 /.phpintel
 .phpintel
 composer.lock
+config/conf.php
+/config/conf.php
