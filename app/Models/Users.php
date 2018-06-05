@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\UsersToken;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Auth\Authenticatable as AuthenticableTrait;
 
-class Users extends Model implements Authenticatable
+use App\Utils\ModelUtil;
+
+class Users extends ModelUtil implements Authenticatable
 {
 	use AuthenticableTrait;
 
@@ -33,5 +35,9 @@ class Users extends Model implements Authenticatable
 
 		$user = Users::where('id', $token->user);
 		return $user;
+	}
+
+	public function __set($sVar, $var) {
+		$this->attributes[$sVar] = $var;
 	}
 }

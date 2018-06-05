@@ -1,0 +1,108 @@
+[
+  {
+    "id": "ba041388-2270-4d10-a2d5-aa171b6ccfa8",
+    "cities_id": "c661d0ba-f710-43d3-ac5b-79ea5e1fce8b",
+    "title": {
+      "fr": "Le genre des sciences",
+      "en": "Le genre des sciences"
+    },
+    "time": {
+      "fr": "entre 3 et 5h",
+      "en": "around 3 and 5h"
+    },
+    "audio": {
+      "fr": "",
+      "en": ""
+    },
+    "description": {
+      "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
+      "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
+    },
+    "force_lang": "",
+    "state": true
+  },
+  {
+    "cities_id": "c661d0ba-f710-43d3-ac5b-79ea5e1fce8b",
+    "title": {
+      "fr": "Le genre des sciences",
+      "en": "Le genre des sciences"
+    },
+    "time": {
+      "fr": "entre 2 et 4h",
+      "en": "around 2 and 4h"
+    },
+    "audio": {
+      "fr": "",
+      "en": ""
+    },
+    "description": {
+      "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
+      "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
+    },
+    "force_lang": "",
+    "state": true
+  },
+  {
+    "cities_id": "c661d0ba-f710-43d3-ac5b-79ea5e1fce8b",
+    "title": {
+      "fr": "L'eau dans paris",
+      "en": "L'eau dans paris"
+    },
+    "time": {
+      "fr": "entre 3 et 5h",
+      "en": "around 3 and 5h"
+    },
+    "audio": {
+      "fr": "",
+      "en": ""
+    },
+    "description": {
+      "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
+      "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
+    },
+    "force_lang": "",
+    "state": true
+  },
+  {
+    "cities_id": "c661d0ba-f710-43d3-ac5b-79ea5e1fce8b",
+    "title": {
+      "fr": "La fée électricité",
+      "en": "La fée électricité"
+    },
+    "time": {
+      "fr": "entre 3 et 5h",
+      "en": "around 3 and 5h"
+    },
+    "audio": {
+      "fr": "",
+      "en": ""
+    },
+    "description": {
+      "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
+      "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
+    },
+    "force_lang": "",
+    "state": true
+  },
+  {
+    "cities_id": "c661d0ba-f710-43d3-ac5b-79ea5e1fce8b",
+    "title": {
+      "fr": "Les amateurs",
+      "en": "Les amateurs"
+    },
+    "time": {
+      "fr": "entre 1 et 1h30",
+      "en": "around 1 and 1h3°"
+    },
+    "audio": {
+      "fr": "",
+      "en": ""
+    },
+    "description": {
+      "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
+      "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
+    },
+    "force_lang": "",
+    "state": true
+  }
+]

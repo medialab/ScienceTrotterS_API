@@ -4,19 +4,50 @@ namespace App\Http\Controllers;
 
 use App\Utils\APIControllerUtil as Controller;
 use App\Utils\RequestUtil as Request;
-use App\Utils\ValidatorUtil as Validator;
 use App\Models\Parcours;
+use App\Utils\CheckerUtil;
 
 class ParcoursController extends Controller
 {
-	public function list(Request $oRequest)
-	{
-		$aParcours = Parcours::where('state', true)->take($oRequest->input('limit'))->skip($oRequest->input('offset'))->get();
-		return $this->sendResponse($aParcours->toArray(), null);
-	}
+  protected $bAdmin = true;
+  protected $sModelClass = 'Parcours';
+  /*public function list() {
+    $aData = Parcours::where('state', '=', 'true')
+      ->get()
+      ->toArray();
+    return $this->sendResponse($aData);
+  }*/
 
-	public function get($id) {
-		$oCity = Parcours::where('id', $id)->first();
-		return $this->sendResponse($oCity->toArray(), null);
-	}
+  public function byCityId($sCityId) {
+    $aData = [];
+
+    if (CheckerUtil::is_uuid_v4($sCityId)) {
+      $aWhereClauses = [
+        ['state', '=', 'true'],
+        ['cities_id', '=', $sCityId]
+      ];
+      $aData = Parcours::where($aWhereClauses)
+        ->get()
+        ->toArray();
+    }
+
+    return $this->sendResponse($aData);
+  }
+
+  public function byId($sParcourId) {
+    $aData = [];
+
+    if (CheckerUtil::is_uuid_v4($sParcourId)) {
+      $aWhereClauses = [
+        ['state', '=', 'true'],
+        ['id', '=', $sParcourId]
+      ];
+      $aData = Parcours::where($aWhereClauses)
+        ->get()
+        ->toArray();
+    }
+
+    return $this->sendResponse($aData);
+  }
+
 }

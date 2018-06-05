@@ -2,18 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Utils\ModelUtil;
 
-class Cities extends Model
+class Cities extends ModelUtil
 {
-
-    public $timestamps = true;
     protected $table = 'cities';
 
-    protected $fillable = ['label','image','state','geoloc'];
-    protected $casts = [
-        'id' => 'string',
-    ];
-    protected $primaryKey = "id";
+    public $timestamps = true;
 
+    protected $fillable = [
+      'id',
+      'title',
+      'image',
+      'geoloc',
+      'force_lang',
+      'state',
+      'created_at',
+      'updated_at'
+    ];
+
+    protected $casts = [
+      'id' => 'string',
+      'title' => 'json',
+      'geoloc' => 'json'
+    ];
+
+    protected $primaryKey = 'id';
+
+    protected $aTranslateVars = [
+      'title'
+    ];
 }
