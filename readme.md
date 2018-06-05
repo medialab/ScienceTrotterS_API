@@ -10,16 +10,16 @@
 
 ## Getting Started
 
-1) Prerequisites
-First of all you need an installation of Node JS.
-https://getcomposer.org/
-
-2) Dependencies 
+1) Dependencies 
 
 Install all dependencies
 ```
 composer install
 ```
+
+2) Set configuartions in /config/config.php
+
+
 3) Configuration
 
 Copy the file `.env.example` and past it to a new file `.env`
@@ -38,8 +38,16 @@ PG_PREFIX=
 PG_SCHEMA=
 ```
 
-4) Nginx Vhost
+4) Create Database On server
 
+
+5) To populate the Database
+
+go to the website root	
+execute the command: php tng
+
+
+6) Nginx Vhost
 
 server {
 	listen 80;
@@ -72,7 +80,7 @@ server {
 }
 
 
-5) Usage
+7) Usage
 
 The main entry url is `your_site_name.your_domain_name/public`
 

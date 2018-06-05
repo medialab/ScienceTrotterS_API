@@ -1,0 +1,94 @@
+[
+  {
+    "id": "c661d0ba-f710-43d3-ac5b-79ea5e1fce8b",
+    "title": {
+      "fr": "Paris",
+      "en": "Paris"
+    },
+    "geoloc": {
+      "latitude": 48.8566,
+      "longitude": 2.3522
+    },
+    "image": "/cities/placeholder.png",
+    "state": true,
+    "force_lang": ""
+  },
+  {
+    "title": {
+      "fr": "Dijon",
+      "en": "Dijon"
+    },
+    "geoloc": {
+      "latitude": 48.863770,
+      "longitude": 2.347921
+    },
+    "image": "/cities/placeholder.png",
+    "state": true,
+    "force_lang": ""
+  },
+  {
+    "title": {
+      "fr": "Le Havre",
+      "en": "Le Havre"
+    },
+    "geoloc": {
+      "latitude": 48.863770,
+      "longitude": 2.347921
+    },
+    "image": "/cities/placeholder.png",
+    "state": true,
+    "force_lang": ""
+  },
+  {
+    "title": {
+      "fr": "Menton",
+      "en": "Menton"
+    },
+    "geoloc": {
+      "latitude": 48.863770,
+      "longitude": 2.347921
+    },
+    "image": "/cities/placeholder.png",
+    "state": true,
+    "force_lang": ""
+  },
+  {
+    "title": {
+      "fr": "Nancy",
+      "en": "Nancy"
+    },
+    "geoloc": {
+      "latitude": 48.863770,
+      "longitude": 2.347921
+    },
+    "image": "/cities/placeholder.png",
+    "state": true,
+    "force_lang": ""
+  },
+  {
+    "title": {
+      "fr": "Poitiers",
+      "en": "Poitiers"
+    },
+    "geoloc": {
+      "latitude": 48.863770,
+      "longitude": 2.347921
+    },
+    "image": "/cities/placeholder.png",
+    "state": true,
+    "force_lang": ""
+  },
+  {
+    "title": {
+      "fr": "Reims",
+      "en": "Reims"
+    },
+    "geoloc": {
+      "latitude": 48.863770,
+      "longitude": 2.347921
+    },
+    "image": "/cities/placeholder.png",
+    "state": true,
+    "force_lang": ""
+  }
+]

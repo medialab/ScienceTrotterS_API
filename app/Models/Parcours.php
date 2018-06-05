@@ -2,22 +2,42 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Utils\ModelUtil;
 
-class Parcours extends Model
+class Parcours extends ModelUtil
 {
-	public $timestamps = true;
     protected $table = 'parcours';
+
+    public $timestamps = true;
+
+    protected $fillable = [
+      'id',
+      'cities_id',
+      'title',
+      'time',
+      'audio',
+      'description',
+      'force_lang',
+      'state',
+      'color',
+      'created_at',
+      'updated_at'
+    ];
 
     protected $casts = [
         'id' => 'string',
+        'title' => 'json',
+        'time' => 'json',
+        'audio' => 'json',
+        'description' => 'json'
     ];
 
-    protected $fillable = ['title','time','audio','description', 'city_id', 'state'];
+    protected $primaryKey = 'id';
 
-    public static function getByCity($city_id) {
-    	$aParcours = Self::where(['city_id', '=', $city_id], ['state', '=', true]);
-
-    	return $this->sendResponse($oCity->toArray(), null);
-    }
+    protected $aTranslateVars = [
+      'title', 
+      'time', 
+      'audio', 
+      'description'
+    ];
 }
