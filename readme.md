@@ -16,7 +16,9 @@ Install all dependencies
 ```
 composer install
 ```
-2) Configuration
+2) Set configuartions in /config/config.php
+
+3) Configuration
 
 Copy the file `.env.example` and past it to a new file `.env`
 Then edit the Postgres configuration.
@@ -34,7 +36,7 @@ PG_PREFIX=
 PG_SCHEMA=
 ```
 
-3) Nginx Vhost
+4) Nginx Vhost
 
 
 server {
@@ -68,7 +70,7 @@ server {
 }
 
 
-4) Usage
+5) Usage
 
 The main entry url is `your_site_name.your_domain_name/public`
 
