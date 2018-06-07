@@ -23,7 +23,7 @@ class Interests extends ModelUtil
       'audio',
       'transport',
       'audio_script',
-      'gallery_image',
+      'galery_image',
       'bibliography',
       'force_lang',
       'state',
