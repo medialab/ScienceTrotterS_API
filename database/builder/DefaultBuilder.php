@@ -51,6 +51,18 @@ class DefaultBuilder
         }
     }
 
+    public function table_colors () {
+        Schema::dropIfExists('colors');
+        if (!Schema::hasTable('colors')) {
+            Schema::create('colors', function (Blueprint $table) {
+                $table->uuid('id')->primary();
+                $table->text('name');
+                $table->text('color');
+            });
+            DB::statement('ALTER TABLE colors ALTER COLUMN id SET DEFAULT uuid_generate_v4();');
+        }
+    }
+
     public function table_cities () {
         Schema::dropIfExists('cities');
         if (!Schema::hasTable('cities')) {

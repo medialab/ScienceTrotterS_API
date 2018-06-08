@@ -13,44 +13,64 @@ class APIControllerUtil extends BaseController
         return 'App\Models\\'.$this->sModelClass;
     }
 
-    public function list(Request $oRequest) {
+    public function list(Request $oRequest, $bAsList=false) {
         $skip = $oRequest->getSkip();
         $limit = $oRequest->getLimit();
         $sLang = $oRequest->input('lang');
+        $aOrder = $oRequest->getOrder();
 
         $columns = $oRequest->input('columns');
 
         $class = $this->getClass();
 
-        if (!$this->bAdmin) {
-            $oModelList = 
-                ($class)::Where('state', true)->where(function($query) use ($sLang){
-                    $query->where('force_lang', $sLang)
-                          ->orWhere('force_lang', '')
-                          ->orWhereNull('force_lang')
-                    ;
-                })
-                ->take($limit)
-                ->skip($skip)
-                ->get($columns)
-            ;
-        }
-        else{
-            $oModelList = call_user_func($class.'::take', $limit);
-
-            if ($sLang) {
-                $oModelList
-                    ->where('force_lang', $sLang)
-                    ->orWhere('force_lang', '')
-                    ->orWhereNull('force_lang')
-                 //   ->take($limit)->skip($skip)
+        if ($sLang || !$this->bAdmin) {
+            $oModelList = ($class)::where(function($query) use ($sLang){
+                $query->where('force_lang', $sLang)
+                      ->orWhere('force_lang', '')
+                      ->orWhereNull('force_lang')
                 ;
+            });
+
+            if (!$this->bAdmin) {
+                $oModelList->where('state', true);
+            }
+        }
+
+        else{
+            $oModelList = new $class;
+        }
+
+        if ($bAsList) {
+            return $oModelList;
+        }
+
+        $oModelList->take($limit)->skip($skip);
+
+        if ($aOrder && count($aOrder) === 2) {
+            $oModel = new $class;
+
+            $sOrderCol = $aOrder[0];
+            $sOrderWay = $aOrder[1];
+
+            if (in_array($sOrderCol, $oModel->aTranslateVars)) {
+                if ($oModel->force_lang) {
+                    $sOrderCol .= '->'.$oModel->force_lang.'' ;
+                }
+                elseif ($sLang) {
+                    $sOrderCol .= '->'.$sLang.'' ;
+                }
+                else{
+                    $sOrderCol .= '->fr' ;
+                }
             }
 
-            $oModelList = $oModelList->take($limit)->skip($skip)->get($columns);
+//            var_dump("ORDER BY", $sOrderCol, $sOrderWay);
+            $oModelList->orderBy($sOrderCol, $sOrderWay);
         }
 
-        if ($sLang) {
+        $oModelList = $oModelList->get($columns);
+
+        if ($this->bAdmin && $sLang) {
             foreach ($oModelList as $key => &$oModel) {
                 $oModel->setLang($sLang);
             }
@@ -116,41 +136,6 @@ class APIControllerUtil extends BaseController
         return response()->json($aResponse, $dCode);
     }
 
-
-    /**
-     * Télécharge l'image de la ville depuis le serveur d'Admin
-     * @param  String $sName Nom de l'image
-     */
-    private function downloadImage($sName) {
-        //var_dump("Downloading", $sName);
-        /* On crée le dossier de l'image */
-        $dir = dirname(UPLOAD_PATH.$sName);
-        if (!is_dir($dir)) {
-            //var_dump("Dir Not Exists");
-            mkdir($dir, 0775, true);
-        }
-
-        /* Url De téléchargement de l'image */
-        $imgUrl = ADMIN_URL.'upload/'.$sName;
-        //var_dump("url", $imgUrl);
-
-        /* si l'image existe on la remplace */
-        $sPath = UPLOAD_PATH.$sName;
-        //var_dump("path", $sPath);
-        //var_dump("path", realpath($sPath));
-
-        
-        if (file_exists($sPath)) {
-            //var_dump("Delete Existing");
-            unlink($sPath);
-        }
-
-        $b = file_put_contents($sPath, fopen($imgUrl, 'r'));
-        //var_dump("Result", $b);
-        //exit;
-    }
-
-
     public function update(Request $oRequest) {
         $class = $this->getClass();
 
@@ -168,12 +153,13 @@ class APIControllerUtil extends BaseController
         $aUpdates = [];
         $aData = $oRequest->input('data');
 
+        $oModel->updateData($aData);
         //var_dump("Adatas", $aData);
-        foreach ($aData as $key => $value) {
+        /*foreach ($aData as $key => $value) {
             //var_dump("===Key: $key");
             //var_dump(strpos($key, 'image'));
             
-            /* Données à Ignorer lors de l'update */
+            // Données à Ignorer lors de l'update
             if (in_array($key, ['id', 'created_at', 'updated_at'])) {
                 continue;
             }
@@ -193,18 +179,28 @@ class APIControllerUtil extends BaseController
 
 
             $oModel->$key = $value;
+        }*/
+
+        $msg = null;
+        if ($aData['state'] != $oModel->state) {
+            if ($oModel->force_lang) {
+                $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
+            }
+            else{
+                $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis les informations dans toutes les langues ?';
+            }
         }
 
+        //$oModel->state = $aData['state'];
         if (property_exists($oModel, 'geoloc')) {
             /* La ville ne peut être activée que si tout les champs sont remplis */
             if (!strlen($oModel->image) || is_null($oCity->geoloc) || count(get_object_vars($oModel->geoloc)) != 2) {
-                $oModel->state = false;
             }
         }
 
         if ($oModel->save()) {
             ModelUtil::$bAdmin = true;
-            return $this->sendResponse($oModel, null);
+            return $this->sendResponse($oModel, $msg);
         }
 
         return $this->sendError('Fail To Query Update', ['Fail To Query Update'], 400);
@@ -225,12 +221,18 @@ class APIControllerUtil extends BaseController
 
         $oModel = new $class;
         $oModel->setLang($sLang);
-        foreach ($aData as $key => $value) {
-            /* Données à Ignorer lors de l'update */
+        $oModel->updateData($aData);
+        
+        /*foreach ($aData as $key => $value) {
+            var_dump($key);
+            // Données à Ignorer lors de l'update
             if (in_array($key, ['id', 'created_at', 'updated_at'])) {
                 continue;
             }
-            if (empty($value)) {
+            if (in_array($key, $oModel)) {
+                # code...
+            }
+            if ( empty($value)) {
                 if (strpos($key, 'image') !== false) {
                     continue;
                 }
@@ -238,24 +240,21 @@ class APIControllerUtil extends BaseController
                     continue;
                 }
             }
-            elseif (strpos($key, 'image') !== false) {
-                if(!empty($aUpdates[$key]) && $aUpdates[$key] !== $oModel->image) {
+            elseif ($key === 'audio' || strpos($key, 'image') !== false) {
+                var_dump("Is Upload");
+                if(!empty($aUpdates[$key]) && $aUpdates[$key] !== $oModel->$key) {
                     $this->downloadImage($aUpdates[$key]);
+                }
+                else{
+                    var_dump("Skip Update");
                 }
             }
 
             $oModel->$key = $value;
-        }
-
-        if (!empty($aData['image'])) {
-            $this->downloadImage($aData['image']);
-            $oModel->image = $aData['image'];
-        }
+        }*/
 
         /* La ville ne peut être activée que si tout les champs sont remplis */
-        if (!strlen($oModel->image) || is_null($oCity->geoloc) || count(get_object_vars($oModel->geoloc)) != 2) {
-            $oModel->state = false;
-        }
+        $oModel->state = $aData['state'];
 
         if ($oModel->save()) {
             ModelUtil::$bAdmin = true;
@@ -351,5 +350,24 @@ class APIControllerUtil extends BaseController
         
 
         return $this->sendResponse($oModel->toArray(), null)->content();
+    }
+
+    public function byParcourId($id, Request $oRequest) {
+        $skip = $oRequest->getSkip();
+        $limit = $oRequest->getLimit();
+        $sLang = $oRequest->input('lang');
+        $columns = $oRequest->input('columns');
+
+        $oModelList = $this->list($oRequest, true);
+        $oModelList = $oModelList->where('parcours_id', $id)->take($limit)->skip($skip)->get($columns);;
+
+        if ($this->bAdmin && $sLang) {
+            foreach ($oModelList as $key => &$oModel) {
+                $oModel->setLang($sLang);
+            }
+        }
+
+        ModelUtil::$bAdmin = $this->bAdmin;
+        return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
     }
 }

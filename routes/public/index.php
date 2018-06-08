@@ -1,6 +1,13 @@
 <?php
 
 $aConfig = [
+  'prefix' => 'colors'
+];
+$router->group($aConfig, function () use ($router) {
+    require __DIR__.'/colors.php';
+});
+
+$aConfig = [
   'prefix' => 'cities'
 ];
 $router->group($aConfig, function () use ($router) {
