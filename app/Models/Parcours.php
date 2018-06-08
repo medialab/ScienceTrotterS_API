@@ -32,7 +32,12 @@ class Parcours extends ModelUtil
         'description' => 'json'
     ];
 
+<<<<<<< HEAD
     protected $primaryKey = 'id';
+=======
+    protected $aTranslateVars = ['title','time','audio','description'];
+    protected $fillable = ['title','time','audio','description','color','city_id','state','force_lang','updated_at','created_at'];
+>>>>>>> f1fdbfe865596218bbe90ad54ae416eda1f5920f
 
     protected $aTranslateVars = [
       'title', 

@@ -1,7 +1,11 @@
 <?php
 
+<<<<<<< HEAD
 require_once(dirname(realpath('.')).'/config/conf.php');
 
+=======
+require_once(dirname(realpath('.')).'/config.php');
+>>>>>>> f1fdbfe865596218bbe90ad54ae416eda1f5920f
 ini_set('xdebug.var_display_max_data', -1);
 ini_set('xdebug.var_display_max_depth', -1);
 ini_set('xdebug.var_display_max_children', -1);
