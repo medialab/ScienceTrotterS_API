@@ -11,13 +11,13 @@ return [
           */
         'pgsql' => [
             'driver' => 'pgsql',
-            'host' => env('PG_HOST'),
-            'port' => env('PG_PORT'),
-            'database' => env('PG_DATABASE'),
-            'username' => env('PG_USERNAME'),
-            'password' => env('PG_PASSWORD'),
-            'charset' => env('PG_CHARSET'),
-            'prefix' => env('PG_PREFIX'),
+            'host' => env('POSTGRES_HOST'),
+            'port' => env('POSTGRES_PORT'),
+            'database' => env('POSTGRES_DB'),
+            'username' => env('POSTGRES_USER'),
+            'password' => env('POSTGRES_PASSWORD'),
+            'charset' => env('POSTGRES_CHARSET'),
+            'prefix' => env('POSTGRES_PREFIX'),
             'schema' => 'public'
         ]
     ]
