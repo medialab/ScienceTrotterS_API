@@ -1,8 +1,6 @@
 <?php
 
-global $GET;
-$GET = json_decode(file_get_contents("php://input"), true);
-
+require_once(dirname(realpath('.')).'/config.php');
 ini_set('xdebug.var_display_max_data', -1);
 ini_set('xdebug.var_display_max_depth', -1);
 ini_set('xdebug.var_display_max_children', -1);

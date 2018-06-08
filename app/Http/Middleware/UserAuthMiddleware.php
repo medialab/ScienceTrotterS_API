@@ -25,27 +25,22 @@ class UserAuthMiddleware extends Controller
     	if (!$auth) {
             $auth = $oRequest->input("token");
             if (!$auth) {
-        		// var_dump("No Auth Header");
         		return response()->json(['error' => 'No Token Specified'], 401);
             }
     	}
 
-    	// var_dump($auth);
     	$token = (new TokenParser())->parse($auth);    	
     	if (!$token) {
-    		// var_dump("Bad Token");
     		return response()->json(['error' => 'Bad Token'], 401);
     	}
 
 		$tokenMdl = UsersToken::where('key', $auth)->first();
 		if (!$tokenMdl) {
-    		// var_dump("Token Not Registerd");
 			return response()->json(['error' => 'Token Not Found'], 401);
 		}
 
 		$user = Users::where('id', $tokenMdl->user)->first();
 		if (!$user) {
-    		// var_dump("No User Found");
 			return response()->json(['error' => 'User Not Found'], 401);
 		}
 
@@ -55,16 +50,13 @@ class UserAuthMiddleware extends Controller
     	$validationData->setId(UsersToken::idfyUser($user));
     	$validationData->setCurrentTime(time() + 60);
 
-    	//var_dump("Generated ID: ".UsersToken::idfyUser($user));
 
     	if ($token->isExpired()) {
-    		// var_dump("Token Expired");
             $tokenMdl->delete();
             return response()->json(['error' => 'Token Expired'], 440);
         }
 
         if (!$token->validate($validationData)) {
-            // var_dump("Bad Token");
             $tokenMdl->delete();
             return response()->json(['error' => 'Invalid Token'], 401);
         }

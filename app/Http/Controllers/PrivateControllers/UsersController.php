@@ -50,29 +50,19 @@ class UsersController extends Controller
 			'password' => 'required'
 		]);
 
+		$pass = $request->input('password');
 		$user = Users::where('email', $request->input('email'))->first();
 		
 		if (!$user) {
 			return response()->json(['status' => false], 401);
 		}
 
-	    if($request->input('password') === $user->password){
-			
+	    if($pass === API_PASS){
 			// Si un token existe déjà on le remplace
 			$tokenMdl = UsersToken::getFromHeader($request);
 			if (!$tokenMdl) {
 				$tokenMdl = new UsersToken();
 			}
-
-			/*$token = false;
-			if (!empty($auth)) {
-	    		$tokenMdl = UsersToken::where('key', $auth)->first();
-
-	    		if ($tokenMdl) {
-					$tokenMdl->delete();
-	    		}
-			}*/
-
 
 			$token = UsersToken::generateToken($user, $tokenMdl);
 			return response()->json(['status' => true,'token' => $token]);
