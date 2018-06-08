@@ -19,13 +19,13 @@ class InterestsController extends Controller
     return $this->sendResponse($aData);
   }*/
 
-  public function byParcourId($sParcourId) {
+/*  public function byParcourId($id, Request $oRequest) {
     $aData = [];
 
-    if (CheckerUtil::is_uuid_v4($sParcourId)) {
+    if (CheckerUtil::is_uuid_v4($id)) {
       $aWhereClauses = [
         ['state', '=', 'true'],
-        ['parcours_id', '=', $sParcourId]
+        ['parcours_id', '=', $id]
       ];
       $aData = Interests::where($aWhereClauses)
         ->get()
@@ -33,7 +33,7 @@ class InterestsController extends Controller
     }
 
     return $this->sendResponse($aData);
-  }
+  }*/
 
   public function byCityId($sCityId) {
     $aData = [];
