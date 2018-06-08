@@ -10,6 +10,7 @@ class ModelUtil extends Model
 	private $sCurLang = false; // Langue Séléctionnée
 	protected $aTranslateVars = []; // les Variables à traduire
 	protected $aSkipPublic = ['created_at', 'state', 'sCurLang'];
+	protected $aUploads = ['image', 'audio'];
 
 	/**
 	 * Mets à jour une variable traductible pour une langue
@@ -172,7 +173,43 @@ class ModelUtil extends Model
 	            continue;
 	        }
 
-	        if (array_key_exists($sVar, $this->getCasts()) && $this->getCasts()[$sVar] === 'json') {
+	        if (in_array($sVar, $this->aTranslateVars)) {
+	        	if (is_string($value)) {
+	        		$value = json_decode($value);
+	        	}
+
+	        	if (empty($value)) {
+	        		$value = new StdClass;
+	        	}
+	        	else{
+	        		if (!$bAdmin) {
+	        			if (empty($value->$sLang)) {
+	        				$aResult[$sVar] = (object) [$sLang => null];
+	        			}
+	        			else{
+	        				$aResult[$sVar] = (object) [$sLang => $value->$sLang];
+	        			}
+	        		}
+	        	}
+	        }
+	        else{
+	        	if ($sVar === "geoloc") {
+		        	
+		        	if (is_string($value)) {
+		        		$value = json_decode($value);
+		        	}
+	        	    //$aGeo = explode(';', $value);
+	        	    $aResult['geo'] = [
+	        	        'latitude' => empty($value->latitude) ? 0 : $value->latitude,
+	        	        'longitude' => empty($value->longitude) ? 0 : $value->longitude
+	        	    ];
+	        	}
+	        	else{
+	        		$aResult[$sVar] = $value;
+	        	}
+	        }
+
+	        /*if (array_key_exists($sVar, $this->getCasts()) && $this->getCasts()[$sVar] === 'json') {
 	            if (is_string($value)) {
 	                $value = json_decode($value);
 	            }
@@ -199,6 +236,8 @@ class ModelUtil extends Model
 	        }
 	        else{
 	            if ($sVar === "geoloc") {
+	            	var_dump($value);
+	            	exit;
 	                $aGeo = explode(';', $value);
 	                $aResult['geo'] = [
 	                    'latitude' => empty($aGeo[0]) ? 0 : $aGeo[0],
@@ -207,7 +246,7 @@ class ModelUtil extends Model
 	            }
 	            
 	            $aResult[$sVar] = $value;
-	        }
+	        }*/
 	    }
 
 	    if ($bAdmin || static::$bAdmin) {
@@ -226,12 +265,88 @@ class ModelUtil extends Model
 	 		 		$this->getCasts()[$skey] === 'json'
 	 		 	)
 		 	) {
-		 		if (is_object($iAttr)) {
+		 		if (!is_string($iAttr)) {
 					$this->attributes[$skey] = json_encode($iAttr);
 		 		}
 			}
 		}
 
 	    return Parent::save($options);
+	}
+
+	public function enable($b = true) {
+		if (!$b) {
+			$this->attributes['state'] = false;
+			return true;
+		}
+
+		$force = $this->fore_lang;
+		$tmpLang = $this->sCurLang;
+		$this->setLang(false);
+
+		var_dump("TEST ENABLE");
+		foreach ($this->fillable as $key) {
+			var_dump("===== $key ====");
+			$value = empty($this->attributes[$key]) ? null : $this->attributes[$key];
+
+			var_dump("===== $key ====");
+			if (empty($value)) {
+				return false;
+			}
+			
+			if ($force) {
+				empty($this->attributes[$key]->$force);
+				return false;
+			}
+			elseif(empty($this->attributes[$key]->fr) || empty($this->attributes[$key]->en)) {
+				return false;
+			}
+		}
+
+		$this->attributes['state'] = true;
+		return true;
+	}
+
+	public function updateData($aData) {
+		foreach ($aData as $key => $value) {
+            // Données à Ignorer lors de l'update
+            if (in_array($key, ['id', 'created_at', 'updated_at', 'state'])) {
+                continue;
+            }
+            if (in_array($key, $this->aUploads)) {
+                if (empty($value)) {
+                	continue;
+                }
+
+                if($aData[$key] !== $this->$key) {
+                    $this->downloadImage($aData[$key]);
+                }
+            }
+
+            $this->$key = $value;
+        }
+
+        if (array_key_exists('state', $aData)) {
+        	$this->enable((bool)$aData['state']);
+        }
+	}
+
+	private function downloadImage($sName) {
+	    /* On crée le dossier de l'image */
+	    $dir = dirname(UPLOAD_PATH.$sName);
+	    if (!is_dir($dir)) {
+	        mkdir($dir, 0775, true);
+	    }
+
+	    /* Url De téléchargement de l'image */
+	    $imgUrl = ADMIN_URL.'upload/'.$sName;
+	    
+	    /* si l'image existe on la remplace */
+	    $sPath = UPLOAD_PATH.$sName;
+	    
+	    if (file_exists($sPath)) {
+	        unlink($sPath);
+	    }
+	    $b = file_put_contents($sPath, fopen($imgUrl, 'r'));
 	}
 }

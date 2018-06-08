@@ -33,7 +33,6 @@ class Parcours extends ModelUtil
     ];
 
     protected $primaryKey = 'id';
-    protected $fillable = ['title','time','audio','description','color','city_id','state','force_lang','updated_at','created_at'];
 
     protected $aTranslateVars = [
       'title', 
