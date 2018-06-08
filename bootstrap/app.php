@@ -63,14 +63,14 @@ $app->singleton(
 //    App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
-
 $app->routeMiddleware([
-    'isUserAuthenticatedMiddleware' => App\Http\Middleware\isUserAuthenticatedMiddleware::class
+    'auth' => App\Http\Middleware\UserAuthMiddleware::class,
 ]);
 
+/*$app->routeMiddleware([
+    'isUserAuthenticatedMiddleware' => App\Http\Middleware\isUserAuthenticatedMiddleware::class
+]);
+*/
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers

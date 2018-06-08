@@ -3,3 +3,9 @@
 Homestead.json
 Homestead.yaml
 .env
+.env.example
+/.phpintel
+.phpintel
+composer.lock
+config/conf.php
+/config/conf.php

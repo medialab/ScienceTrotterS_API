@@ -20,7 +20,5 @@ return [
             'prefix' => env('PG_PREFIX'),
             'schema' => 'public'
         ]
-
     ]
-
 ];

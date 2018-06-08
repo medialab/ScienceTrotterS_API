@@ -1,5 +1,19 @@
 <?php
 
+require_once(dirname(realpath('.')).'/config/conf.php');
+
+ini_set('xdebug.var_display_max_data', -1);
+ini_set('xdebug.var_display_max_depth', -1);
+ini_set('xdebug.var_display_max_children', -1);
+
+if ($_SERVER['REQUEST_METHOD'] === "OPTIONS") {
+    $_SERVER['REQUEST_METHOD'] = 'POST';
+    /*header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Max-Age: 604800');
+    //if you need special headers
+    header('Access-Control-Allow-Headers: Authorization');*/
+//    exit;
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -26,4 +40,4 @@ $app = require __DIR__.'/../bootstrap/app.php';
 |
 */
 
-$app->run();
+$app->run($app->make('request'));

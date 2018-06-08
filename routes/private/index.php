@@ -1,17 +1,38 @@
 <?php
 
+/* API INFOS */
 $router->get('/', function () use ($router) {
     return 'private : ' . $router->app->version();
 });
 
-$router->get('/home', 'HomeController@home');
+/* USERT */
+	$aConfig = [
+	    'prefix' => 'users',
+	];
+	$router->group($aConfig, function () use ($router) {
+	    $router->get('/list', 'UsersController@list');
+	});
 
-$aConfig = [
-    'prefix' => 'users',
-    'middleware' => 'isUserAuthenticatedMiddleware'
-];
+/* PARCOURS */
+	$aConfig = [
+	    'prefix' => 'parcours',
+	];
+	$router->group($aConfig, function () use ($router) {
+	    require __DIR__.'/parcours.php';
+	});
 
-$router->group($aConfig, function () use ($router) {
-    $router->post('/', 'UsersController@home');
-    $router->get('/list', 'UsersController@list');
-});
+/* CITY */
+	$aConfig = [
+	    'prefix' => 'cities',
+	];
+	$router->group($aConfig, function () use ($router) {
+	    require __DIR__.'/cities.php';
+	});
+
+/* Interests */
+	$aConfig = [
+	    'prefix' => 'interests',
+	];
+	$router->group($aConfig, function () use ($router) {
+	    require __DIR__.'/interests.php';
+	});

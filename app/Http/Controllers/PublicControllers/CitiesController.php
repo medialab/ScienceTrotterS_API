@@ -4,21 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Utils\APIControllerUtil as Controller;
 use App\Utils\RequestUtil as Request;
-use App\Utils\ValidatorUtil as Validator;
 use App\Models\Cities;
+use App\Utils\CheckerUtil;
 
 class CitiesController extends Controller
 {
+  protected $sModelClass = 'Cities';
 
-    public function list() {
-      $aCities = Cities::where('state', 1)
+  /*public function list() {
+    $aData = Cities::where('state', '=', 'true')
+      ->get()
+      ->toArray();
+    return $this->sendResponse($aData);
+  }*/
+
+  public function byId($sCityId) {
+    $aData = [];
+
+    if (CheckerUtil::is_uuid_v4($sCityId)) {
+      $aWhereClauses = [
+        ['state', '=', 'true'],
+        ['id', '=', $sCityId]
+      ];
+      $aData = Cities::where($aWhereClauses)
         ->get()
-        ->makeHidden('state')
-        ->makeHidden('created_at')
-        ->makeHidden('updated_at')
         ->toArray();
-
-      return $this->sendResponse($aCities, null);
     }
+
+    return $this->sendResponse($aData);
+  }
 
 }
