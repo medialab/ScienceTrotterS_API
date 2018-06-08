@@ -1,14 +1,10 @@
 <?php
 
-global $GET;
-$GET = json_decode(file_get_contents("php://input"), true);
+require_once(dirname(realpath('.')).'/config/conf.php');
 
 ini_set('xdebug.var_display_max_data', -1);
 ini_set('xdebug.var_display_max_depth', -1);
 ini_set('xdebug.var_display_max_children', -1);
-
-define('ADMIN_URL', 'https://admin-sts.actu.com/');
-define('UPLOAD_PATH', realpath('.').'/ressources/upload/');
 
 if ($_SERVER['REQUEST_METHOD'] === "OPTIONS") {
     $_SERVER['REQUEST_METHOD'] = 'POST';

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "c661d0ba-f710-43d3-ac5b-79ea5e1fce8b",
+    "firstname": "Admin",
+    "lastname": "Account",
+    "email": "admin@admin.com",
+    "password": "",
+    "state": true
+  }
+]
