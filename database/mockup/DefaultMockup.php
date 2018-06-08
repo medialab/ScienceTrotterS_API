@@ -19,6 +19,7 @@ class DefaultMockup
     $this->table_parcours();
     $this->table_interests();
     $this->table_users();
+    $this->table_colors();
   }
 
   public function table_cities() {
@@ -97,6 +98,22 @@ class DefaultMockup
 
     foreach ($aData as $iData) {
       $oUsers = new Users;
+
+      foreach ($iData as $sKey => $sData) {
+        $oUsers->$sKey = $sData;
+      }
+
+      $oUsers->save();
+    }
+  }
+
+  public function table_colors() {
+    $aData = $this->getFile('colors');
+
+    Users::truncate();
+
+    foreach ($aData as $iData) {
+      $oUsers = new colors;
 
       foreach ($iData as $sKey => $sData) {
         $oUsers->$sKey = $sData;

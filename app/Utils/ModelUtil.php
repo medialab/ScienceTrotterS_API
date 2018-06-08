@@ -226,7 +226,9 @@ class ModelUtil extends Model
 	 		 		$this->getCasts()[$skey] === 'json'
 	 		 	)
 		 	) {
-				$this->attributes[$skey] = json_encode($iAttr);
+		 		if (is_object($iAttr)) {
+					$this->attributes[$skey] = json_encode($iAttr);
+		 		}
 			}
 		}
 
