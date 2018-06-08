@@ -181,8 +181,10 @@ class ModelUtil extends Model
 	        	if (empty($value)) {
 	        		$value = new StdClass;
 	        	}
-	        	else{
+	        	elseif($sLang){
+	        		
 	        		if (!$bAdmin) {
+		        		
 	        			if (empty($value->$sLang)) {
 	        				$aResult[$sVar] = (object) [$sLang => null];
 	        			}
@@ -190,6 +192,18 @@ class ModelUtil extends Model
 	        				$aResult[$sVar] = (object) [$sLang => $value->$sLang];
 	        			}
 	        		}
+	        		else{
+	        			if (empty($value->$sLang)) {
+	        				$aResult[$sVar] = null;
+	        			}
+	        			else{
+	        				$aResult[$sVar] = $value->$sLang;
+	        			}
+	        		}
+		        	
+	        	}
+	        	else{
+	        		$aResult[$sVar] = $value;
 	        	}
 	        }
 	        else{
@@ -236,7 +250,6 @@ class ModelUtil extends Model
 	        }
 	        else{
 	            if ($sVar === "geoloc") {
-	            	var_dump($value);
 	            	exit;
 	                $aGeo = explode(';', $value);
 	                $aResult['geo'] = [

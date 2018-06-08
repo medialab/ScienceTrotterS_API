@@ -69,7 +69,6 @@ class APIControllerUtil extends BaseController
         }
 
         $oModelList = $oModelList->get($columns);
-
         if ($this->bAdmin && $sLang) {
             foreach ($oModelList as $key => &$oModel) {
                 $oModel->setLang($sLang);
