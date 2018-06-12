@@ -64,18 +64,15 @@ class APIControllerUtil extends BaseController
                 }
             }
 
-//            var_dump("ORDER BY", $sOrderCol, $sOrderWay);
             $oModelList->orderBy($sOrderCol, $sOrderWay);
         }
 
         $oModelList = $oModelList->get($columns);
-        if ($this->bAdmin && $sLang) {
-            foreach ($oModelList as $key => &$oModel) {
-                $oModel->setLang($sLang);
-            }
+
+        if ($sLang) {
+            $oModelList->setLang($sLang);
         }
 
-        ModelUtil::$bAdmin = $this->bAdmin;
         return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
     }
 
@@ -153,32 +150,6 @@ class APIControllerUtil extends BaseController
         $aData = $oRequest->input('data');
 
         $oModel->updateData($aData);
-        //var_dump("Adatas", $aData);
-        /*foreach ($aData as $key => $value) {
-            //var_dump("===Key: $key");
-            //var_dump(strpos($key, 'image'));
-            
-            // Données à Ignorer lors de l'update
-            if (in_array($key, ['id', 'created_at', 'updated_at'])) {
-                continue;
-            }
-            elseif (strpos($key, 'image') !== false) {
-                //var_dump("Image $key", $value);
-                if (empty($value)) {
-                    //var_dump("Image Empty");
-                    continue;
-                }
-                
-                //var_dump("TEST", !empty($value), $value !== $oModel->$key);
-                if(!empty($value) && $value !== $oModel->$key) {
-                    //var_dump("downloading");
-                    $this->downloadImage($value);
-                }
-            }
-
-
-            $oModel->$key = $value;
-        }*/
 
         $msg = null;
         if ($aData['state'] != $oModel->state) {
@@ -198,8 +169,7 @@ class APIControllerUtil extends BaseController
         }
 
         if ($oModel->save()) {
-            ModelUtil::$bAdmin = true;
-            return $this->sendResponse($oModel, $msg);
+            return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
         }
 
         return $this->sendError('Fail To Query Update', ['Fail To Query Update'], 400);
@@ -222,42 +192,11 @@ class APIControllerUtil extends BaseController
         $oModel->setLang($sLang);
         $oModel->updateData($aData);
         
-        /*foreach ($aData as $key => $value) {
-            var_dump($key);
-            // Données à Ignorer lors de l'update
-            if (in_array($key, ['id', 'created_at', 'updated_at'])) {
-                continue;
-            }
-            if (in_array($key, $oModel)) {
-                # code...
-            }
-            if ( empty($value)) {
-                if (strpos($key, 'image') !== false) {
-                    continue;
-                }
-                elseif(strpos($key, 'id')) {
-                    continue;
-                }
-            }
-            elseif ($key === 'audio' || strpos($key, 'image') !== false) {
-                var_dump("Is Upload");
-                if(!empty($aUpdates[$key]) && $aUpdates[$key] !== $oModel->$key) {
-                    $this->downloadImage($aUpdates[$key]);
-                }
-                else{
-                    var_dump("Skip Update");
-                }
-            }
-
-            $oModel->$key = $value;
-        }*/
-
         /* La ville ne peut être activée que si tout les champs sont remplis */
         $oModel->state = $aData['state'];
 
         if ($oModel->save()) {
-            ModelUtil::$bAdmin = true;
-            return $this->sendResponse($oModel, null);
+            return $this->sendResponse($oModel->toArray($this->bAdmin), null);
         }
 
         return $this->sendError('Fail To Query Insert', ['Fail To Query Insert'], 400);
@@ -321,7 +260,6 @@ class APIControllerUtil extends BaseController
             }
         }
 
-        ModelUtil::$bAdmin = $this->bAdmin;
         if (is_null($oModel)) {
             return $this->sendError('Not Found', ['Model introuvable'], 404);
         }
@@ -348,7 +286,7 @@ class APIControllerUtil extends BaseController
         }
         
 
-        return $this->sendResponse($oModel->toArray(), null)->content();
+        return $this->sendResponse($oModel->toArray($this->bAdmin), null)->content();
     }
 
     public function byParcourId($id, Request $oRequest) {
@@ -360,13 +298,10 @@ class APIControllerUtil extends BaseController
         $oModelList = $this->list($oRequest, true);
         $oModelList = $oModelList->where('parcours_id', $id)->take($limit)->skip($skip)->get($columns);;
 
-        if ($this->bAdmin && $sLang) {
-            foreach ($oModelList as $key => &$oModel) {
-                $oModel->setLang($sLang);
-            }
+        if ($sLang) {
+            $oModelList->setLang($sLang);
         }
 
-        ModelUtil::$bAdmin = $this->bAdmin;
         return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
     }
 }

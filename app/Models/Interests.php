@@ -7,6 +7,7 @@ use App\Utils\ModelUtil;
 class Interests extends ModelUtil
 {
     protected $table = 'interests';
+    protected $userStr = 'le point d\'intérêt';
 
     public $timestamps = true;
 

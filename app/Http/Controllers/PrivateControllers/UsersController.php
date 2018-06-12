@@ -38,12 +38,6 @@ class UsersController extends Controller
 		return $this->sendResponse([], 'Users retrieved successfully.');
 	}
 
-	public function list(Request $oRequest)
-	{
-		$oUsers = Users::all();
-		return $this->sendResponse($oUsers->toArray(), null);
-	}
-
 	public function login(Request $request) {
 		$this->validate($request, [
 			'email' => 'required',
@@ -56,8 +50,8 @@ class UsersController extends Controller
 		if (!$user) {
 			return response()->json(['status' => false], 401);
 		}
-
-	    if($pass === API_PASS){
+		
+		if($pass === API_PASS){
 			// Si un token existe déjà on le remplace
 			$tokenMdl = UsersToken::getFromHeader($request);
 			if (!$tokenMdl) {
