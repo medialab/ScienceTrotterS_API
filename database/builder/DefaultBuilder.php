@@ -16,6 +16,7 @@ class DefaultBuilder
         $this->table_cities();
         $this->table_parcours();
         $this->table_interests();
+        $this->table_colors();
     }
 
     public function initialize_uuid () {
