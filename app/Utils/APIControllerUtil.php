@@ -149,15 +149,16 @@ class APIControllerUtil extends BaseController
         $aUpdates = [];
         $aData = $oRequest->input('data');
 
+        $bCurState = $oModel->state;
         $oModel->updateData($aData);
 
         $msg = null;
         if ($aData['state'] != $oModel->state) {
             if ($oModel->force_lang) {
-                $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
+                $msg = 'Impossible de sauvegarder '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
             }
             else{
-                $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis les informations dans toutes les langues ?';
+                $msg = 'Impossible de sauvegarder '.$oModel->userStr.'. Avez-vous remplis les informations dans toutes les langues ?';
             }
         }
 
@@ -168,11 +169,17 @@ class APIControllerUtil extends BaseController
             }
         }
 
-        if ($oModel->save()) {
-            return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
+        if (!$bCurState || empty($msg)) {
+            if ($oModel->save()) {
+                return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
+            }
         }
 
-        return $this->sendError('Fail To Query Update', ['Fail To Query Update'], 400);
+        if (empty($msg)) {
+            $msg = 'Fail To Query Update';
+        }
+
+        return $this->sendError($msg, null, 400);
     }
 
     public function insert(Request $oRequest) {
@@ -192,14 +199,21 @@ class APIControllerUtil extends BaseController
         $oModel->setLang($sLang);
         $oModel->updateData($aData);
         
-        /* La ville ne peut être activée que si tout les champs sont remplis */
-        $oModel->state = $aData['state'];
-
-        if ($oModel->save()) {
-            return $this->sendResponse($oModel->toArray($this->bAdmin), null);
+        $msg = null;
+        if ($aData['state'] != $oModel->state) {
+            if ($oModel->force_lang) {
+                $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
+            }
+            else{
+                $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis les informations dans toutes les langues ?';
+            }
         }
 
-        return $this->sendError('Fail To Query Insert', ['Fail To Query Insert'], 400);
+        if ($oModel->save()) {
+            return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
+        }
+
+        return $this->sendError('Fail To Query Insert', null, 400);
     }
 
     public function delete(Request $oRequest) {
