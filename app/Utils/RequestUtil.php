@@ -42,6 +42,7 @@ class RequestUtil extends Request
 		if (!$aOrder) {
 			$aOrder = false;
 		}
+
 		static::$aOrder = $aOrder;
 	}
 
