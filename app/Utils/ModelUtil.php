@@ -142,13 +142,11 @@ class ModelUtil extends Model
 				return $var;
 			}
 
-			return $this->attributes[$sVar];
+			return empty($this->attributes[$sVar]) ? null : $this->attributes[$sVar];
 		}
 
 		return empty($this->$sVar) ? null : $this->$sVar;
 	}
-
-	
 
 	function __set($sVar, $value) {
 		// var_dump("==== SETTING $sVar ====", $value);
@@ -327,8 +325,8 @@ class ModelUtil extends Model
 			//var_dump("-- Adding Lang");
 			$aResult['sCurLang'] = $sLang;
 			//var_dump("-- Adding Force Lang");
-			$aResult['force_lang'] = empty($this->attributes['force_lang']) ? null : $this->attributes['force_lang'];
 		}
+		$aResult['force_lang'] = empty($this->attributes['force_lang']) ? null : $this->attributes['force_lang'];
 
 		//var_dump("-- Result: ", $aResult);
 

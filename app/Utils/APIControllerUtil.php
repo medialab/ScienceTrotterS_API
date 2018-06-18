@@ -23,21 +23,20 @@ class APIControllerUtil extends BaseController
 
         $class = $this->getClass();
 
-        if ($sLang || !$this->bAdmin) {
+        if ($sLang) {
             $oModelList = ($class)::where(function($query) use ($sLang){
                 $query->where('force_lang', $sLang)
                       ->orWhere('force_lang', '')
                       ->orWhereNull('force_lang')
                 ;
             });
-
-            if (!$this->bAdmin) {
-                $oModelList->where('state', true);
-            }
         }
-
         else{
             $oModelList = new $class;
+        }
+
+        if (!$this->bAdmin) {
+            $oModelList->where('state', true);
         }
 
         if ($bAsList) {
@@ -73,6 +72,7 @@ class APIControllerUtil extends BaseController
             $oModelList->setLang($sLang);
         }
 
+        $oModelList->toArray($this->bAdmin);
         return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
     }
 
@@ -289,7 +289,11 @@ class APIControllerUtil extends BaseController
         return $this->sendResponse($oModel->toArray($this->bAdmin), null)->content();
     }
 
-    public function byParcourId($id, Request $oRequest) {
+    public function byParcourId(Request $oRequest=NULL, $id) {
+        if (is_null($oRequest)) {
+            $oRequest = new Request();
+        }
+
         $skip = $oRequest->getSkip();
         $limit = $oRequest->getLimit();
         $sLang = $oRequest->input('lang');
