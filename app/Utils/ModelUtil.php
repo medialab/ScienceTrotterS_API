@@ -149,20 +149,20 @@ class ModelUtil extends Model
 	}
 
 	function __set($sVar, $value) {
-		// var_dump("==== SETTING $sVar ====", $value);
+		//var_dump("==== SETTING $sVar ====", $value);
 		// Si il s'agit d'une variable à traduire
 		if (in_array($sVar, $this->aTranslateVars)) {
-			// var_dump("-- As Translate");
+			//var_dump("-- As Translate");
 			
 			
 			// Si une langue est choisie on met à jour que celle ci
 			if ($this->sCurLang) {
-				// var_dump("-- Setting For Lang: {$this->sCurLang}");
+				//var_dump("-- Setting For Lang: {$this->sCurLang}");
 				$this->setValueByLang($sVar, $value);
 			}
 			// Si aucune langue est choisie on les met toutes à jour
 			else{
-				// var_dump("-- Setting For All Langs");
+				//var_dump("-- Setting For All Langs");
 				$this->setValueAsJson($sVar, $value);
 			}
 		}
@@ -176,7 +176,7 @@ class ModelUtil extends Model
 			throw new \Exception("Error: Try To Set $sVar In Model", 1);
 		}
 
-		// var_dump("RESULT: ", $this->$sVar);
+		//var_dump("RESULT: ", $this->$sVar);
 	}
 
 	
@@ -384,7 +384,13 @@ class ModelUtil extends Model
 				continue;
 			}
 
-			$value = empty($this->attributes[$key]) ? null : $this->attributes[$key];
+			if (empty($this->attributes[$key])) {
+				$value = null;
+			}
+			else{
+				$value =  &$this->attributes[$key];
+				
+			}
 
 			//var_dump("-- key $key", $value);
 
@@ -395,6 +401,10 @@ class ModelUtil extends Model
 			}
 			
 			if (in_array($key, $this->aTranslateVars)) {
+				if (is_string($value)) {
+					$value = json_decode($value);
+				}
+
 				if ($force) {
 					if (empty($value->$force)) {
 						//var_dump("-- Fail $key Is Empty For Force Lang: '$force'", $value);
