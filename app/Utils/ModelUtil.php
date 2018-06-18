@@ -97,12 +97,12 @@ class ModelUtil extends Model
 	public function __get($sVar) {
 		// Si il s'agit d'une variable De la BDD
 
-		if (array_key_exists($sVar, $this->attributes)) {
-			//var_dump("===== GETTING $sVar =====");
+		if (in_array($sVar, $this->fillable) || array_key_exists($sVar, $this->attributes)) {
+			// var_dump("===== GETTING $sVar =====");
 
 			// Si il s'agit d'une variable à traduire
 			if (in_array($sVar, $this->aTranslateVars)) {
-				//var_dump("-- As Translate");
+				// var_dump("-- As Translate");
 				
 				if (empty($this->attributes[$sVar])) {
 					$var = new \StdClass;
@@ -114,38 +114,35 @@ class ModelUtil extends Model
 
 				// Si la valeur actuelle est une string on la décode
 				if (is_string($var)) {
-					//var_dump("-- Decoding Value", $var);
+					// var_dump("-- Decoding Value", $var);
 					$var = json_decode($var);
 
 					// En cas d'échec on retourne NULL
 					if (is_null($var)) {
-						//var_dump("-- Decoding Faild");
+						// var_dump("-- Decoding Faild");
 						return null;
 					}
 
 					$this->attributes[$sVar] = $var;
 				}
 
-				//var_dump("-- Value: ", $var);
+				// var_dump("-- Value: ", $var);
 				// Si une langue est séléctionnée
 				if ($this->sCurLang) {
-					//var_dump("-- Get By Lang: {$this->sCurLang}");
+					// var_dump("-- Get By Lang: {$this->sCurLang}");
 
 					$sLang = $this->sCurLang;
 					$res = empty($var->$sLang) ? null : $var->$sLang;;
-					//var_dump($res);
+					// var_dump($res);
 
 					return $res;
 				}
 
-				//var_dump("-- Get As Json: ", $var);
+				// var_dump("-- Get As Json: ", $var);
 				return $var;
 			}
 
 			return $this->attributes[$sVar];
-		}
-		elseif(in_array($sVar, $this->fillable)){
-			return null;
 		}
 
 		return empty($this->$sVar) ? null : $this->$sVar;
@@ -154,24 +151,24 @@ class ModelUtil extends Model
 	
 
 	function __set($sVar, $value) {
-		//var_dump("==== SETTING $sVar ====", $value);
+		// var_dump("==== SETTING $sVar ====", $value);
 		// Si il s'agit d'une variable à traduire
 		if (in_array($sVar, $this->aTranslateVars)) {
-			//var_dump("-- As Translate");
+			// var_dump("-- As Translate");
 			
 			
 			// Si une langue est choisie on met à jour que celle ci
 			if ($this->sCurLang) {
-				//var_dump("-- Setting For Lang: {$this->sCurLang}");
+				// var_dump("-- Setting For Lang: {$this->sCurLang}");
 				$this->setValueByLang($sVar, $value);
 			}
 			// Si aucune langue est choisie on les met toutes à jour
 			else{
-				//var_dump("-- Setting For All Langs");
+				// var_dump("-- Setting For All Langs");
 				$this->setValueAsJson($sVar, $value);
 			}
 		}
-		elseif(in_array($sVar, $this->attributes) || in_array($sVar, $this->fillable)){
+		elseif(array_key_exists($sVar, $this->attributes) || in_array($sVar, $this->fillable)){
 			$this->attributes[$sVar] = $value;
 		}
 		elseif(property_exists($this, $sVar)){
@@ -181,7 +178,7 @@ class ModelUtil extends Model
 			throw new \Exception("Error: Try To Set $sVar In Model", 1);
 		}
 
-		//var_dump("RESULT: ", $this->$sVar);
+		// var_dump("RESULT: ", $this->$sVar);
 	}
 
 	
@@ -349,7 +346,7 @@ class ModelUtil extends Model
 				)
 			) {
 				//var_dump("-- AS TRANS");
-				if (!is_string($value)) {
+				if (!is_string($value) && !is_null($value)) {
 					$this->attributes[$sKey] = json_encode($value);
 				}
 			}
@@ -408,7 +405,7 @@ class ModelUtil extends Model
 					}
 				}
 				elseif(empty($value->fr) || empty($value->en)) {
-					//var_dump("-- Fail $key Is Empty For Obne Lang", $value);
+					//var_dump("-- Fail $key Is Empty For One Lang", $value);
 					$this->attributes['state'] = false;
 					return false;
 				}
@@ -436,12 +433,23 @@ class ModelUtil extends Model
 				}
 			}
 
-			$this->$key = $value;
+			if (in_array($key, $this->aTranslateVars)) {
+				if ($this->sCurLang) {
+					$this->setValueByLang($key, $value);
+				}
+				else{
+					$this->setValueAsJson($key, $value);
+				}
+			}
+			else{
+				$this->$key = $value;
+			}
 		}
 
 		//var_dump("--- TEST", $this->attributes);
 
 		//var_dump("--- Change Enable");
+		//var_dump($this);
 		if (array_key_exists('state', $aData)) {
 			$this->enable((bool)$aData['state']);
 		}
