@@ -162,13 +162,6 @@ class APIControllerUtil extends BaseController
             }
         }
 
-        //$oModel->state = $aData['state'];
-        if (property_exists($oModel, 'geoloc')) {
-            /* La ville ne peut être activée que si tout les champs sont remplis */
-            if (!strlen($oModel->image) || is_null($oCity->geoloc) || count(get_object_vars($oModel->geoloc)) != 2) {
-            }
-        }
-
         if (!$bCurState || empty($msg)) {
             if ($oModel->save()) {
                 return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
