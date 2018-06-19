@@ -32,10 +32,11 @@ class APIControllerUtil extends BaseController
             });
         }
         else{
-            $oModelList = new $class;
+            $oModelList = ($class)::where(1);
         }
 
         if (!$this->bAdmin) {
+            var_dump("TEST");
             $oModelList->where('state', true);
         }
 
