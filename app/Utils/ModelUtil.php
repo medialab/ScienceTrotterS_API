@@ -380,7 +380,7 @@ class ModelUtil extends Model
 		$this->setLang(false);
 
 		foreach ($this->fillable as $key) {
-			if (in_array($key, ['state', 'force_lang'])) {
+			if (in_array($key, ['id', 'state', 'force_lang', 'created_at', 'updated_at'])) {
 				continue;
 			}
 
