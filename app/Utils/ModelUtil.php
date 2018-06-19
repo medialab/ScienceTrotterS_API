@@ -388,7 +388,7 @@ class ModelUtil extends Model
 				$value = null;
 			}
 			else{
-				$value =  &$this->attributes[$key];
+				$value =  $this->attributes[$key];
 				
 			}
 
@@ -402,7 +402,8 @@ class ModelUtil extends Model
 			
 			if (in_array($key, $this->aTranslateVars)) {
 				if (is_string($value)) {
-					$value = json_decode($value);
+					$this->attributes[$key] = json_decode($value);
+					$value = $this->attributes[$key];
 				}
 
 				if ($force) {
