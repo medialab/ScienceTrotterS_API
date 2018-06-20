@@ -84,7 +84,26 @@ server {
 
 The main entry url is `your_site_name.your_domain_name/public`
 
+## Docker deployment
+
+Build the PHP container
+```bash
+docker build -t phpcomposer .
+```
+
+Start containers
+```bash
+docker-compose  up
+```
+
+Initialize depedencies + databse intialisation
+```bash
+./setup_php_db.sh 
+```
+
+The API is served at htt://localhost:5000
+Configuration to be added later.
+ 
 
 ## License
 This project is licensed under the GPLv2 License - see the [GPLv2-LICENSE.md](https://github.com/medialab/ScienceTrotterS_API/GPLv2-LICENSE.md) file for details
-

@@ -10,3 +10,4 @@ composer.lock
 config/conf.php
 /config/conf.php
 /public/ressources/*
+*.env
