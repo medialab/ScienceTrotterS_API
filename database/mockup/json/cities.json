@@ -9,7 +9,7 @@
       "latitude": 48.8566,
       "longitude": 2.3522
     },
-    "image": "/cities/placeholder.png",
+    "image": null,
     "state": true,
     "force_lang": ""
   },
@@ -22,7 +22,7 @@
       "latitude": 48.863770,
       "longitude": 2.347921
     },
-    "image": "/cities/placeholder.png",
+    "image": null,
     "state": true,
     "force_lang": ""
   },
@@ -35,7 +35,7 @@
       "latitude": 48.863770,
       "longitude": 2.347921
     },
-    "image": "/cities/placeholder.png",
+    "image": null,
     "state": true,
     "force_lang": ""
   },
@@ -48,7 +48,7 @@
       "latitude": 48.863770,
       "longitude": 2.347921
     },
-    "image": "/cities/placeholder.png",
+    "image": null,
     "state": true,
     "force_lang": ""
   },
@@ -61,7 +61,7 @@
       "latitude": 48.863770,
       "longitude": 2.347921
     },
-    "image": "/cities/placeholder.png",
+    "image": null,
     "state": true,
     "force_lang": ""
   },
@@ -74,7 +74,7 @@
       "latitude": 48.863770,
       "longitude": 2.347921
     },
-    "image": "/cities/placeholder.png",
+    "image": null,
     "state": true,
     "force_lang": ""
   },
@@ -87,7 +87,7 @@
       "latitude": 48.863770,
       "longitude": 2.347921
     },
-    "image": "/cities/placeholder.png",
+    "image": null,
     "state": true,
     "force_lang": ""
   }

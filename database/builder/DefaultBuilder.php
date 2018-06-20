@@ -16,6 +16,7 @@ class DefaultBuilder
         $this->table_cities();
         $this->table_parcours();
         $this->table_interests();
+        $this->table_colors();
     }
 
     public function initialize_uuid () {
@@ -48,6 +49,18 @@ class DefaultBuilder
                 $table->timestamps();
             });
             DB::statement('ALTER TABLE users_token ALTER COLUMN id SET DEFAULT uuid_generate_v4();');
+        }
+    }
+
+    public function table_colors () {
+        Schema::dropIfExists('colors');
+        if (!Schema::hasTable('colors')) {
+            Schema::create('colors', function (Blueprint $table) {
+                $table->uuid('id')->primary();
+                $table->text('name');
+                $table->text('color');
+            });
+            DB::statement('ALTER TABLE colors ALTER COLUMN id SET DEFAULT uuid_generate_v4();');
         }
     }
 
@@ -102,7 +115,7 @@ class DefaultBuilder
                 $table->json('audio')->nullable();
                 $table->json('transport')->nullable();
                 $table->json('audio_script')->nullable();
-                $table->json('galery_image')->nullable();
+                $table->json('gallery_image')->nullable();
                 $table->json('bibliography')->nullable();
                 $table->text('force_lang')->nullable();
                 $table->boolean('state');

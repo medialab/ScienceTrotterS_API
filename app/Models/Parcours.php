@@ -7,6 +7,7 @@ use App\Utils\ModelUtil;
 class Parcours extends ModelUtil
 {
     protected $table = 'parcours';
+    protected $userStr = 'le parcours';
 
     public $timestamps = true;
 

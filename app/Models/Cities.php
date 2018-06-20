@@ -7,6 +7,7 @@ use App\Utils\ModelUtil;
 class Cities extends ModelUtil
 {
     protected $table = 'cities';
+    protected $userStr = 'la ville';
 
     public $timestamps = true;
 

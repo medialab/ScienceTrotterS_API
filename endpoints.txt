@@ -1,0 +1,209 @@
+API END POINTS:
+	- Public:
+		+ logout
+			=> Déconnexion
+			=> /logout
+
+		+ login:
+			=> Connexion
+			=> /login
+				= params: {
+					email: (string),
+					password: (string)
+				}
+
+				= Response: {state: (bool), token: (string)}
+
+		+ Common For All Models:
+			## Liste toutes les entrées actives d'un model ##
+				=> /{$model}/list
+					= params:  {
+						skip: (int),
+						limit: (int),
+						lang: (string),
+						order: [
+							0: column (string),
+							1: way (string [ASC, DESC])
+						],
+
+						columns: (string Array)
+					}
+
+					= Response: {
+						succes: true,
+						data: [
+							0: {
+								id: xxxx-xx-xx-xxxx,
+								title: xxxx
+								....
+							}
+						],
+						message: null
+					}
+
+			## Récupère Un model par son ID ##
+				=> /{$model}/byId/{id:[a-z0-9-]+}
+					= params {
+						lang: (string)
+						columns: (string Array)
+					}
+
+					= Response: {
+						succes: true,
+						data: {
+							id: xxxx-xx-xx-xxxx,
+							title: xxxx
+							....
+						},
+						message: null
+					}
+
+
+		+ Parcours Model:
+			## Récupère tous les parcours d'une ville ##
+				=> /parcours/byCityId/{[a-z0-9-]+}
+				= params: {
+					lang: (string),
+					columns: (String Array),
+					order: [
+						0: column (string),
+						1: way (string [ASC, DESC])
+					],
+				}
+
+				= Response: {
+					succes: true,
+					data: [
+						0: {
+							id: xxxx-xx-xx-xxxx,
+							title: xxxx
+							....
+						}
+					],
+					message: null
+				}
+
+		+ Interests Model:
+			## Récupère tous les points d'intérêts d'une ville ##
+				=> /interests/byCityId/{[a-z0-9-]+}
+				= params: {
+					lang: (string),
+					columns: (String Array),
+					order: [
+						0: column (string),
+						1: way (string [ASC, DESC])
+					],
+				}
+
+				= Response: {
+					succes: true,
+					data: [
+						0: {
+							id: xxxx-xx-xx-xxxx,
+							title: xxxx
+							....
+						}
+					],
+					message: null
+				}
+
+			## Récupère tous les points d'intérêts d'un parcours ##
+				=> /interests/byParcourId/{[a-z0-9-]+}
+				= params: {
+					lang: (string),
+					columns: (String Array),
+					order: [
+						0: column (string),
+						1: way (string [ASC, DESC])
+					],
+				}
+
+				= Response: {
+					succes: true,
+					data: [
+						0: {
+							id: xxxx-xx-xx-xxxx,
+							title: xxxx
+							....
+						}
+					],
+					message: null
+				}
+
+
+	- Private:
+		+ add:
+			## Crée un nouveau Model
+			=> /{$model}/add
+			=> params: {
+				lang: (string|false),
+				data {
+					state: (bool),
+					title: (string),
+					....
+				}
+			}
+
+			=> Response: 
+				## ON SUCCESS ##
+				{
+					success: true,
+					data: {
+						id: xxxx-xx-xx-xxxx
+						title: xxxx,
+						....
+					},
+					message: null
+				}
+
+				## ON ERROR ##
+				{
+					success: false,
+					message: Error Message (string)
+				}
+
+		+ update:
+			## Met à jour un Model
+			=> /{$model}/update
+			=> params: {
+				lang: (string|false),
+				data {
+					id: xxxx-xx-xx-xxxx
+					state: (bool),
+					title: (string),
+					....
+				}
+			}
+
+			=> Response: 
+				## ON SUCCESS ##
+				{
+					success: true,
+					data: {
+						id: xxxx-xx-xx-xxxx
+						title: xxxx,
+						....
+					},
+					message: null
+				}
+
+				## ON ERROR ##
+				{
+					success: false,
+					message: Error Message (string)
+				}
+
+		+ delete:
+			## Supprime Model
+			=> /{$model}/delete
+			=> params: {
+				id: xxxx-xx-xx-xxxx
+			}
+
+			=> Response: 
+				## ON SUCCESS ##
+				{
+					success: true,
+					data: null,
+					message: null
+				}

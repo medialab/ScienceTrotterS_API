@@ -4,6 +4,7 @@ namespace Database\Mockup;
 
 use App\Models\Users;
 use App\Models\Cities;
+use App\Models\Colors;
 use App\Models\Parcours;
 use App\Models\Interests;
 
@@ -19,6 +20,7 @@ class DefaultMockup
     $this->table_parcours();
     $this->table_interests();
     $this->table_users();
+    $this->table_colors();
   }
 
   public function table_cities() {
@@ -54,6 +56,7 @@ class DefaultMockup
       $oParcour->title = $iData->title;
       $oParcour->time = $iData->time;
       $oParcour->audio = $iData->audio;
+      $oParcour->color = $iData->color;
       $oParcour->description = $iData->description;
       $oParcour->state = $iData->state;
       $oParcour->force_lang = $iData->force_lang;
@@ -82,7 +85,7 @@ class DefaultMockup
       $oInterest->audio = $iData->audio;
       $oInterest->transport = $iData->transport;
       $oInterest->audio_script = $iData->audio_script;
-      $oInterest->galery_image = $iData->galery_image;
+      $oInterest->gallery_image = $iData->gallery_image;
       $oInterest->bibliography = $iData->bibliography;
       $oInterest->force_lang = $iData->force_lang;
       $oInterest->state = $iData->state;
@@ -97,6 +100,22 @@ class DefaultMockup
 
     foreach ($aData as $iData) {
       $oUsers = new Users;
+
+      foreach ($iData as $sKey => $sData) {
+        $oUsers->$sKey = $sData;
+      }
+
+      $oUsers->save();
+    }
+  }
+
+  public function table_colors() {
+    $aData = $this->getFile('colors');
+
+    Colors::truncate();
+
+    foreach ($aData as $iData) {
+      $oUsers = new Colors;
 
       foreach ($iData as $sKey => $sData) {
         $oUsers->$sKey = $sData;

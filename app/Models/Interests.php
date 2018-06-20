@@ -7,6 +7,7 @@ use App\Utils\ModelUtil;
 class Interests extends ModelUtil
 {
     protected $table = 'interests';
+    protected $userStr = 'le point d\'intérêt';
 
     public $timestamps = true;
 
@@ -33,16 +34,18 @@ class Interests extends ModelUtil
 
     protected $casts = [
         'id' => 'string',
+        'cities_id' => 'string',
+        'parcours_id' => 'string',
         'title' => 'json',
         'address' => 'json',
+        'geoloc' => 'json',
         'schedule' => 'json',
         'price' => 'json',
         'audio' => 'json',
         'transport' => 'json',
         'audio_script' => 'json',
-        'galery_image' => 'json',
+        'gallery_image' => 'json',
         'bibliography' => 'json',
-        'geoloc' => 'json'
     ];
 
     protected $primaryKey = 'id';
@@ -57,4 +60,6 @@ class Interests extends ModelUtil
       'audio_script',
       'bibliography',
     ];
+
+    protected $aUploads = ['header_image', 'audio', 'gallery_image'];
 }

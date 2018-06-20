@@ -13,50 +13,66 @@ class APIControllerUtil extends BaseController
         return 'App\Models\\'.$this->sModelClass;
     }
 
-    public function list(Request $oRequest) {
+    public function list(Request $oRequest, $bAsList=false) {
         $skip = $oRequest->getSkip();
         $limit = $oRequest->getLimit();
         $sLang = $oRequest->input('lang');
+        $aOrder = $oRequest->getOrder();
 
         $columns = $oRequest->input('columns');
 
         $class = $this->getClass();
 
-        if (!$this->bAdmin) {
-            $oModelList = 
-                ($class)::Where('state', true)->where(function($query) use ($sLang){
-                    $query->where('force_lang', $sLang)
-                          ->orWhere('force_lang', '')
-                          ->orWhereNull('force_lang')
-                    ;
-                })
-                ->take($limit)
-                ->skip($skip)
-                ->get($columns)
-            ;
+        if ($sLang) {
+            $oModelList = ($class)::where(function($query) use ($sLang){
+                $query->where('force_lang', $sLang)
+                      ->orWhere('force_lang', '')
+                      ->orWhereNull('force_lang')
+                ;
+            });
         }
         else{
-            $oModelList = call_user_func($class.'::take', $limit);
+            $oModelList = ($class)::whereNotNull('id');
+        }
 
-            if ($sLang) {
-                $oModelList
-                    ->where('force_lang', $sLang)
-                    ->orWhere('force_lang', '')
-                    ->orWhereNull('force_lang')
-                 //   ->take($limit)->skip($skip)
-                ;
+        if (!$this->bAdmin) {
+            $oModelList->where('state', true);
+        }
+
+        if ($bAsList) {
+            return $oModelList;
+        }
+
+        $oModelList->take($limit)->skip($skip);
+
+        if ($aOrder && count($aOrder) === 2) {
+            $oModel = new $class;
+
+            $sOrderCol = $aOrder[0];
+            $sOrderWay = $aOrder[1];
+
+            if (in_array($sOrderCol, $oModel->aTranslateVars)) {
+                if ($oModel->force_lang) {
+                    $sOrderCol .= '->'.$oModel->force_lang.'' ;
+                }
+                elseif ($sLang) {
+                    $sOrderCol .= '->'.$sLang.'' ;
+                }
+                else{
+                    $sOrderCol .= '->fr' ;
+                }
             }
 
-            $oModelList = $oModelList->take($limit)->skip($skip)->get($columns);
+            $oModelList->orderBy($sOrderCol, $sOrderWay);
         }
+
+        $oModelList = $oModelList->get($columns);
 
         if ($sLang) {
-            foreach ($oModelList as $key => &$oModel) {
-                $oModel->setLang($sLang);
-            }
+            $oModelList->setLang($sLang);
         }
 
-        ModelUtil::$bAdmin = $this->bAdmin;
+        $oModelList->toArray($this->bAdmin);
         return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
     }
 
@@ -116,41 +132,6 @@ class APIControllerUtil extends BaseController
         return response()->json($aResponse, $dCode);
     }
 
-
-    /**
-     * Télécharge l'image de la ville depuis le serveur d'Admin
-     * @param  String $sName Nom de l'image
-     */
-    private function downloadImage($sName) {
-        //var_dump("Downloading", $sName);
-        /* On crée le dossier de l'image */
-        $dir = dirname(UPLOAD_PATH.$sName);
-        if (!is_dir($dir)) {
-            //var_dump("Dir Not Exists");
-            mkdir($dir, 0775, true);
-        }
-
-        /* Url De téléchargement de l'image */
-        $imgUrl = ADMIN_URL.'upload/'.$sName;
-        //var_dump("url", $imgUrl);
-
-        /* si l'image existe on la remplace */
-        $sPath = UPLOAD_PATH.$sName;
-        //var_dump("path", $sPath);
-        //var_dump("path", realpath($sPath));
-
-        
-        if (file_exists($sPath)) {
-            //var_dump("Delete Existing");
-            unlink($sPath);
-        }
-
-        $b = file_put_contents($sPath, fopen($imgUrl, 'r'));
-        //var_dump("Result", $b);
-        //exit;
-    }
-
-
     public function update(Request $oRequest) {
         $class = $this->getClass();
 
@@ -168,46 +149,30 @@ class APIControllerUtil extends BaseController
         $aUpdates = [];
         $aData = $oRequest->input('data');
 
-        //var_dump("Adatas", $aData);
-        foreach ($aData as $key => $value) {
-            //var_dump("===Key: $key");
-            //var_dump(strpos($key, 'image'));
-            
-            /* Données à Ignorer lors de l'update */
-            if (in_array($key, ['id', 'created_at', 'updated_at'])) {
-                continue;
+        $bCurState = $oModel->state;
+        $oModel->updateData($aData);
+
+        $msg = null;
+        if ($aData['state'] != $oModel->state) {
+            if ($oModel->force_lang) {
+                $msg = 'Impossible de sauvegarder '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
             }
-            elseif (strpos($key, 'image') !== false) {
-                //var_dump("Image $key", $value);
-                if (empty($value)) {
-                    //var_dump("Image Empty");
-                    continue;
-                }
-                
-                //var_dump("TEST", !empty($value), $value !== $oModel->$key);
-                if(!empty($value) && $value !== $oModel->$key) {
-                    //var_dump("downloading");
-                    $this->downloadImage($value);
-                }
-            }
-
-
-            $oModel->$key = $value;
-        }
-
-        if (property_exists($oModel, 'geoloc')) {
-            /* La ville ne peut être activée que si tout les champs sont remplis */
-            if (!strlen($oModel->image) || is_null($oCity->geoloc) || count(get_object_vars($oModel->geoloc)) != 2) {
-                $oModel->state = false;
+            else{
+                $msg = 'Impossible de sauvegarder '.$oModel->userStr.'. Avez-vous remplis les informations dans toutes les langues ?';
             }
         }
 
-        if ($oModel->save()) {
-            ModelUtil::$bAdmin = true;
-            return $this->sendResponse($oModel, null);
+        if (!$bCurState || empty($msg)) {
+            if ($oModel->save()) {
+                return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
+            }
         }
 
-        return $this->sendError('Fail To Query Update', ['Fail To Query Update'], 400);
+        if (empty($msg)) {
+            $msg = 'Fail To Query Update';
+        }
+
+        return $this->sendError($msg, null, 400);
     }
 
     public function insert(Request $oRequest) {
@@ -225,44 +190,23 @@ class APIControllerUtil extends BaseController
 
         $oModel = new $class;
         $oModel->setLang($sLang);
-        foreach ($aData as $key => $value) {
-            /* Données à Ignorer lors de l'update */
-            if (in_array($key, ['id', 'created_at', 'updated_at'])) {
-                continue;
+        $oModel->updateData($aData);
+        
+        $msg = null;
+        if ($aData['state'] != $oModel->state) {
+            if ($oModel->force_lang) {
+                $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
             }
-            if (empty($value)) {
-                if (strpos($key, 'image') !== false) {
-                    continue;
-                }
-                elseif(strpos($key, 'id')) {
-                    continue;
-                }
+            else{
+                $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis les informations dans toutes les langues ?';
             }
-            elseif (strpos($key, 'image') !== false) {
-                if(!empty($aUpdates[$key]) && $aUpdates[$key] !== $oModel->image) {
-                    $this->downloadImage($aUpdates[$key]);
-                }
-            }
-
-            $oModel->$key = $value;
-        }
-
-        if (!empty($aData['image'])) {
-            $this->downloadImage($aData['image']);
-            $oModel->image = $aData['image'];
-        }
-
-        /* La ville ne peut être activée que si tout les champs sont remplis */
-        if (!strlen($oModel->image) || is_null($oCity->geoloc) || count(get_object_vars($oModel->geoloc)) != 2) {
-            $oModel->state = false;
         }
 
         if ($oModel->save()) {
-            ModelUtil::$bAdmin = true;
-            return $this->sendResponse($oModel, null);
+            return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
         }
 
-        return $this->sendError('Fail To Query Insert', ['Fail To Query Insert'], 400);
+        return $this->sendError('Fail To Query Insert', null, 400);
     }
 
     public function delete(Request $oRequest) {
@@ -323,7 +267,6 @@ class APIControllerUtil extends BaseController
             }
         }
 
-        ModelUtil::$bAdmin = $this->bAdmin;
         if (is_null($oModel)) {
             return $this->sendError('Not Found', ['Model introuvable'], 404);
         }
@@ -350,6 +293,26 @@ class APIControllerUtil extends BaseController
         }
         
 
-        return $this->sendResponse($oModel->toArray(), null)->content();
+        return $this->sendResponse($oModel->toArray($this->bAdmin), null)->content();
+    }
+
+    public function byParcourId(Request $oRequest=NULL, $id) {
+        if (is_null($oRequest)) {
+            $oRequest = new Request();
+        }
+
+        $skip = $oRequest->getSkip();
+        $limit = $oRequest->getLimit();
+        $sLang = $oRequest->input('lang');
+        $columns = $oRequest->input('columns');
+
+        $oModelList = $this->list($oRequest, true);
+        $oModelList = $oModelList->where('parcours_id', $id)->take($limit)->skip($skip)->get($columns);;
+
+        if ($sLang) {
+            $oModelList->setLang($sLang);
+        }
+
+        return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
     }
 }

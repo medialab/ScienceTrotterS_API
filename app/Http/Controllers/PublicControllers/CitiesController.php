@@ -11,13 +11,6 @@ class CitiesController extends Controller
 {
   protected $sModelClass = 'Cities';
 
-  /*public function list() {
-    $aData = Cities::where('state', '=', 'true')
-      ->get()
-      ->toArray();
-    return $this->sendResponse($aData);
-  }*/
-
   public function byId($sCityId) {
     $aData = [];
 
