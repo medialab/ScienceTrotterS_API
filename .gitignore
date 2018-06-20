@@ -2,8 +2,6 @@
 /.idea
 Homestead.json
 Homestead.yaml
-.env
-.env.example
 /.phpintel
 .phpintel
 composer.lock
