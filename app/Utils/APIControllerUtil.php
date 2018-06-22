@@ -45,7 +45,9 @@ class APIControllerUtil extends BaseController
 
         $oModelList->take($limit)->skip($skip);
 
+        //var_dump($aOrder);
         if ($aOrder && count($aOrder) === 2) {
+            //var_dump("ORDERING", $aOrder);
             $oModel = new $class;
 
             $sOrderCol = $aOrder[0];
@@ -63,6 +65,8 @@ class APIControllerUtil extends BaseController
                 }
             }
 
+            //var_dump("Column ", $sOrderCol);
+            //var_dump("Way ", $sOrderWay);
             $oModelList->orderBy($sOrderCol, $sOrderWay);
         }
 
@@ -135,8 +139,9 @@ class APIControllerUtil extends BaseController
     public function update(Request $oRequest) {
         $class = $this->getClass();
 
-        $id = $oRequest->input('id');
+        $id = $oRequest->input('id');        
         $oModel = call_user_func($class.'::where', 'id', $id)->first();
+        
         
         if (!$oModel) {
             return $this->sendError('Not Found', ['Can\'t found '.$class.' With ID:'.$id], 404);
@@ -148,22 +153,36 @@ class APIControllerUtil extends BaseController
         $aErrors = [];
         $aUpdates = [];
         $aData = $oRequest->input('data');
+        if (isset($aData['state'])) {
+            $aData['state'] = $aData['state'] === 'true';
+        }
 
         $bCurState = $oModel->state;
         $oModel->updateData($aData);
 
         $msg = null;
         if ($aData['state'] != $oModel->state) {
-            if ($oModel->force_lang) {
-                $msg = 'Impossible de sauvegarder '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
+            if ($bCurState) {
+                if ($oModel->force_lang) {
+                    $msg = 'Impossible de sauvegarder '.$oModel->userStr.' sans le désactiver. Avez-vous remplis toutes les informations de la langue ?';
+                }
+                else{
+                    $msg = 'Impossible de sauvegarder '.$oModel->userStr.' sans le désactiver. Avez-vous remplis les informations dans toutes les langues ?';
+                }
             }
             else{
-                $msg = 'Impossible de sauvegarder '.$oModel->userStr.'. Avez-vous remplis les informations dans toutes les langues ?';
+                if ($oModel->force_lang) {
+                    $msg = 'Impossible d\'activer '.$oModel->userStr.' sans le désactiver. Avez-vous remplis toutes les informations de la langue ?';
+                }
+                else{
+                    $msg = 'Impossible d\'activer '.$oModel->userStr.' sans le désactiver. Avez-vous remplis les informations dans toutes les langues ?';
+                }
             }
         }
 
         if (!$bCurState || empty($msg)) {
             if ($oModel->save()) {
+                $oModel->setLang($sLang);
                 return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
             }
         }
@@ -172,7 +191,7 @@ class APIControllerUtil extends BaseController
             $msg = 'Fail To Query Update';
         }
 
-        return $this->sendError($msg, null, 400);
+        return $this->sendError($msg, null, 200);
     }
 
     public function insert(Request $oRequest) {
@@ -190,6 +209,10 @@ class APIControllerUtil extends BaseController
 
         $oModel = new $class;
         $oModel->setLang($sLang);
+        if (isset($aData['state'])) {
+            $aData['state'] = $aData['state'] === 'true';
+        }
+
         $oModel->updateData($aData);
         
         $msg = null;
@@ -232,6 +255,10 @@ class APIControllerUtil extends BaseController
     }
 
     public function get($id, Request $oRequest) {
+        if (!preg_match('/[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}/', $id)) {
+            return $this->sendError('Bad  ID', ['L\'identifiant est invalide'], 400);
+        }
+
         $columns = $oRequest->input('columns');
         $sLang = $oRequest->input('lang');
         $class = $this->getClass();

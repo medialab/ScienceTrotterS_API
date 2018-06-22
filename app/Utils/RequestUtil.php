@@ -19,35 +19,28 @@ class RequestUtil extends Request
 	public function __init () {
 		// ==> Set lang.
 		if ($this->getParam('lang')) {
-		   static::$sLang = strtolower($this->getParam('lang'));
+		   static::$sLang = strtolower($this->input('lang'));
 		}
 
 		// ==> Set limit.
-		$limit = (int)$this->getParam('limit');
+		$limit = (int)$this->input('limit');
 		if (!$limit) {
 			$limit = 5000;
 		}
 		static::$dLimit = $limit;
 		
 		// ==> Set skip.
-		$skip = (int)$this->getParam('skip');
+		$skip = (int)$this->input('skip');
 		if (!$skip) {
 			$skip = 0;
 		}
 		static::$dSkip = $skip;
 
-		// ==> Set order.
-		$aOrder = $this->getParam('order');
-
-		if (!$aOrder) {
-			$aOrder = false;
-		}
-
-		static::$aOrder = $aOrder;
+		static::$aOrder = $this->getOrder();
 	}
 
 	public function getParam($sKey) {
-		return empty($_GET[$sKey]) ? null : $_GET[$sKey];
+		return $this->input($sKey);
 	}
 
 	public static function getParams() {
@@ -71,6 +64,11 @@ class RequestUtil extends Request
 	}
 
 	public function getOrder () {
-		return static::$aOrder;
+		$aOrder = $this->input('order');
+		if (empty($aOrder) || !is_array($aOrder) || empty($aOrder['order'])) {
+			return false;
+		}
+
+		return $aOrder['order'];
 	}
 }

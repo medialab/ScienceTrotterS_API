@@ -101,7 +101,7 @@ class ModelUtil extends Model
 			// var_dump("===== GETTING $sVar =====");
 
 			// Si il s'agit d'une variable à traduire
-			if (in_array($sVar, $this->aTranslateVars)) {
+			if (in_array($sVar, $this->aTranslateVars) || (array_key_exists($sVar, $this->casts) && $this->casts[$sVar] === 'json')) {
 				// var_dump("-- As Translate");
 				
 				if (empty($this->attributes[$sVar])) {
@@ -128,7 +128,7 @@ class ModelUtil extends Model
 
 				// var_dump("-- Value: ", $var);
 				// Si une langue est séléctionnée
-				if ($this->sCurLang) {
+				if (in_array($sVar, $this->aTranslateVars) && $this->sCurLang) {
 					// var_dump("-- Get By Lang: {$this->sCurLang}");
 
 					$sLang = $this->sCurLang;
@@ -142,7 +142,7 @@ class ModelUtil extends Model
 				return $var;
 			}
 
-			return empty($this->attributes[$sVar]) ? null : $this->attributes[$sVar];
+			return !isset($this->attributes[$sVar]) ? null : $this->attributes[$sVar];
 		}
 
 		return empty($this->$sVar) ? null : $this->$sVar;
@@ -205,7 +205,7 @@ class ModelUtil extends Model
 				continue;
 			}
 
-			if (in_array($sVar, $this->aTranslateVars)) {
+			if (in_array($sVar, $this->aTranslateVars) || (array_key_exists($sVar, $this->casts) && $this->casts[$sVar] === 'json')) {
 				//var_dump("-- Translate Var");
 				if (is_string($value)) {
 					//var_dump("-- Decoding");
@@ -217,7 +217,7 @@ class ModelUtil extends Model
 					//var_dump('-- Is Empty');
 					$value = new \StdClass;
 				}
-				elseif($sLang){
+				elseif($sLang && in_array($sVar, $this->aTranslateVars)){
 					//var_dump("-- Selecting Lang $sLang");
 					
 					if (!$bAdmin) {
@@ -397,6 +397,8 @@ class ModelUtil extends Model
 			if (empty($value)) {
 				//var_dump("-- Fail $key Is Empty", $value);
 				$this->attributes['state'] = false;
+				//var_dump($this->state);
+				//var_dump($this->attributes);
 				return false;
 			}
 			
@@ -437,12 +439,49 @@ class ModelUtil extends Model
 					continue;
 				}
 
-				if($aData[$key] !== $this->$key) {
-					$this->downloadImage($aData[$key]);
+				if (is_array($aData[$key])) {
+					$aFiles = &$aData[$key];
+
+					if (empty($this->$key)) {
+						$this->$key = new \StdClass;
+					}
+
+					$aCurFiles = (object)$this->$key;
+
+
+					//var_dump($aCurFiles);
+					foreach($aFiles as $i => $sFile) {
+						//var_dump("#### TEST FILE: $i => $sFile");
+						if (!empty($sFile) && (empty($aCurFiles->$i) || $aCurFiles->$i !== $sFile)) {
+							//var_dump("#### Do Download: $sFile");
+							$this->downloadImage($sFile);
+							$aCurFiles->$i = $sFile;
+						}
+						else{
+							//var_dump("#### Faild:");
+							//var_dump("-- is Empty: ", !empty($sFile));
+							//var_dump("-- Cur Empty: ", empty($aCurFiles->$i));
+							//var_dump("-- Diff: ",  $aCurFiles->$i !== $sFile);
+						}
+					}
+
+					$this->$key = $aCurFiles;
+					//var_dump("====== TEST Result =====", $this->$key);
+				}
+				else{
+					//var_dump("UPLOAD: $key");
+					$sFile = $aData[$key];
+					//var_dump("Current: ".$this->$key);
+					//var_dump("New: ".$aData[$key]);
+					
+					if($sFile !== $this->$key) {
+						//var_dump("Downloading");
+						$this->downloadImage($sFile);
+						$this->$key = $sFile;
+					}
 				}
 			}
-
-			if (in_array($key, $this->aTranslateVars)) {
+			else if (in_array($key, $this->aTranslateVars)) {
 				if ($this->sCurLang) {
 					$this->setValueByLang($key, $value);
 				}
@@ -483,6 +522,7 @@ class ModelUtil extends Model
 		if (file_exists($sPath)) {
 			unlink($sPath);
 		}
+
 		$b = file_put_contents($sPath, fopen($imgUrl, 'r'));
 	}
 }
