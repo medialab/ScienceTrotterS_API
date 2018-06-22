@@ -21,6 +21,15 @@ composer install
 
 
 3) Configuration
+Set up Environment Variables in /etc/php/{$php_version}/fpm/pool.d/www.conf
+env[POSTGRES_HOST] = your database host
+env[POSTGRES_PORT] = your database port
+env[POSTGRES_DB] = your database
+env[POSTGRES_USER] = your database user
+env[POSTGRES_PASSWORD] = your database password
+env[POSTGRES_CHARSET] = your database charset
+
+
 
 Copy the file `.env.example` and past it to a new file `.env`
 Then edit the Postgres configuration.

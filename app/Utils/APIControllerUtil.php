@@ -155,10 +155,10 @@ class APIControllerUtil extends BaseController
         $msg = null;
         if ($aData['state'] != $oModel->state) {
             if ($oModel->force_lang) {
-                $msg = 'Impossible de sauvegarder '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
+                $msg = 'Impossible de sauvegarder '.$oModel->userStr.' sans le désactiver. Avez-vous remplis toutes les informations de la langue ?';
             }
             else{
-                $msg = 'Impossible de sauvegarder '.$oModel->userStr.'. Avez-vous remplis les informations dans toutes les langues ?';
+                $msg = 'Impossible de sauvegarder '.$oModel->userStr.' sans le désactiver. Avez-vous remplis les informations dans toutes les langues ?';
             }
         }
 
