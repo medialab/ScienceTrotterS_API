@@ -526,3 +526,4 @@ class ModelUtil extends Model
 		$b = file_put_contents($sPath, fopen($imgUrl, 'r'));
 	}
 }
+
