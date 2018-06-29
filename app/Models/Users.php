@@ -40,4 +40,8 @@ class Users extends ModelUtil implements Authenticatable
 	public function __set($sVar, $var) {
 		$this->attributes[$sVar] = $var;
 	}
+
+	public static function search($search, $columns) { 
+		return null; 
+	}
 }

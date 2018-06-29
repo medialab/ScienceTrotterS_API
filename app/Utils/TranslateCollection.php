@@ -18,6 +18,14 @@ class TranslateCollection extends Collection
 		foreach ($this->items as &$oModel) {
 			$oModel->setLang($this->sCurLang);
 		}
+
+		return $this;
+	}
+
+	public function loadParents() {
+		foreach ($this->items as &$oModel) {
+			$oModel->loadParents();
+		}
 	}
 
 	public function toArray($bAdmin = false) {

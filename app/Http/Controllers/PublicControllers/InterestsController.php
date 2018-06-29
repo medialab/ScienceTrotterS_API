@@ -10,61 +10,64 @@ use App\Utils\CheckerUtil;
 
 class InterestsController extends Controller
 {
-  protected $bAdmin = false;
-  protected $sModelClass = 'Interests';
-  /*public function list() {
-    $aData = Interests::where('state', '=', 'true')
-      ->get()
-      ->toArray();
-    return $this->sendResponse($aData);
-  }*/
+	protected $bAdmin = false;
+	protected $sModelClass = 'Interests';
+	/*public function list() {
+		$aData = Interests::where('state', '=', 'true')
+			->get()
+			->toArray();
+			return $this->sendResponse($aData);
+	}
 
-/*  public function byParcourId($id, Request $oRequest) {
-    $aData = [];
+	public function byParcourId($id, Request $oRequest) {
+		$aData = [];
 
-    if (CheckerUtil::is_uuid_v4($id)) {
-      $aWhereClauses = [
-        ['state', '=', 'true'],
-        ['parcours_id', '=', $id]
-      ];
-      $aData = Interests::where($aWhereClauses)
-        ->get()
-        ->toArray();
-    }
+		if (CheckerUtil::is_uuid_v4($id)) {
+			$aWhereClauses = [
+				['state', '=', 'true'],
+				['parcours_id', '=', $id]
+			];
+			
+			$aData = Interests::where($aWhereClauses)
+			->get()
+			->toArray();
+		}
 
-    return $this->sendResponse($aData);
-  }*/
+		return $this->sendResponse($aData);
+	}*/
 
-  public function byCityId($sCityId) {
-    $aData = [];
+	/*public function byCityId($sCityId) {
+		$aData = [];
 
-    if (CheckerUtil::is_uuid_v4($sCityId)) {
-      $aWhereClauses = [
-        ['state', '=', 'true'],
-        ['cities_id', '=', $sCityId]
-      ];
-      $aData = Interests::where($aWhereClauses)
-        ->get()
-        ->toArray();
-    }
+		if (CheckerUtil::is_uuid_v4($sCityId)) {
+			$aWhereClauses = [
+				['state', '=', 'true'],
+				['cities_id', '=', $sCityId]
+			];
 
-    return $this->sendResponse($aData);
-  }
+			$aData = Interests::where($aWhereClauses)
+				->get()
+				->toArray()
+			;
+		}
 
-  public function byId($sInterestId) {
-    $aData = [];
+		return $this->sendResponse($aData);
+	}*/
 
-    if (CheckerUtil::is_uuid_v4($sInterestId)) {
-      $aWhereClauses = [
-        ['state', '=', 'true'],
-        ['id', '=', $sInterestId]
-      ];
-      $aData = Interests::where($aWhereClauses)
-        ->get()
-        ->toArray();
-    }
+	public function byId($sInterestId) {
+	$aData = [];
 
-    return $this->sendResponse($aData);
-  }
+	if (CheckerUtil::is_uuid_v4($sInterestId)) {
+	$aWhereClauses = [
+	['state', '=', 'true'],
+	['id', '=', $sInterestId]
+	];
+	$aData = Interests::where($aWhereClauses)
+	->get()
+	->toArray();
+	}
+
+	return $this->sendResponse($aData);
+	}
 
 }

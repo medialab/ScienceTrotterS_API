@@ -32,7 +32,6 @@ class DefaultBuilder
                 $table->text('lastname');
                 $table->text('email')->unique();
                 $table->text('password')->unique();
-                $table->boolean('state');
                 $table->timestamps();
             });
             DB::statement('ALTER TABLE users ALTER COLUMN id SET DEFAULT uuid_generate_v4();');
@@ -91,6 +90,7 @@ class DefaultBuilder
                 $table->json('audio')->nullable();
                 $table->text('color')->nullable();
                 $table->json('description')->nullable();
+                $table->json('audio_script')->nullable();
                 $table->text('force_lang')->nullable();
                 $table->boolean('state');
                 $table->timestamps();
@@ -108,7 +108,7 @@ class DefaultBuilder
                 $table->uuid('parcours_id')->nullable();
                 $table->text('header_image')->nullable();
                 $table->json('title');
-                $table->text('address')->nullable();
+                $table->json('address')->nullable();
                 $table->json('geoloc')->nullable();
                 $table->json('schedule')->nullable();
                 $table->json('price')->nullable();

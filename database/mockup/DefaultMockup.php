@@ -58,6 +58,7 @@ class DefaultMockup
       $oParcour->audio = $iData->audio;
       $oParcour->color = $iData->color;
       $oParcour->description = $iData->description;
+      $oParcour->audio_script = null;
       $oParcour->state = $iData->state;
       $oParcour->force_lang = $iData->force_lang;
       $oParcour->save();

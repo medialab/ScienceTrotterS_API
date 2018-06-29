@@ -2,9 +2,10 @@
 
 namespace App\Utils;
 
+use App\Utils\RequestUtil as Request;
 use Illuminate\Database\Eloquent\Model;
 
-class ModelUtil extends Model
+abstract class ModelUtil extends Model
 {
 	private $sCurLang = false; // Langue Séléctionnée
 
@@ -185,6 +186,82 @@ class ModelUtil extends Model
 		$this->sCurLang = $l;
 	}
 
+	// Définis la langue de l'objet
+	public function getLang() {
+		return $this->sCurLang;
+	}
+
+	public static function getInstance() {
+		return null;
+	}
+
+	public static function list(Request $oRequest, $bAdmin=false) {
+		$skip = $oRequest->getSkip();
+		$limit = $oRequest->getLimit();
+		$sLang = $oRequest->input('lang');
+		$aOrder = $oRequest->getOrder();
+
+		/*$class = get_class();
+		var_dump($class);
+		exit;*/
+
+		if ($sLang) {
+		    $oModelList = Self::where(function($query) use ($sLang, $bAdmin){
+		        if (!$bAdmin) {
+		            $query->Where('force_lang', '')
+		              ->orWhereNull('force_lang')
+		              ->where('force_lang', $sLang);
+		        }
+		    });
+		}
+		else{
+		    $oModelList = Self::whereNotNull('id');
+			
+		}
+
+		if (!$bAdmin) {
+		    $oModelList->where('state', true);
+		}
+
+		//var_dump($aOrder);
+		if ($aOrder && count($aOrder) === 2) {
+		    //var_dump("ORDERING", $aOrder);
+		    $oModel = static::getInstance();
+
+		    $aOrderCol = $aOrder[0];
+		    $sOrderWay = $aOrder[1];
+
+		    if (!is_array($aOrderCol)) {
+		        $aOrderCol = [$aOrderCol];
+		    }
+
+		    foreach ($aOrderCol as $sOrderCol) {
+		    	$sColName = explode('.', $sOrderCol);
+		    	$sColName = $sColName[count($sColName)-1];
+
+		        if (in_array($sColName, $oModel->aTranslateVars)) {
+		            if ($oModel->force_lang) {
+		                $sOrderCol .= '->'.$oModel->force_lang.'' ;
+		            }
+		            elseif ($sLang) {
+		                $sOrderCol .= '->'.$sLang.'' ;
+		            }
+		            else{
+		                $sOrderCol .= '->fr' ;
+		            }
+		        }
+
+		        $oModelList->orderBy($sOrderCol, $sOrderWay);
+		    }
+		}
+
+		$oModelList->take($limit)->skip($skip);
+		/*var_dump($oModelList->toSql());
+		exit;*/
+
+		return $oModelList;
+	}
+
 	/**
 	 * Override de la fonction afin d'implémenter les traductions
 	 * @return Array données de l'objet
@@ -202,6 +279,11 @@ class ModelUtil extends Model
 			
 			if (in_array($sVar, $this->hidden) || (!$bAdmin && in_array($sVar, $this->aSkipPublic))) {
 				//var_dump("-- Hidden Skip");
+				continue;
+			}
+
+			if ($value instanceOf ModelUtil) {
+				$aResult[$sVar] = $value->toArray($bAdmin);
 				continue;
 			}
 
@@ -326,6 +408,8 @@ class ModelUtil extends Model
 			$aResult['sCurLang'] = $sLang;
 			//var_dump("-- Adding Force Lang");
 		}
+
+		//var_dump(@$this->attributes);
 		$aResult['force_lang'] = empty($this->attributes['force_lang']) ? null : $this->attributes['force_lang'];
 
 		//var_dump("-- Result: ", $aResult);
@@ -334,36 +418,30 @@ class ModelUtil extends Model
 	}
 
 	public function save(Array $options=[]) {
+		$aTmpVars = [];
 		//var_dump("==== SAVING ====");
 		foreach ($this->attributes as $sKey => $value) {
+			if (!in_array($sKey, $this->fillable)) {
+				
+				//var_dump("==== Skipping: $sKey ====");
+				$aTmpVars[$sKey] = $value;
+				unset($this->attributes[$sKey]);
+				continue;
+			}
+
 			//var_dump("-- $sKey: ", $value);
-			if (
-				//in_array($sKey, $this->aTranslateVars) ||
-				(array_key_exists($sKey, $this->getCasts()) && 
-					$this->getCasts()[$sKey] === 'json'
-				)
-			) {
-				//var_dump("-- AS TRANS");
+			if (array_key_exists($sKey, $this->getCasts()) && $this->getCasts()[$sKey] === 'json') {
 				if (!is_string($value) && !is_null($value)) {
 					$this->attributes[$sKey] = json_encode($value);
 				}
 			}
-			/*elseif ($sKey === 'geoloc') {
-				//var_dump("TEST GEOLOC");
-				if (empty($value) || count($value) != 2) {
-					$this->attributes['geoloc'] = null;
-				}
-				else{
-					$this->attributes['geoloc'] = [
-						"latitude" => $value->latitude, 
-						"longitude" => $value->longitude
-					];
-				}
-			}*/
 		}
 
 		//var_dump("-- Result: ", $this->attributes);
-		return Parent::save($options);
+		$bResult = Parent::save($options);
+		$this->attributes = array_merge($this->attributes, $aTmpVars);
+
+		return $bResult;
 	}
 
 	public function enable($b = true) {
@@ -523,7 +601,13 @@ class ModelUtil extends Model
 			unlink($sPath);
 		}
 
+		//var_dump("URL: $imgUrl");
 		$b = file_put_contents($sPath, fopen($imgUrl, 'r'));
 	}
-}
 
+	public function loadParents() {
+
+	}
+
+	abstract public static function search($search, $columns);
+}

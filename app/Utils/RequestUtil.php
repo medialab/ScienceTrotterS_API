@@ -65,10 +65,10 @@ class RequestUtil extends Request
 
 	public function getOrder () {
 		$aOrder = $this->input('order');
-		if (empty($aOrder) || !is_array($aOrder) || empty($aOrder['order'])) {
+		if (empty($aOrder) || !is_array($aOrder) || empty($aOrder)) {
 			return false;
 		}
 
-		return $aOrder['order'];
+		return $aOrder;
 	}
 }

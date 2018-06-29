@@ -1,9 +1,5 @@
 [
 	{
-		"name": "Mauve",
-		"color": "#3E26B5"
-	},
-	{
 		"name": "Orange",
 		"color": "#F99E19"
 	},
@@ -12,11 +8,39 @@
 		"color": "#D4332E"
 	},
 	{
+		"name": "Bordeaux",
+		"color": "#841E4F"
+	},
+	{
 		"name": "Rose",
 		"color": "#C936A3"
 	},
 	{
-		"name": "Bleu",
+		"name": "Vert",
 		"color": "#047E82"
+	},
+	{
+		"name": "Mauve",
+		"color": "#624D8E"
+	},
+	{
+		"name": "Mauve Clair",
+		"color": "#6961D9"
+	},
+	{
+		"name": "Royal Blue",
+		"color": "#353EED"
+	},
+	{
+		"name": "Sarcelle Blue",
+		"color": "#0B78AE"
+	},
+	{
+		"name": "Spirited Blue",
+		"color": "#3E26B5"
+	},
+	{
+		"name": "Midnight Blue",
+		"color": "#1E155E"
 	}
 ]
