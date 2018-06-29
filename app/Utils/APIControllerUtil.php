@@ -14,66 +14,93 @@ class APIControllerUtil extends BaseController
     }
 
     public function list(Request $oRequest, $bAsList=false) {
-        $skip = $oRequest->getSkip();
-        $limit = $oRequest->getLimit();
-        $sLang = $oRequest->input('lang');
-        $aOrder = $oRequest->getOrder();
-
-        $columns = $oRequest->input('columns');
-
         $class = $this->getClass();
-
-        if ($sLang) {
-            $oModelList = ($class)::where(function($query) use ($sLang){
-                $query->where('force_lang', $sLang)
-                      ->orWhere('force_lang', '')
-                      ->orWhereNull('force_lang')
-                ;
-            });
-        }
-        else{
-            $oModelList = ($class)::whereNotNull('id');
-        }
-
-        if (!$this->bAdmin) {
-            $oModelList->where('state', true);
-        }
+        $oModelList = ($class)::list($oRequest, $this->bAdmin);
 
         if ($bAsList) {
             return $oModelList;
         }
 
-        $oModelList->take($limit)->skip($skip);
-
-        if ($aOrder && count($aOrder) === 2) {
-            $oModel = new $class;
-
-            $sOrderCol = $aOrder[0];
-            $sOrderWay = $aOrder[1];
-
-            if (in_array($sOrderCol, $oModel->aTranslateVars)) {
-                if ($oModel->force_lang) {
-                    $sOrderCol .= '->'.$oModel->force_lang.'' ;
-                }
-                elseif ($sLang) {
-                    $sOrderCol .= '->'.$sLang.'' ;
-                }
-                else{
-                    $sOrderCol .= '->fr' ;
-                }
-            }
-
-            $oModelList->orderBy($sOrderCol, $sOrderWay);
-        }
-
+        $sLang = $oRequest->input('lang');
+        $columns = $oRequest->input('columns');
+        $parents = $oRequest->input('parents');
         $oModelList = $oModelList->get($columns);
 
         if ($sLang) {
             $oModelList->setLang($sLang);
         }
 
-        $oModelList->toArray($this->bAdmin);
+        if ($parents) {
+            $oModelList->loadParents();
+        }
+
         return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
+
+        /*
+            if ($sLang) {
+                $oModelList = ($class)::where(function($query) use ($sLang){
+                    if ($sLang && !$this->bAdmin) {
+                        $query->Where('force_lang', '')
+                          ->orWhereNull('force_lang')
+                          ->where('force_lang', $sLang);
+                    }
+                });
+            }
+            else{
+                $oModelList = ($class)::whereNotNull('id');
+            }
+
+            if (!$this->bAdmin) {
+                $oModelList->where('state', true);
+            }
+
+            if ($bAsList) {
+                return $oModelList;
+            }
+
+            $oModelList->take($limit)->skip($skip);
+
+            //var_dump($aOrder);
+            if ($aOrder && count($aOrder) === 2) {
+                //var_dump("ORDERING", $aOrder);
+                $oModel = new $class;
+
+                $aOrderCol = $aOrder[0];
+                $sOrderWay = $aOrder[1];
+
+                if (!is_array($aOrderCol)) {
+                    $aOrderCol = [$aOrderCol];
+                }
+
+                foreach ($aOrderCol as $sOrderCol) {
+                    if (in_array($sOrderCol, $oModel->aTranslateVars)) {
+                        if ($oModel->force_lang) {
+                            $sOrderCol .= '->'.$oModel->force_lang.'' ;
+                        }
+                        elseif ($sLang) {
+                            $sOrderCol .= '->'.$sLang.'' ;
+                        }
+                        else{
+                            $sOrderCol .= '->fr' ;
+                        }
+                    }
+
+                    $oModelList->orderBy($sOrderCol, $sOrderWay);
+                }
+            }
+
+            $oModelList = $oModelList->get($columns);
+
+            if ($sLang) {
+                $oModelList->setLang($sLang);
+            }
+
+            if ($parents) {
+                $oModelList->loadParents();
+            }
+
+            return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
+        */
     }
 
     public function sendResponse($result, $message = null)
@@ -135,8 +162,9 @@ class APIControllerUtil extends BaseController
     public function update(Request $oRequest) {
         $class = $this->getClass();
 
-        $id = $oRequest->input('id');
+        $id = $oRequest->input('id');        
         $oModel = call_user_func($class.'::where', 'id', $id)->first();
+        
         
         if (!$oModel) {
             return $this->sendError('Not Found', ['Can\'t found '.$class.' With ID:'.$id], 404);
@@ -149,21 +177,36 @@ class APIControllerUtil extends BaseController
         $aUpdates = [];
         $aData = $oRequest->input('data');
 
+        if (isset($aData['state']) && !is_bool($aData['state'])) {
+            $aData['state'] = $aData['state'] === 'true';
+        }
+
         $bCurState = $oModel->state;
         $oModel->updateData($aData);
 
         $msg = null;
         if ($aData['state'] != $oModel->state) {
-            if ($oModel->force_lang) {
-                $msg = 'Impossible de sauvegarder '.$oModel->userStr.' sans le désactiver. Avez-vous remplis toutes les informations de la langue ?';
+            if ($bCurState) {
+                if ($oModel->force_lang) {
+                    $msg = 'Impossible de sauvegarder '.$oModel->userStr.' sans le désactiver. Avez-vous remplis toutes les informations de la langue ?';
+                }
+                else{
+                    $msg = 'Impossible de sauvegarder '.$oModel->userStr.' sans le désactiver. Avez-vous remplis les informations dans toutes les langues ?';
+                }
             }
             else{
-                $msg = 'Impossible de sauvegarder '.$oModel->userStr.' sans le désactiver. Avez-vous remplis les informations dans toutes les langues ?';
+                if ($oModel->force_lang) {
+                    $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
+                }
+                else{
+                    $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis les informations dans toutes les langues ?';
+                }
             }
         }
 
         if (!$bCurState || empty($msg)) {
             if ($oModel->save()) {
+                $oModel->setLang($sLang);
                 return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
             }
         }
@@ -172,7 +215,7 @@ class APIControllerUtil extends BaseController
             $msg = 'Fail To Query Update';
         }
 
-        return $this->sendError($msg, null, 400);
+        return $this->sendError($msg, null, 200);
     }
 
     public function insert(Request $oRequest) {
@@ -190,6 +233,11 @@ class APIControllerUtil extends BaseController
 
         $oModel = new $class;
         $oModel->setLang($sLang);
+        
+        if (isset($aData['state']) && !is_bool($aData['state'])) {
+            $aData['state'] = $aData['state'] === 'true';
+        }
+
         $oModel->updateData($aData);
         
         $msg = null;
@@ -232,6 +280,10 @@ class APIControllerUtil extends BaseController
     }
 
     public function get($id, Request $oRequest) {
+        if (!preg_match('/[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}/', $id)) {
+            return $this->sendError('Bad  ID', ['L\'identifiant est invalide'], 400);
+        }
+
         $columns = $oRequest->input('columns');
         $sLang = $oRequest->input('lang');
         $class = $this->getClass();
@@ -275,16 +327,22 @@ class APIControllerUtil extends BaseController
     }
 
     public function getByCity($id, Request $oRequest) {
+        $class = $this->getClass();
+        $skip = $oRequest->getSkip();
+        $limit = $oRequest->getLimit();
+        $sLang = $oRequest->input('lang');
         $columns = $oRequest->input('columns');
 
+
         if (!$this->bAdmin) {
-            $oModelList = call_user_func($class.'::where', 'state', 'true');
-            $oModelList = $oModelList->take($limit)->skip($skip)->get($columns);
+            $oModelList = ($class)::Where(['state', true]);
+            $oModelList->take($limit);
         }
         else{
             $oModelList = call_user_func($class.'::take', $limit);
-            $oModelList = $oModelList->skip($skip)->get($columns);
         }
+        
+        $oModelList = $oModelList->skip($skip)->get($columns);
 
         if ($sLang) {
             foreach ($oModelList as $key => &$oModel) {
@@ -296,7 +354,47 @@ class APIControllerUtil extends BaseController
         return $this->sendResponse($oModel->toArray($this->bAdmin), null)->content();
     }
 
-    public function byParcourId(Request $oRequest=NULL, $id) {
+    public function byParcoursId(Request $oRequest=NULL, $id) {
+        if (is_null($oRequest)) {
+            $oRequest = new Request();
+        }
+
+        $sLang = $oRequest->input('lang');
+        $columns = $oRequest->input('columns');
+
+        $class = $this->getClass();
+        $oModelList = ($class)::byParcours($id, $oRequest, $this->bAdmin);
+        $oModelList = $oModelList->get($columns);
+
+        if ($sLang) {
+            $oModelList->setLang($sLang);
+        }
+
+        return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
+        
+        /*
+            $where = [['parcours_id', '=', $id]];
+            if (!$this->bAdmin) {
+                $where[] = ['state', '=', 'true'];
+            }
+
+            $oModelList = $this->list($oRequest, true);
+            $oModelList = $oModelList
+                ->where($where)
+                ->take($limit)
+                ->skip($skip)
+                ->get($columns)
+            ;
+
+            if ($sLang) {
+                $oModelList->setLang($sLang);
+            }
+
+            return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
+        */
+    }
+
+    public function byCityId(Request $oRequest=NULL, $id) {
         if (is_null($oRequest)) {
             $oRequest = new Request();
         }
@@ -306,11 +404,154 @@ class APIControllerUtil extends BaseController
         $sLang = $oRequest->input('lang');
         $columns = $oRequest->input('columns');
 
+        $where = [['cities_id', '=', $id]];
+
+        if (!$this->bAdmin) {
+            $where[] = ['state', '=', 'true'];
+        }
+
+        $class = $this->getClass();
+
+        $oModelList = ($class)::list($oRequest, $this->bAdmin, $where);
+        $oModelList = $oModelList
+            ->where($where)
+            ->take($limit)
+            ->skip($skip)
+            ->get($columns)
+        ;
+
+        //var_dump($oModelList->toSql());
+        /*var_dump($oModelList);
+        exit;*/
+        if ($sLang) {
+            $oModelList->setLang($sLang);
+        }
+
+        return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
+    }
+
+    public function byNoParcours(Request $oRequest=NULL, $id) {
+        if (is_null($oRequest)) {
+            $oRequest = new Request();
+        }
+
+        $skip = $oRequest->getSkip();
+        $limit = $oRequest->getLimit();
+        $sLang = $oRequest->input('lang');
+        $columns = $oRequest->input('columns');
+
+
+        $bNoCity = $id === 'no-city';
+        if (!$bNoCity) {
+            $where = [['cities_id', '=', $id]];
+        }
+        else{
+            $where = [];
+        }
+
+        if (!$this->bAdmin) {
+            $where[] = ['state', '=', 'true'];
+        }
+
         $oModelList = $this->list($oRequest, true);
-        $oModelList = $oModelList->where('parcours_id', $id)->take($limit)->skip($skip)->get($columns);;
+        $oModelList = $oModelList
+            ->where($where)
+            ->whereNull('parcours_id')
+        ;
+
+        if ($bNoCity) {
+            $oModelList->whereNull('cities_id');
+        }
+
+        $oModelList = $oModelList->take($limit)
+            ->skip($skip)
+            ->get($columns)
+        ;
+
 
         if ($sLang) {
             $oModelList->setLang($sLang);
+        }
+
+        return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
+    }
+
+    public function byNoCity(Request $oRequest=NULL) {
+        if (is_null($oRequest)) {
+            $oRequest = new Request();
+        }
+
+        $class = $this->getClass();
+        $oModel = new $class;
+
+        $skip = $oRequest->getSkip();
+        $limit = $oRequest->getLimit();
+        $sLang = $oRequest->input('lang');
+        $columns = $oRequest->input('columns');
+        $table = $oModel->table;
+
+        foreach ($columns as &$sCol) {
+            $sCol = $table.'.'.$sCol;
+        }
+
+
+        $oModelList = $this->list($oRequest, true)
+            ->leftJoin('cities', $table.'.cities_id', '=', 'cities.id')
+            ->where(function($query) {
+            $query->whereNull('cities_id')
+                  ->orWhereNull('cities.id')
+            ;
+        });
+
+        if (!$this->bAdmin) {
+            $oModelList->where(['state', '=', 'true']);
+        }
+
+        $oModelList = $oModelList
+            ->take($limit)
+            ->skip($skip)
+            ->get($columns)
+        ;
+
+        /*var_dump($oModelList->toSql());
+        $oModelList = $oModelList->get($columns);
+        var_dump($oModelList);*/
+
+
+        if ($sLang) {
+            $oModelList->setLang($sLang);
+        }
+
+        return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
+    }
+
+    public function search(Request $oRequest) {
+        $class = $this->getClass();
+        $sLang = $oRequest->input('lang');
+        $order = $oRequest->input('order');
+        $search = $oRequest->input('search');
+        $parents = $oRequest->input('parents');
+        $columns = $oRequest->input('columns');
+        
+        //var_dump($columns);
+
+        $oModelList = ($class)::search($search, $columns, $order);
+        //$oModelList = $oModelList->get(['id']);
+
+
+        //$oModelList = $oModelList->get($columns);
+
+        if ($sLang) {
+            $oModelList->setLang($sLang);
+        }
+
+
+        if ($parents) {
+            $oModelList->loadParents();
+        }
+
+        if ($parents) {
+            $oModelList->loadParents();
         }
 
         return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();

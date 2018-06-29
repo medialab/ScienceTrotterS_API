@@ -1,5 +1,4 @@
-<?php
-define('API_PASS', getenv('API_PASS'));
-
-define('ADMIN_URL', getenv('BACKOFFICE_URL'));
+<?php 
+define('API_PASS', 'ZWn%mU5]');
+define('ADMIN_URL', 'https://admin-sts-dev.actu.com/');
 define('UPLOAD_PATH', realpath('.').'/ressources/upload/');

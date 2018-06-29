@@ -10,38 +10,13 @@
       "fr": "entre 3 et 5h",
       "en": "around 3 and 5h"
     },
-    "audio": {
-      "fr": "",
-      "en": ""
-    },
+    "audio": null,
     "description": {
       "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
       "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
     },
     "force_lang": "",
     "color": "#3E26B5",
-    "state": true
-  },
-  {
-    "cities_id": "c661d0ba-f710-43d3-ac5b-79ea5e1fce8b",
-    "title": {
-      "fr": "Le genre des sciences",
-      "en": "Le genre des sciences"
-    },
-    "time": {
-      "fr": "entre 2 et 4h",
-      "en": "around 2 and 4h"
-    },
-    "audio": {
-      "fr": "",
-      "en": ""
-    },
-    "description": {
-      "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
-      "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
-    },
-    "force_lang": "",
-    "color": "#F99E19",
     "state": true
   },
   {
@@ -54,10 +29,7 @@
       "fr": "entre 3 et 5h",
       "en": "around 3 and 5h"
     },
-    "audio": {
-      "fr": "",
-      "en": ""
-    },
+    "audio": null,
     "description": {
       "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
       "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
@@ -76,10 +48,7 @@
       "fr": "entre 3 et 5h",
       "en": "around 3 and 5h"
     },
-    "audio": {
-      "fr": "",
-      "en": ""
-    },
+    "audio": null,
     "description": {
       "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
       "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
@@ -98,10 +67,7 @@
       "fr": "entre 1 et 1h30",
       "en": "around 1 and 1h3°"
     },
-    "audio": {
-      "fr": "",
-      "en": ""
-    },
+    "audio": null,
     "description": {
       "fr": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum.",
       "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus, ex id volutpat placerat, arcu justo vehicula ligula, id hendrerit nunc urna at lectus. Nulla massa nisl, condimentum eget pharetra a, malesuada vel erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer auctor elit at ex auctor interdum."
