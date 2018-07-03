@@ -1,6 +1,6 @@
 <?php
 
-header('Access-Control-Allow-Origin: '.env('BACKOFFICE_URL'));
+header('Access-Control-Allow-Origin: '.getenv('BACKOFFICE_URL'));
 header('Access-Control-Allow-Methods: GET, POST');  
 
 $confPath = dirname(realpath('.')).'/config/conf.php';
