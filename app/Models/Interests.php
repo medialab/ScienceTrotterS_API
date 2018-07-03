@@ -23,6 +23,7 @@ class Interests extends ModelUtil
 	'audio',
 	'transport',
 	'audio_script',
+	'description',
 	'gallery_image',
 	'bibliography',
 	'force_lang',
@@ -43,6 +44,7 @@ class Interests extends ModelUtil
 	  'audio' => 'json',
 	  'transport' => 'json',
 	  'audio_script' => 'json',
+	  'description' => 'json',
 	  'gallery_image' => 'json',
 	  'bibliography' => 'json',
 	];
@@ -57,11 +59,13 @@ class Interests extends ModelUtil
 	'audio', 
 	'transport',
 	'audio_script',
+	'description',
 	'bibliography',
 	];
 
 	protected $aUploads = ['header_image', 'audio', 'gallery_image'];
 	
+	protected $aOptionalFields = ['parcours_id'];
 
 	public static function getInstance() {
 		return new Interests;
@@ -132,6 +136,9 @@ class Interests extends ModelUtil
 				"CONCAT(parcours.title->>'fr', parcours.title->>'en') ILIKE '%{$query}%'"
 			)
 			->orWhereRaw(
+				"CONCAT(interests.description->>'fr', interests.description->>'en') ILIKE '%{$query}%'"
+			)
+			->orWhereRaw(
 				"CONCAT(parcours.description->>'fr', parcours.description->>'en') ILIKE '%{$query}%'"
 			)
 			
@@ -162,16 +169,20 @@ class Interests extends ModelUtil
 				((
 					CONCAT(interests.audio_script->>'fr', interests.audio_script->>'en') ILIKE '%".$query."%')::int * 15
 				) +
+				((
+					CONCAT(interests.description->>'fr', interests.description->>'en') ILIKE '%".$query."%')::int * 13
+				) +
 
 				((
 					CONCAT(parcours.title->>'fr', parcours.title->>'en') ILIKE '%".$query."%')::int * 10
 				) +
+
 				((
-					CONCAT(cities.title->>'fr', cities.title->>'en') ILIKE '%".$query."%')::int * 5
+					CONCAT(parcours.description->>'fr', parcours.description->>'en') ILIKE '%".$query."%')::int * 3
 				) +
 				((
-					CONCAT(parcours.description->>'fr', parcours.description->>'en') ILIKE '%".$query."%')::int *
-				 3)
+					CONCAT(cities.title->>'fr', cities.title->>'en') ILIKE '%".$query."%')::int * 5
+				)
 
 				".$orderWay."
 			");

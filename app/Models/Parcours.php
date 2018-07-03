@@ -8,6 +8,7 @@ class Parcours extends ModelUtil
 {
 	protected $table = 'parcours';
 	protected $userStr = 'le parcours';
+	protected static $sChildTable = 'interests';
 
 	public $timestamps = true;
 
@@ -155,7 +156,6 @@ class Parcours extends ModelUtil
 				$list->orderBy('parcours.'.$orderCol.'->fr', $orderWay);
 			}
 		}
-
 
 		return $list->get();
 	}

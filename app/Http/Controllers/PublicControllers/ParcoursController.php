@@ -9,7 +9,7 @@ use App\Utils\CheckerUtil;
 
 class ParcoursController extends Controller
 {
-	protected $bAdmin = true;
+	protected $bAdmin = false;
 	protected $sModelClass = 'Parcours';
 	/*public function list() {
 		$aData = Parcours::where('state', '=', 'true')

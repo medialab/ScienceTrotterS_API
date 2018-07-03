@@ -9,6 +9,7 @@ use App\Utils\CheckerUtil;
 
 class CitiesController extends Controller
 {
+  protected $bAdmin = false;
   protected $sModelClass = 'Cities';
 
   public function byId($sCityId) {

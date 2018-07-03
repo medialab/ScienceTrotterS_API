@@ -114,6 +114,7 @@ class DefaultBuilder
                 $table->json('price')->nullable();
                 $table->json('audio')->nullable();
                 $table->json('transport')->nullable();
+                $table->json('description')->nullable();
                 $table->json('audio_script')->nullable();
                 $table->json('gallery_image')->nullable();
                 $table->json('bibliography')->nullable();
