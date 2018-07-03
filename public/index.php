@@ -1,5 +1,6 @@
 <?php
-
+ini_set( 'display_errors', true );
+	error_reporting( E_ALL | E_NOTICE );
 header('Access-Control-Allow-Origin: '.getenv('BACKOFFICE_URL'));
 header('Access-Control-Allow-Methods: GET, POST');  
 
