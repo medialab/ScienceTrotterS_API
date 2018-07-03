@@ -1,6 +1,6 @@
 <?php
 
-header('Access-Control-Allow-Origin: https://admin-sts-dev.actu.com/');
+header('Access-Control-Allow-Origin: '.env('BACKOFFICE_URL'));
 header('Access-Control-Allow-Methods: GET, POST');  
 
 $confPath = dirname(realpath('.')).'/config/conf.php';
