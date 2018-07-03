@@ -404,10 +404,13 @@ class APIControllerUtil extends BaseController
         $sLang = $oRequest->input('lang');
         $columns = $oRequest->input('columns');
 
-        $where = [['cities_id', '=', $id]];
+        $class = $this->getClass();
+        $oModel = new $class;
+
+        $where = [[$oModel->table.'.cities_id', '=', $id]];
 
         if (!$this->bAdmin) {
-            $where[] = ['state', '=', 'true'];
+            $where[] = [$oModel->table.'.state', '=', 'true'];
         }
 
         $class = $this->getClass();
