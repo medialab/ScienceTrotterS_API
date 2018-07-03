@@ -239,10 +239,10 @@ abstract class ModelUtil extends Model
 				});
 
 				$oModelList->groupBy($sTable.'.id');
+		    	$oModelList->whereNotNull($sChild.'.id');
 			}
 
 		    $oModelList->where($sTable.'.state', true);
-		    $oModelList->whereNotNull($sChild.'.id');
 		}
 
 		if ($aOrder && count($aOrder) === 2) {
