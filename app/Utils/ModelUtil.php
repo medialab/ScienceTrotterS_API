@@ -212,11 +212,12 @@ abstract class ModelUtil extends Model
 		exit;*/
 
 		$oModelList = Self::Select($sTable.'.*');
+		//var_dump($sLang);
 		if ($sLang && !$bAdmin) {
 		    $oModelList->where(function($query) use ($sLang, $bAdmin, $sTable){
 	            $query->Where($sTable.'.force_lang', '')
 	            	->orWhereNull($sTable.'.force_lang')
-	            	->where($sTable.'.force_lang', $sLang);
+	            	->orWhere($sTable.'.force_lang', $sLang);
 		    });
 		}
 
@@ -232,10 +233,15 @@ abstract class ModelUtil extends Model
 					$query->on($sTable.'.id', '=', $childColumn);
 					$query->where($sChild.'.state', '=', true);
 
-					$query->Where($sTable.'.force_lang', '')
-						  ->orWhereNull($sTable.'.force_lang')
-						  ->where($sTable.'.force_lang', $sLang)
-					 ;
+					$query->Where(function($query) use ($sChild, $sLang) {
+						$query->Where($sChild.'.force_lang', '')
+							  ->orWhereNull($sChild.'.force_lang')
+						;
+
+						if ($sLang) {
+							$query->orWhere($sChild.'.force_lang', $sLang);
+						}
+					});
 				});
 
 				$oModelList->groupBy($sTable.'.id');

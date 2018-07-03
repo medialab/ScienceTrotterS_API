@@ -82,6 +82,8 @@ class Interests extends ModelUtil
 				$this->attributes['city'] = $city;
 			}
 		}
+
+		$this->attributes['city'];
 	}
 
 	public function loadParcours() {
@@ -93,12 +95,30 @@ class Interests extends ModelUtil
 				$this->attributes['parcours'] = $parcours;
 			}
 		}
+
+		$this->attributes['parcours'];
 	}
 
 	public function loadParents() {
 		$this->loadCity();
 		$this->loadParcours();
 	}
+
+	/*public function save(Array $options=[]) {
+		$prevGeo = $this->original['geoloc'];
+		$b = Parent::save($options);
+
+		$attrs = &$this->attributes;
+		var_dump(!$b, empty($attrs['parcours_id']), $attrs['geoloc'] === $prevGeo);
+
+		if (!$b || empty($attrs['parcours_id']) || $attrs['geoloc'] === $prevGeo) {
+			return $b;
+		}
+
+		$oParc = $this->loadParcours();
+		var_dump($oParc);
+		exit;
+	}*/
 
 	public static function byParcours($id, $oRequest, $bAdmin = false) {
 		$where = [['parcours_id', '=', $id]];
