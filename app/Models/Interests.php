@@ -11,56 +11,58 @@ class Interests extends ModelUtil
 	public $timestamps = true;
 
 	protected $fillable = [
-	'id',
-	'cities_id',
-	'parcours_id',
-	'header_image',
-	'title',
-	'address',
-	'geoloc',
-	'schedule',
-	'price',
-	'audio',
-	'transport',
-	'audio_script',
-	'description',
-	'gallery_image',
-	'bibliography',
-	'force_lang',
-	'state',
-	'created_at',
-	'updated_at'
+		'id',
+		'cities_id',
+		'parcours_id',
+		'header_image',
+		'title',
+		'address',
+		'geoloc',
+		'schedule',
+		'price',
+		'audio',
+		'transport',
+		'audio_script',
+		'description',
+		'distances',
+		'gallery_image',
+		'bibliography',
+		'force_lang',
+		'state',
+		'created_at',
+		'updated_at'
 	];
 
 	protected $casts = [
-	  'id' => 'string',
-	  'cities_id' => 'string',
-	  'parcours_id' => 'string',
-	  'title' => 'json',
-	  'address' => 'json',
-	  'geoloc' => 'json',
-	  'schedule' => 'json',
-	  'price' => 'json',
-	  'audio' => 'json',
-	  'transport' => 'json',
-	  'audio_script' => 'json',
-	  'description' => 'json',
-	  'gallery_image' => 'json',
-	  'bibliography' => 'json',
+		'id' => 'string',
+		'cities_id' => 'string',
+		'parcours_id' => 'string',
+		'title' => 'json',
+		'address' => 'json',
+		'geoloc' => 'json',
+		'schedule' => 'json',
+		'price' => 'json',
+		'audio' => 'json',
+		'transport' => 'json',
+		'audio_script' => 'json',
+		'description' => 'json',
+		'gallery_image' => 'json',
+		'bibliography' => 'json',
+		'distances' => 'json',
 	];
 
 	protected $primaryKey = 'id';
 
 	protected $aTranslateVars = [
-	'title', 
-	'address', 
-	'schedule', 
-	'price', 
-	'audio', 
-	'transport',
-	'audio_script',
-	'description',
-	'bibliography',
+		'title', 
+		'address', 
+		'schedule', 
+		'price', 
+		'audio', 
+		'transport',
+		'audio_script',
+		'description',
+		'bibliography',
 	];
 
 	protected $aUploads = ['header_image', 'audio', 'gallery_image'];
@@ -71,7 +73,7 @@ class Interests extends ModelUtil
 		return new Interests;
 	}
 
-	public function loadParents() {
+	public function loadCity() {
 		if (!empty($this->attributes['cities_id'])) {
 			$city = Cities::Where('id', $this->attributes['cities_id'])->get(['id', 'title'])->first();
 
@@ -80,16 +82,22 @@ class Interests extends ModelUtil
 				$this->attributes['city'] = $city;
 			}
 		}
+	}
 
+	public function loadParcours() {
 		if (!empty($this->attributes['parcours_id'])) {
 			$parcours = Parcours::Where('id', $this->attributes['parcours_id'])->get(['id', 'title'])->first();
-
 
 			if (!empty($parcours)) {
 				$parcours->setLang($this->getLang());
 				$this->attributes['parcours'] = $parcours;
 			}
 		}
+	}
+
+	public function loadParents() {
+		$this->loadCity();
+		$this->loadParcours();
 	}
 
 	public static function byParcours($id, $oRequest, $bAdmin = false) {

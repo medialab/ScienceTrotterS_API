@@ -82,6 +82,17 @@ class Parcours extends ModelUtil
 		$this->attributes['city'] = $city;
 	}
 
+	public function getInterests() {
+		if (!empty($this->attributes['interests'])) {
+			return $this->attributes['interests'];
+		}
+
+		$oModelList = Interests::Where('parcours_id', $this->attributes['id']);
+		$this->attributes['interests'] = $oModelList->get();
+
+		return $this->attributes['interests'];
+	}
+
 	public static function search($query, $columns, $order = false) {
 		$oModel = new Parcours;
 		$query = preg_replace("/('{1})/", ("''"), $query);
