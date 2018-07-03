@@ -8,6 +8,7 @@ class Cities extends ModelUtil
 {
 	protected $table = 'cities';
 	protected $userStr = 'la ville';
+	protected static $sChildTable = 'interests';
 
 	public $timestamps = true;
 

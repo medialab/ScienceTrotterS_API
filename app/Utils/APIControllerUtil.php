@@ -303,7 +303,7 @@ class APIControllerUtil extends BaseController
         else{
             $oModelList = $class::Where('id', $id);
 
-            if ($sLang) {
+            /*if ($sLang) {
                 $oModelList->where(function($query) use ($sLang){
                         $query->where('force_lang', $sLang)
                               ->orWhere('force_lang', '')
@@ -311,7 +311,7 @@ class APIControllerUtil extends BaseController
                         ;
                     })
                 ;
-            }
+            }*/
 
             $oModel = $oModelList->get($columns)->first();
             if ($sLang) {

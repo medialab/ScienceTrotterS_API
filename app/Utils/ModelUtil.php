@@ -10,10 +10,13 @@ abstract class ModelUtil extends Model
 	private $sCurLang = false; // Langue Séléctionnée
 
 	protected $userStr = 'Model';
+	protected static $sChildTable = false;
 	
 	protected $aTranslateVars = []; // les Variables à traduire
 	protected $aSkipPublic = ['created_at', 'state', 'sCurLang'];
 	protected $aUploads = ['image', 'audio'];
+
+	protected $aOptionalFields = [];
 
 	public function newCollection(array $models = []) {
 		return new TranslateCollection($models);
@@ -200,34 +203,49 @@ abstract class ModelUtil extends Model
 		$limit = $oRequest->getLimit();
 		$sLang = $oRequest->input('lang');
 		$aOrder = $oRequest->getOrder();
+		$oModel = static::getInstance();
+
+		$sTable = $oModel->table;
 
 		/*$class = get_class();
 		var_dump($class);
 		exit;*/
 
-		if ($sLang) {
-		    $oModelList = Self::where(function($query) use ($sLang, $bAdmin){
-		        if (!$bAdmin) {
-		            $query->Where('force_lang', '')
-		              ->orWhereNull('force_lang')
-		              ->where('force_lang', $sLang);
-		        }
+		$oModelList = Self::Select($sTable.'.*');
+		if ($sLang && !$bAdmin) {
+		    $oModelList->where(function($query) use ($sLang, $bAdmin, $sTable){
+	            $query->Where($sTable.'.force_lang', '')
+	            	->orWhereNull($sTable.'.force_lang')
+	            	->where($sTable.'.force_lang', $sLang);
 		    });
-		}
-		else{
-		    $oModelList = Self::whereNotNull('id');
-			
 		}
 
 		if (!$bAdmin) {
-		    $oModelList->where('state', true);
+			if (static::$sChildTable) {
+				$sChild = static::$sChildTable;
+				
+				$childColumn = static::$sChildTable.'.';
+				$childColumn .= $oModel->table;
+				$childColumn .= '_id';
+
+				$oModelList->leftJoin($sChild, function($query) use ($childColumn, $sChild, $sTable, $sLang) {
+					$query->on($sTable.'.id', '=', $childColumn);
+					$query->where($sChild.'.state', '=', true);
+
+					$query->Where($sTable.'.force_lang', '')
+						  ->orWhereNull($sTable.'.force_lang')
+						  ->where($sTable.'.force_lang', $sLang)
+					 ;
+				});
+
+				$oModelList->groupBy($sTable.'.id');
+			}
+
+		    $oModelList->where($sTable.'.state', true);
+		    $oModelList->whereNotNull($sChild.'.id');
 		}
 
-		//var_dump($aOrder);
 		if ($aOrder && count($aOrder) === 2) {
-		    //var_dump("ORDERING", $aOrder);
-		    $oModel = static::getInstance();
-
 		    $aOrderCol = $aOrder[0];
 		    $sOrderWay = $aOrder[1];
 
@@ -257,6 +275,7 @@ abstract class ModelUtil extends Model
 
 		$oModelList->take($limit)->skip($skip);
 		/*var_dump($oModelList->toSql());
+		var_dump($oModelList->get());
 		exit;*/
 
 		return $oModelList;
@@ -269,7 +288,6 @@ abstract class ModelUtil extends Model
 	public function toArray($bAdmin=false) {
 		$aResult = [];
 		$sLang = $this->sCurLang;
-
 		//var_dump("====== To Array: $sLang =====", $this->attributes);
 
 		//var_dump("-- As Admin", $bAdmin);
@@ -316,8 +334,19 @@ abstract class ModelUtil extends Model
 					}
 					else{
 						//var_dump('-- As Admin');
-						
-						if (empty($value->$sLang)) {
+						if ($this->force_lang) {
+							$fLang = $this->force_lang;
+
+							if (empty($value->$fLang)) {
+								//var_dump('-- Is Empty');
+								$aResult[$sVar] = null;
+							}
+							else{
+								//var_dump('-- Getting Data');
+								$aResult[$sVar] = $value->$fLang;
+							}
+						}
+						elseif (empty($value->$sLang)) {
 							//var_dump('-- Is Empty');
 							$aResult[$sVar] = null;
 						}
@@ -405,7 +434,13 @@ abstract class ModelUtil extends Model
 
 		if ($bAdmin) {
 			//var_dump("-- Adding Lang");
-			$aResult['sCurLang'] = $sLang;
+			//$aResult['sCurLang'] = $sLang;
+			if ($sLang) {
+				$aResult['sCurLang'] = empty($this->attributes['force_lang']) ? $sLang : $this->attributes['force_lang'];
+			}
+			else {
+				$aResult['sCurLang'] = false;
+			}
 			//var_dump("-- Adding Force Lang");
 		}
 
@@ -459,6 +494,9 @@ abstract class ModelUtil extends Model
 
 		foreach ($this->fillable as $key) {
 			if (in_array($key, ['id', 'state', 'force_lang', 'created_at', 'updated_at'])) {
+				continue;
+			}
+			elseif(in_array($key, $this->aOptionalFields)) {
 				continue;
 			}
 
