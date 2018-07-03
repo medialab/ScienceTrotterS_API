@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use App\Utils\ModelUtil;
+use App\Utils\MapApiUtil;
 
 class Interests extends ModelUtil
 {
@@ -67,7 +68,7 @@ class Interests extends ModelUtil
 
 	protected $aUploads = ['header_image', 'audio', 'gallery_image'];
 	
-	protected $aOptionalFields = ['parcours_id'];
+	protected $aOptionalFields = ['parcours_id', 'distances'];
 
 	public static function getInstance() {
 		return new Interests;
@@ -83,7 +84,7 @@ class Interests extends ModelUtil
 			}
 		}
 
-		$this->attributes['city'];
+		return $this->attributes['city'];
 	}
 
 	public function loadParcours() {
@@ -96,7 +97,7 @@ class Interests extends ModelUtil
 			}
 		}
 
-		$this->attributes['parcours'];
+		return $this->attributes['parcours'];
 	}
 
 	public function loadParents() {
@@ -104,21 +105,77 @@ class Interests extends ModelUtil
 		$this->loadParcours();
 	}
 
-	/*public function save(Array $options=[]) {
-		$prevGeo = $this->original['geoloc'];
+	public function save(Array $options=[]) {
+		$prevGeo = empty($this->original['geoloc']) ? false : $this->original['geoloc'];
 		$b = Parent::save($options);
 
 		$attrs = &$this->attributes;
-		var_dump(!$b, empty($attrs['parcours_id']), $attrs['geoloc'] === $prevGeo);
 
 		if (!$b || empty($attrs['parcours_id']) || $attrs['geoloc'] === $prevGeo) {
 			return $b;
 		}
 
 		$oParc = $this->loadParcours();
-		var_dump($oParc);
-		exit;
-	}*/
+		$aInterests = $oParc->getInterests();
+
+		$mapApi = new MapApiUtil();
+		$aDistances = [];
+		foreach ($aInterests as $oInt) {
+			var_dump("## Handle ".$oInt->id);
+			if ($oInt->id === $attrs['id']) {
+				var_dump("## Is Same Than ".$this->id);
+				continue;
+			}
+			elseif(empty($oInt->geoloc)) {
+				var_dump("## No Geoloc Spécified");
+				continue;
+			}
+
+			$aDist = $mapApi->getDistance($this, $oInt);
+			if (!$aDist) {
+				continue;
+			}
+
+			$aDist = ['time' => $aDist->duration, 'distance' => $aDist->distance];
+
+			if (!is_array($oInt->attributes['distances'])) {
+				$oInt->attributes['distances'] = [];
+			}
+
+			$aDistances[$oInt->id] = $aDist;
+
+			$oInt->attributes['distances'][$this->attributes['id']] = $aDist;
+			$oInt->save();
+			var_dump("Updating: ".$oInt->title->fr);
+		}
+
+		$attrs['distances'] = $aDistances;
+		return Parent::save($options);
+	}
+
+	public function delete() {
+		if (empty($this->attributes['parcours_id'])) {
+			return Parent::delete();
+		}
+
+		$id = $this->attributes['id'];
+		$oParc = $this->loadParcours();
+
+		$b = Parent::delete();
+		if (!$b || !$oParc) {
+			return $b;
+		}
+
+		$aInterests = $oParc->getInterests();
+		foreach ($aInterests as $oInt) {
+			if (is_array($oInt->distances)) {
+				unset($oInt->distances[$id]);
+				$oInt->save();
+			}
+		}
+
+		return $b;
+	}
 
 	public static function byParcours($id, $oRequest, $bAdmin = false) {
 		$where = [['parcours_id', '=', $id]];
