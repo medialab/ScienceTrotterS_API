@@ -21,6 +21,10 @@ class APIControllerUtil extends BaseController
             return $oModelList;
         }
 
+        /*var_dump($oModelList->toSql());
+        var_dump($oModelList->get());
+        exit;*/
+
         $sLang = $oRequest->input('lang');
         $columns = $oRequest->input('columns');
         $parents = $oRequest->input('parents');
