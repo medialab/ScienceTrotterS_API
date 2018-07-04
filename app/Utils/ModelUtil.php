@@ -16,7 +16,13 @@ abstract class ModelUtil extends Model
 	protected $aSkipPublic = ['created_at', 'state', 'sCurLang'];
 	protected $aUploads = ['image', 'audio'];
 
+	protected $errorMsg = null;
 	protected $aOptionalFields = [];
+	protected $aProperties = [];
+
+	public function getId() {
+		return empty($this->attributes['id']) ? null : $this->attributes['id'];
+	}
 
 	public function newCollection(array $models = []) {
 		return new TranslateCollection($models);
@@ -95,6 +101,24 @@ abstract class ModelUtil extends Model
 		$this->attributes[$sVar] = $var;
 	}
 
+	public function __isset($sVar) {
+		if (in_array($sVar, $this->fillable) || array_key_exists($sVar, $this->attributes)) {
+
+			if (isset($this->casts[$sVar]) && $this->casts[$sVar] === 'json' && is_string($this->attributes[$sVar])) {
+				$this->attributes[$sVar] = json_decode($this->attributes[$sVar]);
+			}
+
+			if (is_object($this->attributes[$sVar])) {
+				return !empty(get_object_vars($this->attributes[$sVar]));
+			}
+			else{
+				return !empty($this->attributes[$sVar]);
+			}
+		}
+		
+		return Parent::__isset($sVar);
+	}
+
 	/**
 	 *
 	 */
@@ -102,10 +126,10 @@ abstract class ModelUtil extends Model
 		// Si il s'agit d'une variable De la BDD
 
 		if (in_array($sVar, $this->fillable) || array_key_exists($sVar, $this->attributes)) {
-			// var_dump("===== GETTING $sVar =====");
+			//var_dump("===== GETTING =====");
 
 			// Si il s'agit d'une variable à traduire
-			if (in_array($sVar, $this->aTranslateVars) || (array_key_exists($sVar, $this->casts) && $this->casts[$sVar] === 'json')) {
+			if (in_array($sVar, $this->aTranslateVars) || (isset($this->casts[$sVar]) && $this->casts[$sVar] === 'json')) {
 				// var_dump("-- As Translate");
 				
 				if (empty($this->attributes[$sVar])) {
@@ -171,7 +195,12 @@ abstract class ModelUtil extends Model
 			}
 		}
 		elseif(array_key_exists($sVar, $this->attributes) || in_array($sVar, $this->fillable)){
-			$this->attributes[$sVar] = $value;
+			if (isset($this->casts[$sVar]) && $this->casts[$sVar] === 'json') {
+				$this->attributes[$sVar] = (object)$value;
+			}
+			else{
+				$this->attributes[$sVar] = $value;
+			}
 		}
 		elseif(property_exists($this, $sVar)){
 			$this->$sVar = $value;
@@ -212,7 +241,6 @@ abstract class ModelUtil extends Model
 		exit;*/
 
 		$oModelList = Self::Select($sTable.'.*');
-		//var_dump($sLang);
 		if ($sLang && !$bAdmin) {
 		    $oModelList->where(function($query) use ($sLang, $bAdmin, $sTable){
 	            $query->Where($sTable.'.force_lang', '')
@@ -231,7 +259,7 @@ abstract class ModelUtil extends Model
 
 				$oModelList->leftJoin($sChild, function($query) use ($childColumn, $sChild, $sTable, $sLang) {
 					$query->on($sTable.'.id', '=', $childColumn);
-					$query->where($sChild.'.state', '=', true);
+					/*$query->where($sChild.'.state', '=', true);*/
 
 					$query->Where(function($query) use ($sChild, $sLang) {
 						$query->Where($sChild.'.force_lang', '')
@@ -480,6 +508,13 @@ abstract class ModelUtil extends Model
 
 		//var_dump("-- Result: ", $this->attributes);
 		$bResult = Parent::save($options);
+		if (!$bResult) {
+			$this->errorMsg = 'Une erreur s\'est produite lors de l\'enregistrement';
+		}
+		else{
+			$this->errorMsg = null;
+		}
+
 		$this->attributes = array_merge($this->attributes, $aTmpVars);
 
 		return $bResult;
@@ -493,11 +528,12 @@ abstract class ModelUtil extends Model
 
 		//var_dump("====== TEST ENABLE ======");
 		
-		$force = $this->force_lang;
 		//var_dump("FORCE LANG", $force);
+		$aErrors = [];
+		$force = $this->force_lang;
 		$tmpLang = $this->sCurLang;
 		$this->setLang(false);
-
+		
 		foreach ($this->fillable as $key) {
 			if (in_array($key, ['id', 'state', 'force_lang', 'created_at', 'updated_at'])) {
 				continue;
@@ -516,12 +552,15 @@ abstract class ModelUtil extends Model
 
 			//var_dump("-- key $key", $value);
 
-			if (empty($value)) {
-				//var_dump("-- Fail $key Is Empty", $value);
-				$this->attributes['state'] = false;
+			if (empty($this->$key)) {
+				//var_dump("-- Fail $key Is Empty", $this->$key);
+				//$this->attributes['state'] = false;
 				//var_dump($this->state);
 				//var_dump($this->attributes);
-				return false;
+				$aErrors[] = $this->getProperyName($key);
+				//var_dump('TEST-1: '.$key, $value);
+				continue;
+				//return false;
 			}
 			
 			if (in_array($key, $this->aTranslateVars)) {
@@ -533,25 +572,49 @@ abstract class ModelUtil extends Model
 				if ($force) {
 					if (empty($value->$force)) {
 						//var_dump("-- Fail $key Is Empty For Force Lang: '$force'", $value);
-						$this->attributes['state'] = false;
-						return false;
+						//$this->attributes['state'] = false;
+						$aErrors[] = $this->getProperyName($key);
+						//var_dump('TEST-2: '.$key, $value);
+						continue;
+						//return false;
 					}
 				}
 				elseif(empty($value->fr) || empty($value->en)) {
 					//var_dump("-- Fail $key Is Empty For One Lang", $value);
-					$this->attributes['state'] = false;
-					return false;
+					//$this->attributes['state'] = false;
+					//var_dump('TEST-3: '.$key, $value);
+					$aErrors[] = $this->getProperyName($key);
+					continue;
+					//return false;
 				}
 			}
 		}
 
-		$this->attributes['state'] = true;
-		return true;
+		if (empty($aErrors)) {
+			$this->errorMsg = null;
+		}
+		else{
+			$this->errorMsg = 'Impossible d\'activer '.$this->userStr.'. Veuillez renseinger les champs suivants ';
+			$this->errorMsg .= !$this->force_lang ? 'dans toutes les langues:' : 'dans la langue:';
+
+			$this->errorMsg .= '<ul>';
+			foreach ($aErrors as $name) {
+				$this->errorMsg .= '<li>'.$name.'</li>';
+			}
+			$this->errorMsg .= '</ul>';
+
+		}
+
+		$this->attributes['state'] = empty($aErrors);
+		return empty($aErrors);
 	}
 
 	public function updateData($aData) {
+		$bCurState = $this->state;
+
 		//var_dump("=== Updating Object ===", $aData);
 		foreach ($aData as $key => $value) {
+			//var_dump("################ $key ################");
 			// Données à Ignorer lors de l'update
 			if (in_array($key, ['id', 'created_at', 'updated_at', 'state'])) {
 				continue;
@@ -571,39 +634,47 @@ abstract class ModelUtil extends Model
 					$aCurFiles = (object)$this->$key;
 
 
-					//var_dump($aCurFiles);
 					foreach($aFiles as $i => $sFile) {
-						//var_dump("#### TEST FILE: $i => $sFile");
 						if (!empty($sFile) && (empty($aCurFiles->$i) || $aCurFiles->$i !== $sFile)) {
-							//var_dump("#### Do Download: $sFile");
 							$this->downloadImage($sFile);
 							$aCurFiles->$i = $sFile;
 						}
-						else{
-							//var_dump("#### Faild:");
-							//var_dump("-- is Empty: ", !empty($sFile));
-							//var_dump("-- Cur Empty: ", empty($aCurFiles->$i));
-							//var_dump("-- Diff: ",  $aCurFiles->$i !== $sFile);
-						}
+						/*else{
+							var_dump("#### Faild:");
+							var_dump("-- is Empty: ", !empty($sFile));
+							var_dump("-- Cur Empty: ", empty($aCurFiles->$i));
+							var_dump("-- Diff: ",  $aCurFiles->$i !== $sFile);
+						}*/
 					}
 
+					//var_dump("VERIFY-4: $key", $value);
 					$this->$key = $aCurFiles;
 					//var_dump("====== TEST Result =====", $this->$key);
 				}
 				else{
+					//var_dump("=== $key ===");
 					//var_dump("UPLOAD: $key");
 					$sFile = $aData[$key];
+					//var_dump("New: ". $sFile);
+					//var_dump("Cur: ".$this->$key);
 					//var_dump("Current: ".$this->$key);
 					//var_dump("New: ".$aData[$key]);
 					
-					if($sFile !== $this->$key) {
+					if($sFile !== $this->attributes[$key]) {
 						//var_dump("Downloading");
+						
 						$this->downloadImage($sFile);
-						$this->$key = $sFile;
+						$this->attributes[$key] = $sFile;
+
+						//var_dump("Downloading DONE");
 					}
+
+					//var_dump("CHECKING: ".$this->attributes[$key]);
+					continue;
 				}
 			}
 			else if (in_array($key, $this->aTranslateVars)) {
+				//var_dump("VERIFY-0: $key", $value);
 				if ($this->sCurLang) {
 					$this->setValueByLang($key, $value);
 				}
@@ -611,7 +682,12 @@ abstract class ModelUtil extends Model
 					$this->setValueAsJson($key, $value);
 				}
 			}
+			elseif (isset($this->casts[$key]) && $this->casts[$key] === 'json') {
+				//var_dump("VERIFY-1: $key", (object)$value);
+				$this->attributes[$key] = (object)$value;
+			}
 			else{
+				//var_dump("VERIFY-2: $key", $value);
 				$this->$key = $value;
 			}
 		}
@@ -620,11 +696,22 @@ abstract class ModelUtil extends Model
 
 		//var_dump("--- Change Enable");
 		//var_dump($this);
+		//var_dump($this->attributes);
 		if (array_key_exists('state', $aData)) {
-			$this->enable((bool)$aData['state']);
+			$b = $this->enable((bool)$aData['state']);
 		}
 		else{
-			$this->enable($this->attributes['state']);
+			$b = $this->enable($this->attributes['state']);
+		}
+
+		//var_dump($this->attributes);
+
+		if (!$b && $bCurState) {
+			$this->errorMsg = str_replace(
+				'd\'activer '.$this->userStr, 
+				'de sauvegarder '.$this->userStr.' sans le désactiver', 
+				$this->errorMsg
+			);
 		}
 	}
 
@@ -651,6 +738,14 @@ abstract class ModelUtil extends Model
 
 	public function loadParents() {
 
+	}
+
+	public function getError() {
+		return $this->errorMsg;
+	}
+
+	public function getProperyName($sProp) {
+		return empty($this->aProperties) ? null : $this->aProperties[$sProp];
 	}
 
 	abstract public static function search($search, $columns);
