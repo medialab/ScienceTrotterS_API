@@ -12,6 +12,16 @@ class Parcours extends ModelUtil
 
 	public $timestamps = true;
 
+	protected $aProperties = [
+		'title' => 'Titre',
+		'state' => 'Status',
+		'time' => 'Durée',
+		'color' => 'Couleur',
+		'audio' => 'Audio',
+		'description' => 'Déscription',
+		'audio_script' => 'Script Audio',
+	];
+
 	protected $fillable = [
 	  'id',
 	  'cities_id',
@@ -89,6 +99,8 @@ class Parcours extends ModelUtil
 
 		$oModelList = Interests::Where('parcours_id', $this->attributes['id']);
 		$this->attributes['interests'] = $oModelList->get();
+
+		$this->attributes['interests']->setLang($this->getLang());
 
 		return $this->attributes['interests'];
 	}

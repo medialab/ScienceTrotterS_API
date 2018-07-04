@@ -12,6 +12,13 @@ class Cities extends ModelUtil
 
 	public $timestamps = true;
 
+	protected $aProperties = [
+		'title' => 'Titre',
+		'state' => 'Status',
+		'geoloc' => 'Géolocalisation',
+		'image' => 'Image de Couverture',
+	];
+
 	protected $fillable = [
 	  'id',
 	  'title',
