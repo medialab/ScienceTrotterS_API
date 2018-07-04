@@ -42,4 +42,13 @@ class TranslateCollection extends Collection
 		Parent::get($key, $default);
 		$this->setLang($this->sCurLang);
 	}
+
+	public function delete() {
+		$b = true;
+		foreach ($this->items as &$oModel) {
+			$b = $b && $oModel->delete();
+		}
+
+		return $b;
+	}
 }
