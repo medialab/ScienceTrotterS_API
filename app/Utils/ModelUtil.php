@@ -553,6 +553,7 @@ abstract class ModelUtil extends Model
 			//var_dump("-- key $key", $value);
 
 			if (empty($this->$key)) {
+				//var_dump('isEmpty');
 				//var_dump("-- Fail $key Is Empty", $this->$key);
 				//$this->attributes['state'] = false;
 				//var_dump($this->state);
@@ -564,13 +565,16 @@ abstract class ModelUtil extends Model
 			}
 			
 			if (in_array($key, $this->aTranslateVars)) {
+				//var_dump("Tanslate");
 				if (is_string($value)) {
 					$this->attributes[$key] = json_decode($value);
 					$value = $this->attributes[$key];
 				}
 
+				//var_dump($value);
 				if ($force) {
 					if (empty($value->$force)) {
+						//var_dump("force Empty");
 						//var_dump("-- Fail $key Is Empty For Force Lang: '$force'", $value);
 						//$this->attributes['state'] = false;
 						$aErrors[] = $this->getProperyName($key);
@@ -580,6 +584,7 @@ abstract class ModelUtil extends Model
 					}
 				}
 				elseif(empty($value->fr) || empty($value->en)) {
+					//var_dump("Langs Empty");
 					//var_dump("-- Fail $key Is Empty For One Lang", $value);
 					//$this->attributes['state'] = false;
 					//var_dump('TEST-3: '.$key, $value);
@@ -589,6 +594,8 @@ abstract class ModelUtil extends Model
 				}
 			}
 		}
+
+		//var_dump($aErrors);
 
 		if (empty($aErrors)) {
 			$this->errorMsg = null;
@@ -610,7 +617,7 @@ abstract class ModelUtil extends Model
 	}
 
 	public function updateData($aData) {
-		$bCurState = $this->state;
+		$bCurState = (bool) @$this->attributes['state'];
 
 		//var_dump("=== Updating Object ===", $aData);
 		foreach ($aData as $key => $value) {
@@ -621,6 +628,7 @@ abstract class ModelUtil extends Model
 			}
 			if (in_array($key, $this->aUploads)) {
 				if (empty($value)) {
+					//var_dump("Empty");
 					continue;
 				}
 
@@ -640,10 +648,10 @@ abstract class ModelUtil extends Model
 							$aCurFiles->$i = $sFile;
 						}
 						/*else{
-							var_dump("#### Faild:");
-							var_dump("-- is Empty: ", !empty($sFile));
-							var_dump("-- Cur Empty: ", empty($aCurFiles->$i));
-							var_dump("-- Diff: ",  $aCurFiles->$i !== $sFile);
+							//var_dump("#### Faild:");
+							//var_dump("-- is Empty: ", !empty($sFile));
+							//var_dump("-- Cur Empty: ", empty($aCurFiles->$i));
+							//var_dump("-- Diff: ",  $aCurFiles->$i !== $sFile);
 						}*/
 					}
 
@@ -655,21 +663,25 @@ abstract class ModelUtil extends Model
 					//var_dump("=== $key ===");
 					//var_dump("UPLOAD: $key");
 					$sFile = $aData[$key];
+
 					//var_dump("New: ". $sFile);
 					//var_dump("Cur: ".$this->$key);
-					//var_dump("Current: ".$this->$key);
-					//var_dump("New: ".$aData[$key]);
 					
 					if($sFile !== @$this->attributes[$key]) {
 						//var_dump("Downloading");
 						
 						$this->downloadImage($sFile);
-						$this->attributes[$key] = $sFile;
+						if (!in_array($key, $this->aTranslateVars)) {
+							$this->attributes[$key] = $sFile;
+						}
+						else{
+							$this->setValueByLang($key, $value);
+						}
 
 						//var_dump("Downloading DONE");
 					}
 
-					//var_dump("CHECKING: ".$this->attributes[$key]);
+					//var_dump("CHECKING: ",$this->attributes[$key]);
 					continue;
 				}
 			}
@@ -704,7 +716,6 @@ abstract class ModelUtil extends Model
 			$b = $this->enable($this->attributes['state']);
 		}
 
-		//var_dump($this->attributes);
 
 		if (!$b && $bCurState) {
 			$this->errorMsg = str_replace(
@@ -712,6 +723,8 @@ abstract class ModelUtil extends Model
 				'de sauvegarder '.$this->userStr.' sans le désactiver', 
 				$this->errorMsg
 			);
+			//var_dump('Change Message To Save');
+			//var_dump($this->errorMsg);
 		}
 	}
 
