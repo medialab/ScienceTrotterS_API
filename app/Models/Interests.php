@@ -290,7 +290,7 @@ class Interests extends ModelUtil
 			}
 
 			$otherId = $oWay->int1 === $this->id ? $oWay->int1 : $oWay->int;
-			$oInt = Interests::Where([['id', '=', $otherId], ['state', '=', true]])->get(['title']);
+			$oInt = Interests::Where([['id', '=', $otherId], ['state', '=', true]])->get(['title'])->first();
 			if (!$oInt) {
 				continue;
 			}
