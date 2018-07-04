@@ -104,11 +104,11 @@ abstract class ModelUtil extends Model
 	public function __isset($sVar) {
 		if (in_array($sVar, $this->fillable) || array_key_exists($sVar, $this->attributes)) {
 
-			if (isset($this->casts[$sVar]) && $this->casts[$sVar] === 'json' && is_string($this->attributes[$sVar])) {
+			if (isset($this->casts[$sVar]) && $this->casts[$sVar] === 'json' && is_string(@$this->attributes[$sVar])) {
 				$this->attributes[$sVar] = json_decode($this->attributes[$sVar]);
 			}
 
-			if (is_object($this->attributes[$sVar])) {
+			if (is_object(@$this->attributes[$sVar])) {
 				return !empty(get_object_vars($this->attributes[$sVar]));
 			}
 			else{
@@ -273,7 +273,7 @@ abstract class ModelUtil extends Model
 				});
 
 				$oModelList->groupBy($sTable.'.id');
-				$oModelList->whereNotNull($sChild.'.id');
+		    	$oModelList->whereNotNull($sChild.'.id');
 			}
 
 		    $oModelList->where($sTable.'.state', true);
@@ -660,7 +660,7 @@ abstract class ModelUtil extends Model
 					//var_dump("Current: ".$this->$key);
 					//var_dump("New: ".$aData[$key]);
 					
-					if($sFile !== $this->attributes[$key]) {
+					if($sFile !== @$this->attributes[$key]) {
 						//var_dump("Downloading");
 						
 						$this->downloadImage($sFile);

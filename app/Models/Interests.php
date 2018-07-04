@@ -183,6 +183,12 @@ class Interests extends ModelUtil
 		if ($bGeoSame && !$bParcoursUpdated) {
 			return Parent::save($options);
 		}
+		elseif(empty($this->attributes['id'])){
+			$b = Parent::save($options);
+			if (!$b) {
+				return false;
+			}
+		}
 		else{
 			InterestWay::deleteByInterest($this);
 		}
