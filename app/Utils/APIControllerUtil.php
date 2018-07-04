@@ -246,10 +246,8 @@ class APIControllerUtil extends BaseController
         $oModel->updateData($aData);
         
         $msg = null;
-        var_dump($aData['state'], $oModel->state);
         if ($aData['state'] !== $oModel->state) {
             $msg = $oModel->getError();
-            var_dump("Get Error: ", $msg);
             /*if ($oModel->force_lang) {
                 $msg = 'Impossible d\'activer '.$oModel->userStr.'. Avez-vous remplis toutes les informations de la langue ?';
             }
