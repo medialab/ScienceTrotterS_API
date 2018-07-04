@@ -86,7 +86,6 @@ class DefaultMockup
       $oInterest->audio = $iData->audio;
       $oInterest->transport = $iData->transport;
       $oInterest->description = null;
-      $oInterest->distances = null;
       $oInterest->audio_script = $iData->audio_script;
       $oInterest->gallery_image = $iData->gallery_image;
       $oInterest->bibliography = $iData->bibliography;

@@ -2,14 +2,33 @@
 namespace App\Models;
 
 use App\Utils\ModelUtil;
-use App\Utils\MapApiUtil;
 
 class Interests extends ModelUtil
 {
 	protected $table = 'interests';
 	protected $userStr = 'le point d\'intérêt';
+	protected $distances = false;
 
 	public $timestamps = true;
+
+
+	protected $aProperties = [
+		'title' => 'Titre',
+		'state' => 'Status',
+		'geoloc' => 'Géolocalisation',
+		'header_image' => 'Image de Couverture',
+		'gallery_image' => 'Gallerie d\'image',
+		'cities_id' => 'Ville',
+		'parcours_id' => 'Parcours',
+		'address' => 'Accroche',
+		'schedule' => 'Horaires',
+		'price' => 'Difficulté',
+		'audio' => 'Audio',
+		'transport' => 'Transports',
+		'audio_script' => 'Script Audio',
+		'description' => 'Déscription',
+		'bibliography' => 'Bibliographie',
+	];
 
 	protected $fillable = [
 		'id',
@@ -25,7 +44,6 @@ class Interests extends ModelUtil
 		'transport',
 		'audio_script',
 		'description',
-		'distances',
 		'gallery_image',
 		'bibliography',
 		'force_lang',
@@ -49,7 +67,6 @@ class Interests extends ModelUtil
 		'description' => 'json',
 		'gallery_image' => 'json',
 		'bibliography' => 'json',
-		'distances' => 'json',
 	];
 
 	protected $primaryKey = 'id';
@@ -68,7 +85,49 @@ class Interests extends ModelUtil
 
 	protected $aUploads = ['header_image', 'audio', 'gallery_image'];
 	
-	protected $aOptionalFields = ['parcours_id', 'distances'];
+	protected $aOptionalFields = ['parcours_id'];
+
+	public function __get($sVar) {
+		switch ($sVar) {
+			case 'distances':
+				return $this->getDistances();
+				break;
+		}
+
+		return Parent::__get($sVar);
+	}
+
+	public function getDistances() {
+		if (is_array($this->distances)) {
+			return $this->distances;
+		}
+		
+		$attrs = &$this->attributes;
+		if (empty($attrs['parcours_id'])) {
+			$this->distances = [];
+			return $this->distances;
+		}
+
+		$oWayList = InterestWay::byInterest($this);
+		$this->distances = [];
+
+		foreach ($oWayList as $oWay) {
+			$intID = null;
+			if ($oWay->int1 === $this->id) {
+				$intID = $oWay->int2;
+			}
+			else{
+				$intID = $oWay->int1;
+			}
+			
+			$this->distances[$intID] = [
+				'time' => $oWay->time,
+				'distance' => $oWay->distance
+			];
+		}
+
+		return $this->distances;
+	}
 
 	public static function getInstance() {
 		return new Interests;
@@ -95,6 +154,12 @@ class Interests extends ModelUtil
 				$parcours->setLang($this->getLang());
 				$this->attributes['parcours'] = $parcours;
 			}
+			else{
+				$this->attributes['parcours'] = null;
+			}
+		}
+		elseif(!array_key_exists('parcours', $this->attributes)) {
+			$this->attributes['parcours'] = null;
 		}
 
 		return $this->attributes['parcours'];
@@ -107,49 +172,84 @@ class Interests extends ModelUtil
 
 	public function save(Array $options=[]) {
 		$prevGeo = empty($this->original['geoloc']) ? false : $this->original['geoloc'];
-		$b = Parent::save($options);
+		$prevParc = empty($this->original['parcours_id']) ? false : $this->original['parcours_id'];
+
 
 		$attrs = &$this->attributes;
 
-		if (!$b || empty($attrs['parcours_id']) || $attrs['geoloc'] === $prevGeo) {
+		$bGeoSame = $attrs['geoloc'] === $prevGeo;
+		$bParcoursUpdated = $prevParc === @$attrs['parcours_id'];		
+		
+		if ($bGeoSame && !$bParcoursUpdated) {
+			return Parent::save($options);
+		}
+		else{
+			InterestWay::deleteByInterest($this);
+		}
+
+		if (empty($this->geoloc) || empty($attrs['parcours_id'])) {
+			$this->distances = [];
+			return Parent::save($options);
+		}
+
+		//$this->getDistances();
+		
+		/*
+			$oParc = $this->loadParcours();
+
+			if (is_null($oParc)) {
+				return $b;
+			}
+
+			$aDistances = [];
+			$mapApi = new MapApiUtil();
+			$aInterests = $oParc->getInterests();
+
+			foreach ($aInterests as $oInt) {
+				if ($oInt->id === $attrs['id']) {
+					continue;
+				}
+				elseif(empty($oInt->geoloc)) {
+					continue;
+				}
+
+				$aDist = $mapApi->getDistance($this, $oInt);
+				if (!$aDist) {
+					continue;
+				}
+
+				$aDist = [
+					'time' => $aDist->duration, 
+					'distance' => $aDist->distance
+				];
+
+				$oWay = InterestWay::byInterests($this, $oInt);
+				if (is_null($oWay)) {
+					$oWay = new InterestWay;
+					$oWay->int1 = $this->id;
+					$oWay->int2 = $intID;
+				}
+
+				if ($oWay->time !== $aDist['time'] || $oWay->distance !== $aDist['distance']) {
+					$oWay->time = $aDist['time'];
+					$oWay->distance = $aDist['distance'];
+
+					$oWay->save();
+				}
+
+				$aDistances[$oWay->id] = $oWay;
+				$oInt->refresh();
+			}
+
+			$this->distances = $aDistances;
+		*/
+	
+		//var_dump("UPDATING WAYS");
+		$this->distances = InterestWay::updateByInterest($this);
+		if ($this->distances === false) {
 			return $b;
 		}
 
-		$oParc = $this->loadParcours();
-		$aInterests = $oParc->getInterests();
-
-		$mapApi = new MapApiUtil();
-		$aDistances = [];
-		foreach ($aInterests as $oInt) {
-			var_dump("## Handle ".$oInt->id);
-			if ($oInt->id === $attrs['id']) {
-				var_dump("## Is Same Than ".$this->id);
-				continue;
-			}
-			elseif(empty($oInt->geoloc)) {
-				var_dump("## No Geoloc Spécified");
-				continue;
-			}
-
-			$aDist = $mapApi->getDistance($this, $oInt);
-			if (!$aDist) {
-				continue;
-			}
-
-			$aDist = ['time' => $aDist->duration, 'distance' => $aDist->distance];
-
-			if (!is_array($oInt->attributes['distances'])) {
-				$oInt->attributes['distances'] = [];
-			}
-
-			$aDistances[$oInt->id] = $aDist;
-
-			$oInt->attributes['distances'][$this->attributes['id']] = $aDist;
-			$oInt->save();
-			var_dump("Updating: ".$oInt->title->fr);
-		}
-
-		$attrs['distances'] = $aDistances;
 		return Parent::save($options);
 	}
 
@@ -158,23 +258,54 @@ class Interests extends ModelUtil
 			return Parent::delete();
 		}
 
-		$id = $this->attributes['id'];
-		$oParc = $this->loadParcours();
-
-		$b = Parent::delete();
-		if (!$b || !$oParc) {
-			return $b;
-		}
-
-		$aInterests = $oParc->getInterests();
-		foreach ($aInterests as $oInt) {
-			if (is_array($oInt->distances)) {
-				unset($oInt->distances[$id]);
-				$oInt->save();
+		if (!empty($this->attributes['parcours_id'])) {
+			$b = InterestWay::deleteByInterest($this);
+			if (!$b) {
+				return false;
 			}
 		}
 
+		$b = Parent::delete();
 		return $b;
+	}
+
+	public function enable($b = true) {
+		$aErrors = Parent::enable($b);
+		if (!$b || !empty($aErrors)) {
+			return $aErrors;
+		}
+
+		$oWayList = InterestWay::byInterest($this);
+		$aErrors = [];
+
+		foreach ($oWayList as &$oWay) {
+			if ($oWay->time > 0) {
+				continue;
+			}
+
+			$otherId = $oWay->int1 === $this->id ? $oWay->int1 : $oWay->int;
+			$oInt = Interests::Where([['id', '=', $otherId], ['state', '=', true]])->get(['title']);
+			if (!$oInt) {
+				continue;
+			}
+
+			$oInt->setLang('fr');
+			$aErrors[] = $oInt->title;
+		}
+
+		if (empty($aErrors)) {
+			$this->errorMsg = null;
+			return true;
+		}
+
+		$this->errorMsg = 'Impossible d\'activer '.$this->userStr.'. Il semblerait que le trajet est impossible avec: ';
+
+		$this->errorMsg .= '<ul>';
+		foreach ($aErrors as $name) {
+			$this->errorMsg .= '<li>'.$name.'</li>';
+		}
+		$this->errorMsg .= '</ul>';
+		return false;
 	}
 
 	public static function byParcours($id, $oRequest, $bAdmin = false) {
@@ -204,7 +335,6 @@ class Interests extends ModelUtil
 
 		$list = Interests::Select($columns)
 			->leftJoin('cities', 'interests.cities_id', '=', 'cities.id')
-			
 			->leftJoin('parcours', 'interests.parcours_id', '=', 'parcours.id')
 
 			->whereRaw(
@@ -216,7 +346,6 @@ class Interests extends ModelUtil
 			->orWhereRaw(
 				"CONCAT(interests.audio_script->>'fr', interests.audio_script->>'en') ILIKE '%{$query}%'"
 			)
-
 			->orWhereRaw(
 				"CONCAT(parcours.title->>'fr', parcours.title->>'en') ILIKE '%{$query}%'"
 			)
@@ -226,7 +355,6 @@ class Interests extends ModelUtil
 			->orWhereRaw(
 				"CONCAT(parcours.description->>'fr', parcours.description->>'en') ILIKE '%{$query}%'"
 			)
-			
 			->orWhereRaw(
 				"CONCAT(cities.title->>'fr', cities.title->>'en') ILIKE '%{$query}%'"
 			)
