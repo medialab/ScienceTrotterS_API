@@ -1,6 +1,7 @@
 <?php
 
 $router->get('/list', 'InterestsController@list');
+$router->get('/closest', 'InterestsAdminController@closest');
 $router->get('/{id:[a-z0-9-]+}', 'InterestsAdminController@get');
 
 $router->get('/byParcourId/{sParcourId:[a-z0-9-]+}', 'InterestsController@byParcoursId');

@@ -3,15 +3,27 @@
 namespace App\Models;
 
 use App\Utils\ModelUtil;
+use App\Models\InterestWay;
 
 class Parcours extends ModelUtil
 {
+	public $timestamps = true;
 	protected $table = 'parcours';
+
+	/**
+	 * Nom du Model pour un utilisateur
+	 */
 	protected $userStr = 'le parcours';
+
+	/**
+	 * Table Enfant. Utilisé pour le Context public
+	 */
 	protected static $sChildTable = 'interests';
 
-	public $timestamps = true;
 
+	/**
+	 * Liste Des traduction des propriétés
+	 */
 	protected $aProperties = [
 		'title' => 'Titre',
 		'state' => 'Status',
@@ -22,6 +34,9 @@ class Parcours extends ModelUtil
 		'audio_script' => 'Script Audio',
 	];
 
+	/**
+	 * Varialbles modifialbes en DB
+	 */
 	protected $fillable = [
 	  'id',
 	  'cities_id',
@@ -37,6 +52,9 @@ class Parcours extends ModelUtil
 	  'updated_at'
 	];
 
+	/**
+	 * Types des colones particulières 
+	 */
 	protected $casts = [
 	    'id' => 'string',
 	    'title' => 'json',
@@ -48,6 +66,9 @@ class Parcours extends ModelUtil
 
 	protected $primaryKey = 'id';
 
+	/**
+	 * Variables à Traduire
+	 */
 	protected $aTranslateVars = [
 	  'title', 
 	  'time', 
@@ -56,11 +77,36 @@ class Parcours extends ModelUtil
 	  'audio_script'
 	];
 
-
+	/**
+	 * Retrourne une nouvelle instance vide
+	 * @return Parcours nouvelle instance
+	 */
 	public static function getInstance() {
 		return new Parcours;
 	}
 
+	/**
+	 * Réécritue Récupération de variable
+	 * @param  String $sVar Nom de la variable
+	 * @return Mixed       La variable ou NULL
+	 */
+	public function __get($sVar) {
+		switch ($sVar) {
+			case 'interests':
+				return $this->getInterests();
+				break;
+			
+			default:
+				return Parent::__get($sVar);
+				break;
+		}
+	}
+
+	/**
+	 * Insert / Update Model
+	 * @param  Array|array $options Options Lumen
+	 * @return Bool               Success
+	 */
 	public function save(Array $options=[]) {
 		$bPrevState = (bool) @$this->original['state'];
 		$bSuccess = Parent::save($options);
@@ -74,10 +120,125 @@ class Parcours extends ModelUtil
 		return $bSuccess;
 	}
 
-	public function delete() {
-		//Interests::getByParcours();
+	/**
+	 * Calcule la distance + le time les plus courts pour suivre le parcours
+	 * @param  String $parcId Id du parcours
+	 * @return Array         [
+	 *     'pointCnt' => nombre De points à parcourir
+	 *     'distance' => Distance à parcourir en Mètres
+	 *     'time' => [
+	 *         'string' => Heure Sous Forme: 5h 30min
+	 *         'h' => Nombre d'Heures
+	 *         'm' => Nombre de Minutes
+	 *     ]
+	 * ]
+	 */
+	public function getLength() {
+		$cnt = 0;
+		$oMin = false;
+		$oMax = false;
+		$dMinScore = 0;
+		$dMaxScore = 0;
+
+		// Recherche d'un point de départ le plus à l'extrême
+		foreach ($this->interests as $key => $oInt) {
+			if (!$oInt->state) {
+				continue;
+			}
+
+			$oInt->setLang('fr');
+
+			$cnt++;
+			
+			$geoloc = $oInt->geoloc;
+			$dNewScore = $geoloc->latitude + $geoloc->longitude;
+
+			if ($dMinScore === 0 || $dNewScore < $dMinScore) {
+				$oMin = $oInt;
+				$dMinScore = $geoloc->latitude + $geoloc->longitude;
+			}
+			/*elseif ($dMaxScore === 0 || $dNewScore > $dMaxScore) {
+				$oMax = $oInt;
+				$dMaxScore = $geoloc->latitude + $geoloc->longitude;
+			}*/
+		}
+
+		$oFirst = $oMin;
+		/*if ($oMin === $oMax) {
+			$oFirst = $oMax;
+		}
+		else{
+			$oMinClose = InterestWay::closest($oMin);
+			$oMinWay = InterestWay::byInterests($oMin, $oMinClose);
+
+			$oMaxClose = InterestWay::closest($oMax);
+			$oMaxWay = InterestWay::byInterests($oMax, $oMaxClose);
+
+			if ($oMinWay->distance < $oMaxWay->distance) {
+				$oFirst = $oMin;
+			}
+			else {
+				$oFirst = $oMax;
+			}
+		}*/
+
+		$totalTime = 0;
+		$totalLength = 0;
+
+		$aPrevious = [];
+		$oCurrent = $oFirst;
+
+		// Calcule des Distances
+		while(!is_null($oNext = InterestWay::closest($oCurrent, $aPrevious))) { // Récupération Du point le plus proche
+			$oNext->setLang('fr');
+			$aPrevious[] = $oCurrent->id;
+
+			// Si Désactivé, on continue
+			if (!$oNext->state) {
+				$oCurrent = $oNext;
+				continue;
+			}
+
+
+			// On Charge la distance entre les 2 points
+			$oWay = InterestWay::byInterests($oCurrent, $oNext);
+			if (is_null($oWay)) {
+				$oCurrent = $oNext;
+				continue;
+			}
+
+			$totalTime += $oWay->time;
+			$totalLength += $oWay->distance;
+			$oCurrent = $oNext;
+		}
+
+		// On arrondit pour retirer les secondes 
+		$totalTime = round($totalTime / 60) * 60;
+
+		$sTime = date('H:i', $totalTime);
+		$h = explode(':', $sTime);
+		$m = $h[1];
+		$h = $h[0];
+
+		$sTime = $h.'h '.$m.'min';
+
+		$aRes = [
+			'pointCnt' => $cnt,
+			'distance' => round($totalLength / 1000, 3),
+			'time' => [
+				'string' => $sTime,
+				'h' => (int) $h,
+				'm' => (int) $m
+			]
+		];
+
+		return $aRes;
 	}
 
+	/**
+	 * Charge la ville du parcours
+	 * @return Cities Model de la Ville
+	 */
 	public function loadParents() {
 		if (empty($this->attributes['cities_id'])) {
 			$this->attributes['city'] = null;
@@ -92,6 +253,10 @@ class Parcours extends ModelUtil
 		$this->attributes['city'] = $city;
 	}
 
+	/**
+	 * Récupération des points d'interets
+	 * @return Interests Model Du Point
+	 */
 	public function getInterests() {
 		if (!empty($this->attributes['interests'])) {
 			return $this->attributes['interests'];
@@ -105,9 +270,17 @@ class Parcours extends ModelUtil
 		return $this->attributes['interests'];
 	}
 
+	/**
+	 * Recherche une phrase dans tous les Parcours
+	 * @param  String  $query   Recherche
+	 * @param  Array  $columns  Colones à retoruner
+	 * @param  Array  $order    Ordre de retour
+	 * @return TranslateCollection Collection des Modeles
+	 */
 	public static function search($query, $columns, $order = false) {
-		$oModel = new Parcours;
+		// ECHAPPEMENT DES QUOTES
 		$query = preg_replace("/('{1})/", ("''"), $query);
+		$oModel = new Parcours;
 
 		if (!empty($columns)) {
 			foreach ($columns as &$col) {
@@ -120,16 +293,19 @@ class Parcours extends ModelUtil
 
 		$list = Parcours::Select($columns)
 			->leftJoin('cities', 'parcours.cities_id', '=', 'cities.id')
-			->whereRaw(
+			->whereRaw( // Recherche dans le Tite
 				"CONCAT(parcours.title->>'fr', parcours.title->'en') ILIKE '%{$query}%'"
 			)
 			->orWhereRaw(
+				// Recherche dans le sript audio
 				"CONCAT(parcours.audio_script->>'fr', parcours.audio_script->'en') ILIKE '%{$query}%'"
 			)
 			->orWhereRaw(
+				// Recherche dans le Titre de la ville
 				"CONCAT(cities.title->>'fr', cities.title->'en') ILIKE '%{$query}%'"
 			)
 			->orWhereRaw(
+				// Recherche dans description
 				"CONCAT(parcours.description->>'fr', parcours.description->'en') ILIKE '%{$query}%'"
 			)
 		;
@@ -142,35 +318,46 @@ class Parcours extends ModelUtil
 			$order = false;
 		}
 
+		// Tris pard défaut Title
 		if (!$order || ($orderCol !== "score" && !in_array($orderCol, $oModel->fillable))) {
 			$list->orderBy('parcours.title->fr', 'ASC');
 		}
+		// Tri Par Score
 		elseif ($orderCol === 'score') {
-			$list->orderByRaw("
+			$list->orderByRaw(// Recherche dans le Tite => 20 points
+				"
 				(
 					(CONCAT(parcours.title->>'fr', parcours.title->>'en') 
 					ILIKE 
 					'%".$query."%')::int * 20
 				) +
+				".
+				// Recherche dans la déscription=> 15 points
+				"(
+					(CONCAT(parcours.description->>'fr', parcours.description->>'en') 
+					ILIKE 
+					'%".$query."%')::int * 14
+				) +
+				".
+				// Recherche dans le Script Audio => 10 points
+				"
 				(
 					(CONCAT(parcours.audio_script->>'fr', parcours.audio_script->>'en') 
 					ILIKE 
-					'%".$query."%')::int * 15
+					'%".$query."%')::int * 10
 				) +
-				(
+				".
+				// Recherche dans le Titre de la Ville => 3 points
+				"(
 					(CONCAT(cities.title->>'fr', cities.title->>'en') 
 					ILIKE 
 					'%".$query."%')::int * 5
-				) +
-				(
-					(CONCAT(parcours.description->>'fr', parcours.description->>'en') 
-					ILIKE 
-					'%".$query."%')::int *
-				 3)
+				)
 
 				".$orderWay."
 			");
 		}
+		// Tris par Colone demandée
 		else {
 			if (!in_array($orderCol, $oModel->aTranslateVars)) {
 				$list->orderBy('parcours.'.$orderCol, $orderWay);

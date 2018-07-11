@@ -36,9 +36,11 @@ class UpdateBuilder
                 $table->uuid('int1');
                 $table->uuid('int2');
                 $table->float('time');
+                $table->boolean('state');
                 $table->float('distance');
             });
 
+            DB::statement('ALTER TABLE interest_way ALTER COLUMN state SET DEFAULT true;');
             DB::statement('ALTER TABLE interest_way ALTER COLUMN id SET DEFAULT uuid_generate_v4();');
             DB::statement('ALTER TABLE interest_way ALTER COLUMN int1 SET DEFAULT uuid_generate_v4();');
             DB::statement('ALTER TABLE interest_way ALTER COLUMN int2 SET DEFAULT uuid_generate_v4();');

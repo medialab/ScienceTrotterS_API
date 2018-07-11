@@ -17,16 +17,35 @@ class Users extends ModelUtil implements Authenticatable
 	public $timestamps = false;
     protected $table = 'users';
 
+    /**
+     * Types des colones particulières 
+     */
     protected $casts = [
         'id' => 'string',
     ];
 
-    protected $fillable = ['firstname','lastname','email','password'];
+    /**
+     * Varialbles modifialbes en DB
+     */
+    protected $fillable = [
+    	'firstname',
+    	'lastname',
+    	'email',
+    	'password'
+   	];
 
+   	/**
+   	 * Variable à ne pas récupérer
+   	 */
     protected $hidden = [
        'password'
 	];
 
+	/**
+	 * Recherche Un utilisateur par Token
+	 * @param  String $token Le Token
+	 * @return Users        L'Utilisateur Correspondant ou NULL
+	 */
 	public static function getByToken($token) {
 		$token = UsersToken::where('id', $token)->first();
 		if (!empty($token)) {
@@ -41,7 +60,7 @@ class Users extends ModelUtil implements Authenticatable
 		$this->attributes[$sVar] = $var;
 	}
 
-	public static function search($search, $columns) { 
+	public static function search($search, $columns, $order=false) { 
 		return null; 
 	}
 }

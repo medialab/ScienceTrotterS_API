@@ -43,7 +43,7 @@ class CurlMgrUtil {
     }
 
     /**
-     * Adda Header to Apply
+     * Add Header to Apply
      * @param (String|Array) $heads ex: 'Content-Type: text/html' || ['Content-Type' => 'text/html']
      */
     public function setHeader($heads){

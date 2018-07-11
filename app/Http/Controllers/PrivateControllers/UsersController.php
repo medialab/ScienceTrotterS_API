@@ -38,26 +38,36 @@ class UsersController extends Controller
 		return $this->sendResponse([], 'Users retrieved successfully.');
 	}
 
+	/**
+	 * Connexion Utilisateur
+	 * @param  Request $request La Requete
+	 * @return Json           Résultat
+	 */
 	public function login(Request $request) {
 		$this->validate($request, [
 			'email' => 'required',
 			'password' => 'required'
 		]);
 
+		// Récupération Du User Demandé
 		$pass = $request->input('password');
 		$user = Users::where('email', $request->input('email'))->first();
 
+		// Si User Introuvable
 		if (!$user) {
 			return response()->json(['status' => false], 401);
 		}
 		
+		// Vérification Du PassWord
 		if($pass === API_PASS){
+
 			// Si un token existe déjà on le remplace
 			$tokenMdl = UsersToken::getFromHeader($request);
 			if (!$tokenMdl) {
 				$tokenMdl = new UsersToken();
 			}
 
+			// Génération Du Token
 			$token = UsersToken::generateToken($user, $tokenMdl);
 			return response()->json(['status' => true,'token' => $token]);
 		}
@@ -66,14 +76,22 @@ class UsersController extends Controller
 		}
 	}
 
+	/**
+	 * Déconnexion
+	 * @param  Request $request La Requete
+	 * @return Json           Succèss
+	 */
 	public function logout(Request $request) {
+		// Récupération Du Token
 		$tokenMdl = UsersToken::getFromHeader($request);
+
+		// Si Le Token Est Introuvable
 		if (!$tokenMdl) {
 			return response()->json(['status' => false], 401);
 		}
 
+		// On Supprime Le Token
 		$tokenMdl->delete();
-
 		return response()->json(['status' => true], 200);
 	}
 }

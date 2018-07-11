@@ -14,6 +14,15 @@ class MapApiUtil {
 		}
 	}
 
+	/**
+	 * Récupération Du Temps + Distance de Trajet
+	 * @param  Interests $oInt1 Premier Point
+	 * @param  Interests $oInt2 Deuxième Point
+	 * @return Bool | Array        False Si Echec || [
+	 *     'time' => Int (Temps en secondes),
+	 *     'distance' => Int (Distance en Mètres)
+	 * ]
+	 */
 	public function getDistance($oInt1, $oInt2) {
 		$aData = [
 			'instructions' => false,
@@ -26,11 +35,15 @@ class MapApiUtil {
 				$oInt1->geoloc->longitude.','.$oInt1->geoloc->latitude.'|'.
 				$oInt2->geoloc->longitude.','.$oInt2->geoloc->latitude,
 		];
-		$c = new CurlMgrUtil($this->sUrl, $aData);
 
-		$c->setMethod('get');
-		
+		$c = new CurlMgrUtil($this->sUrl, $aData);
+		$c->setMethod('get');		
 		$result = json_decode($c->exec());
+
+		/*var_dump($oInt1->geoloc);
+		var_dump($oInt2->geoloc);
+		var_dump($result);
+		exit;*/
 
 		if (is_null($result) || !empty($result->error)) {
 			return false;

@@ -28,3 +28,10 @@ $aConfig = [
 $router->group($aConfig, function () use ($router) {
     require __DIR__.'/interests.php';
 });
+
+$aConfig = [
+  'prefix' => 'interestWay'
+];
+$router->group($aConfig, function () use ($router) {
+    require __DIR__.'/interestWay.php';
+});

@@ -11,6 +11,12 @@ class ColorsController extends Controller
 {
     protected $sModelClass = 'Colors';
 
+    /**
+     * Retourne Une Liste de Models
+     * @param  Request $oRequest Requete
+     * @param  boolean $bAsList  Retourne Le QueryNuilder Au lieu du Résultat De Requete
+     * @return Collection || QueryBuilder            Liste des Model Ou Constructeur De Requete SQL
+     */
     public function list(Request $oRequest, $bAsList=false) {
         $skip = $oRequest->getSkip();
         $limit = $oRequest->getLimit();

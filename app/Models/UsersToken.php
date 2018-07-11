@@ -10,7 +10,29 @@ use Lcobucci\JWT\ValidationData;
 
 class UsersToken extends Model
 {
+	// Durée de Vie D'un Token
 	private static $expireDelay = 3600;
+
+	protected $table = 'users_token';
+
+	/**
+	 * Types des colones particulières 
+	 */
+	protected $casts = [
+			'id' => 'string',
+	];
+
+	/**
+	 * Varialbles modifialbes en DB
+	 */
+	protected $fillable = ['user','key'];
+
+	/**
+	 * Variable à ne pas récupérer
+	 */
+	protected $hidden = [
+		'id'
+	];
 
 	function __construct(array $attributes = [], Users $user=null) {
 		Parent::__construct($attributes);
@@ -20,52 +42,65 @@ class UsersToken extends Model
 		}
 	}
 
-	protected $table = 'users_token';
-
-	protected $casts = [
-			'id' => 'string',
-	];
-
-	protected $fillable = ['user','key'];
-
-	protected $hidden = [
-		'id'
-	];
-
+	/**
+	 * Récupère La Durée de Vie D'un Token
+	 */
 	public static function getExpireDelay() {
 		return Self::$expireDelay;
 	}
 
+	/**
+	 * Crée un Hash à partir d'un Utilisateur
+	 * @param  Users  $user L'utilisateur
+	 * @return String       Le Hash
+	 */
 	public static function idfyUser(Users $user) {
 		return md5($user->id.'-'.$user->created_at.'-'.$user->email);
 	}
 	
+	/**
+	 * Crée Un Nouveau Token Pour un Utilisateur
+	 * @param  Users           $user     L'Utilisateur
+	 * @param  UsersToken $tokenMdl Token à Mettre à jour Ou NULL pour une Création
+	 * @return String                    Le Token
+	 */
 	public static function generateToken(Users $user, UsersToken $tokenMdl=null) {
 		if (is_null($tokenMdl)) {
 			$tokenMdl = new UsersToken([], $user);
 		}
 
 		$token = (new TokenBuilder())
+			// Définition Domaine
 			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
 			->setAudience('http://'.$_SERVER['HTTP_HOST'])
+			// Définition Hash User
 			->setId(Self::idfyUser($user), true)
+			// Définition Id User
 			->set('uid', $user->id)
+			// Définition de l'heure de création
 			->setIssuedAt(time())
+			// Définition de l'heure de départ
 			->setNotBefore(time())
+			// Définition de l'heure d'Expiration'
 			->setExpiration(time() + Self::$expireDelay)
+			// Génération du Token
 			->getToken()
 		;
 
+		// Enregistrement Du Token En Base
 		$tokenMdl->user = $user->id;
 		$tokenMdl->key = (string) $token;
-		// var_dump("Generated Token: ".$tokenMdl->key);
-		// var_dump("Generated ID: ".Self::idfyUser($user));
 
 		$tokenMdl->save();
 
 		return $tokenMdl->key;
 	}
 
+	/**
+	 * Récupère le Token Depuis les Headers
+	 * @param  RequestUtil $request La Requete
+	 * @return UsersToken          Le Token Ou Null Si In-Existant
+	 */
 	public static function getFromHeader($request) {
 		$auth = $request->header("Authorization");
     	if (!$auth) {

@@ -7,11 +7,14 @@ use App\Utils\ModelUtil;
 class Cities extends ModelUtil
 {
 	protected $table = 'cities';
-	protected $userStr = 'la ville';
-	protected static $sChildTable = 'interests';
+	protected $userStr = 'la ville';	// Nom du Model pour un utilisateur
+	protected static $sChildTable = 'interests';	// Table Enfant. Utilisé pour le Context public
 
 	public $timestamps = true;
 
+	/**
+	 * Liste Des traduction des propriétés
+	 */
 	protected $aProperties = [
 		'title' => 'Titre',
 		'state' => 'Status',
@@ -19,6 +22,9 @@ class Cities extends ModelUtil
 		'image' => 'Image de Couverture',
 	];
 
+	/**
+	 * Varialbles modifialbes en DB
+	 */
 	protected $fillable = [
 	  'id',
 	  'title',
@@ -30,6 +36,9 @@ class Cities extends ModelUtil
 	  'updated_at'
 	];
 
+	/**
+	 * Types des colones particulières 
+	 */
 	protected $casts = [
 	  'id' => 'string',
 	  'title' => 'json',
@@ -38,16 +47,28 @@ class Cities extends ModelUtil
 
 	protected $primaryKey = 'id';
 
+	/**
+	 * Variables à Traduire
+	 */
 	protected $aTranslateVars = [
 	  'title'
 	];
 
-
+	/**
+	 * Retrourne une nouvelle instance vide
+	 * @return Cities nouvelle instance
+	 */
 	public static function getInstance() {
 		return new Cities;
 	}
 
-	public static function search($query, $columns) {
+	/**
+	 * Recherche une phrase dans tous les Parcours
+	 * @param  String  $query   Recherche
+	 * @param  Array  $columns  Colones à retoruner
+	 * @return TranslateCollection Collection des Modeles
+	 */
+	public static function search($query, $columns, $order=false) {
 		$query = preg_replace("/('{1})/", ("''"), $query);
 		/*$list =  Cities::Where([
 					["title->fr", 'ILIKE', "%".$query."%"]
