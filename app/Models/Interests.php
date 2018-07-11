@@ -6,12 +6,16 @@ use App\Utils\ModelUtil;
 class Interests extends ModelUtil
 {
 	protected $table = 'interests';
-	protected $userStr = 'le point d\'intérêt';
-	protected $distances = false;
+	protected $userStr = 'le point d\'intérêt';	// Nom du Model pour un utilisateur
+	
+	protected $parcours = false;	// Parcours Associé
+	protected $distances = false;	// Les Différent Trajets Associes
 
 	public $timestamps = true;
 
-
+	/**
+	 * Liste Des traduction des propriétés
+	 */
 	protected $aProperties = [
 		'title' => 'Titre',
 		'state' => 'Status',
@@ -30,6 +34,9 @@ class Interests extends ModelUtil
 		'bibliography' => 'Bibliographie',
 	];
 
+	/**
+	 * Varialbles modifialbes en DB
+	 */
 	protected $fillable = [
 		'id',
 		'cities_id',
@@ -52,6 +59,9 @@ class Interests extends ModelUtil
 		'updated_at'
 	];
 
+	/**
+	 * Types des colones particulières 
+	 */
 	protected $casts = [
 		'id' => 'string',
 		'cities_id' => 'string',
@@ -71,6 +81,9 @@ class Interests extends ModelUtil
 
 	protected $primaryKey = 'id';
 
+	/**
+	 * Variables à Traduire
+	 */
 	protected $aTranslateVars = [
 		'title', 
 		'address', 
@@ -83,10 +96,21 @@ class Interests extends ModelUtil
 		'bibliography',
 	];
 
+	/**
+	 * Variables à Correspondant à un Upload
+	 */
 	protected $aUploads = ['header_image', 'audio', 'gallery_image'];
 	
+	/**
+	 * Champs Optionnels pour l'Activation
+	 */
 	protected $aOptionalFields = ['parcours_id'];
 
+	/**
+	 * Réécritue Récupération de variable
+	 * @param  String $sVar Nom de la variable
+	 * @return Mixed       La variable ou NULL
+	 */
 	public function __get($sVar) {
 		switch ($sVar) {
 			case 'distances':
@@ -97,6 +121,10 @@ class Interests extends ModelUtil
 		return Parent::__get($sVar);
 	}
 
+	/**
+	 * Retourne la liste des Trajets Liés  Au Point
+	 * @return Array Liste De InterestWay
+	 */
 	public function getDistances() {
 		if (is_array($this->distances)) {
 			return $this->distances;
@@ -129,10 +157,18 @@ class Interests extends ModelUtil
 		return $this->distances;
 	}
 
+	/**
+	 * Retrourne une nouvelle instance vide
+	 * @return Parcours nouvelle instance
+	 */
 	public static function getInstance() {
 		return new Interests;
 	}
 
+	/**
+	 * Récupère La ville Associée
+	 * @return Cities Model Associé
+	 */
 	public function loadCity() {
 		if (!empty($this->attributes['cities_id'])) {
 			$city = Cities::Where('id', $this->attributes['cities_id'])->get(['id', 'title'])->first();
@@ -146,6 +182,11 @@ class Interests extends ModelUtil
 		return $this->attributes['city'];
 	}
 
+
+	/**
+	 * Récupère Le Parcours Associée
+	 * @return Parcours Model Associé
+	 */
 	public function loadParcours() {
 		if (!empty($this->attributes['parcours_id'])) {
 			$parcours = Parcours::Where('id', $this->attributes['parcours_id'])->get(['id', 'title'])->first();
@@ -165,105 +206,137 @@ class Interests extends ModelUtil
 		return $this->attributes['parcours'];
 	}
 
+	/**
+	 * Récupère le Parcours Et La ville
+	 */
 	public function loadParents() {
 		$this->loadCity();
 		$this->loadParcours();
 	}
 
+	/**
+	 * Mets à Jour le Model
+	 * @param  Array $aData Donées à Modifier
+	 */
+	public function updateData($aData) {
+		if (!empty($aData['geoloc']) && (object)$aData['geoloc'] !== $this->geoloc) {
+			InterestWay::deleteByInterest($this, true);
+		}
+
+		Parent::updateData($aData);
+	}
+
+	/**
+	 * Insert / Update Model
+	 * @param  Array|array $options Options Lumen
+	 * @return Bool               Success
+	 */
 	public function save(Array $options=[]) {
+		// Récupération Du Status Actuel
+		$curState = (bool)@$this->original['state'];
+
+		// Récupération De la Géoloc Actuel
 		$prevGeo = empty($this->original['geoloc']) ? false : $this->original['geoloc'];
+		// Récupération Du Parcours Actuel
 		$prevParc = empty($this->original['parcours_id']) ? false : $this->original['parcours_id'];
 
 
+		// Liste des Attributs
 		$attrs = &$this->attributes;
 
+		// Géoloc Identique
 		$bGeoSame = $attrs['geoloc'] === $prevGeo;
-		$bParcoursUpdated = $prevParc === @$attrs['parcours_id'];		
-		
+		// Parcours Mit à Jour
+		$bParcoursUpdated = $prevParc === @$attrs['parcours_id'];
+
+		// SI le parcours et la geoloc Sont les Mêmes, Pas la peine de Mettre à jour les Trajets
 		if ($bGeoSame && !$bParcoursUpdated) {
 			return Parent::save($options);
 		}
+		// SI le Point N'existe pas On L'insère
 		elseif(empty($this->attributes['id'])){
 			$b = Parent::save($options);
 			if (!$b) {
 				return false;
 			}
 		}
+		// Suppression Des Trajet Actuels
 		else{
-			InterestWay::deleteByInterest($this);
+			InterestWay::deleteByInterest($this, true);
 		}
 
+		// Si Aucune Geoloc Ou Aucun Parcours On ne peut pas calculer de Trajet, On Sauvegarde
 		if (empty($this->geoloc) || empty($attrs['parcours_id'])) {
 			$this->distances = [];
+			$this->parcours = null;
 			return Parent::save($options);
 		}
-
-		//$this->getDistances();
-		
-		/*
-			$oParc = $this->loadParcours();
-
-			if (is_null($oParc)) {
-				return $b;
-			}
-
-			$aDistances = [];
-			$mapApi = new MapApiUtil();
-			$aInterests = $oParc->getInterests();
-
-			foreach ($aInterests as $oInt) {
-				if ($oInt->id === $attrs['id']) {
-					continue;
-				}
-				elseif(empty($oInt->geoloc)) {
-					continue;
-				}
-
-				$aDist = $mapApi->getDistance($this, $oInt);
-				if (!$aDist) {
-					continue;
-				}
-
-				$aDist = [
-					'time' => $aDist->duration, 
-					'distance' => $aDist->distance
-				];
-
-				$oWay = InterestWay::byInterests($this, $oInt);
-				if (is_null($oWay)) {
-					$oWay = new InterestWay;
-					$oWay->int1 = $this->id;
-					$oWay->int2 = $intID;
-				}
-
-				if ($oWay->time !== $aDist['time'] || $oWay->distance !== $aDist['distance']) {
-					$oWay->time = $aDist['time'];
-					$oWay->distance = $aDist['distance'];
-
-					$oWay->save();
-				}
-
-				$aDistances[$oWay->id] = $oWay;
-				$oInt->refresh();
-			}
-
-			$this->distances = $aDistances;
-		*/
 	
-		//var_dump("UPDATING WAYS");
+		// Mise à Jour des Trajets
 		$this->distances = InterestWay::updateByInterest($this);
-		if ($this->distances === false) {
-			return $b;
+
+		// Libération De Mémoire
+		$this->parcours = null;
+
+		// Init Message D'erreur
+		$msg = null;
+
+		// Si Le Point est Actif
+		if ($this->attributes['state']) {
+			
+			// On Vérifie Que L'activation Est Possible
+			$b = $this->enable(true);
+
+			// Si L'activation A echoué et Que Le Point Est Actif
+			// On Refuse la mise à jour
+			if (!$b && $curState) {
+				// Modification du Msg D'erreur
+				$this->errorMsg = str_replace(
+					'd\'activer '.$this->userStr, 
+					'de sauvegarder '.$this->userStr.' sans le désactiver', 
+					$this->errorMsg
+				);
+
+				// Suppression Des Nouveaux Trajets
+				InterestWay::deleteByInterest($this);
+				// Re Mise en place Des Trajets Précédemment Supprimés
+				InterestWay::restoreDeleted();
+				return false;
+			}
+			// Si L'activation A echoué On Garde Le Message D'Erreur de Coté
+			elseif (!$b) {
+				$msg = $this->errorMsg;
+			}
 		}
 
-		return Parent::save($options);
+		// On Sauvegarde Les Données
+		$b = Parent::save($options);
+
+		// Si L'enregistrement Est OK On remet en place le potentiel Message d'erreur
+		if ($b) {
+			$this->errorMsg = $msg;
+		}
+		// Si L'enregistrement à Echouer On Remets En Place les Trajets
+		else{
+			// Suppression Des Nouveaux Trajets
+			InterestWay::deleteByInterest($this);
+			// Re Mise en place Des Trajets Précédemment Supprimés
+			InterestWay::restoreDeleted();
+		}
+
+		return $b;
 	}
 
+	/**
+	 * Suppression Du Model
+	 * @return Bool Success
+	 */
 	public function delete() {
 		if (empty($this->attributes['parcours_id'])) {
 			return Parent::delete();
 		}
 
+		// Si Un Parcoures Est asocié On Supprime les Trajets
 		if (!empty($this->attributes['parcours_id'])) {
 			$b = InterestWay::deleteByInterest($this);
 			if (!$b) {
@@ -275,45 +348,67 @@ class Interests extends ModelUtil
 		return $b;
 	}
 
+	/**
+	 * Activation Du Model
+	 * @param  boolean $b Activer ou Non
+	 * @return Bool     Success
+	 */
 	public function enable($b = true) {
-		$aErrors = Parent::enable($b);
-		if (!$b || !empty($aErrors)) {
-			return $aErrors;
+		// Activation Parente
+		$success = Parent::enable($b);
+		if (!$success) {
+			return $success;
 		}
 
+		// RÉCUPÉRATION DES TRAJETS
 		$oWayList = InterestWay::byInterest($this);
 		$aErrors = [];
 
+		// On RECHERCHE LES TRAJETS IMPOSSIBLES
 		foreach ($oWayList as &$oWay) {
-			if ($oWay->time > 0) {
+			// Trajet OK ON PASSE
+			if ($oWay->time >= 0) {
 				continue;
 			}
 
-			$otherId = $oWay->int1 === $this->id ? $oWay->int1 : $oWay->int;
+			// RECUPERATION DU POINT QUI PAUSE PROBLEME
+			$otherId = $oWay->int1 === $this->id ? $oWay->int2 : $oWay->int1;
 			$oInt = Interests::Where([['id', '=', $otherId], ['state', '=', true]])->get(['title'])->first();
 			if (!$oInt) {
 				continue;
 			}
 
+			// Ajout Du TITRE A LA LISTE DES POINTS QUI PAUSENT PROBLEME
 			$oInt->setLang('fr');
 			$aErrors[] = $oInt->title;
 		}
 
+		// Si ON N A PAS D ERREUR ON Ecrase Le Message Et On RETOUNE
 		if (empty($aErrors)) {
 			$this->errorMsg = null;
 			return true;
 		}
 
-		$this->errorMsg = 'Impossible d\'activer '.$this->userStr.'. Il semblerait que le trajet est impossible avec: ';
+		// GENERATION DU MSG D ERREUR
+		$this->errorMsg = 'Impossible d\'activer '.$this->userStr.'.<br>Il semblerait que le trajet à pied est impossible avec les points suivants: ';
 
 		$this->errorMsg .= '<ul>';
 		foreach ($aErrors as $name) {
 			$this->errorMsg .= '<li>'.$name.'</li>';
 		}
 		$this->errorMsg .= '</ul>';
+
+		$this->attributes['state'] = false;
 		return false;
 	}
 
+	/**
+	 * Récupération Par Parcours
+	 * @param  String  $id       ID Parcours
+	 * @param  RequestUtil  $oRequest Requete
+	 * @param  boolean $bAdmin   Context Est Admin
+	 * @return TranslateCollection            Collection Des Modèles
+	 */
 	public static function byParcours($id, $oRequest, $bAdmin = false) {
 		$where = [['parcours_id', '=', $id]];
 		if (!$bAdmin) {
@@ -326,9 +421,17 @@ class Interests extends ModelUtil
 		return $oModelList;
 	}
 
+	/**
+	 * Recherche une phrase dans tous les Points
+	 * @param  String  $query   Recherche
+	 * @param  Array  $columns  Colones à retoruner
+	 * @param  Array  $order    Ordre de retour
+	 * @return TranslateCollection Collection des Modeles
+	 */
 	public static function search($query, $columns, $order = false) {
-		$oModel = new Interests;
+		// ECHAPPEMENT DES QUOTES
 		$query = preg_replace("/('{1})/", ("''"), $query);
+		$oModel = new Interests;
 
 		if (!empty($columns)) {
 			foreach ($columns as &$col) {
@@ -343,25 +446,25 @@ class Interests extends ModelUtil
 			->leftJoin('cities', 'interests.cities_id', '=', 'cities.id')
 			->leftJoin('parcours', 'interests.parcours_id', '=', 'parcours.id')
 
-			->whereRaw(
+			->whereRaw(	// Recherche dans le Tite
 				"CONCAT(interests.title->>'fr', interests.title->>'en') ILIKE '%{$query}%'"
 			)
-			->orWhereRaw(
+			->orWhereRaw(	// Recherche dans l'adresse
 				"CONCAT(interests.address->>'fr', interests.address->>'en') ILIKE '%{$query}%'"
 			)
-			->orWhereRaw(
+			->orWhereRaw(	// Recherche dans l'audio Script'
 				"CONCAT(interests.audio_script->>'fr', interests.audio_script->>'en') ILIKE '%{$query}%'"
 			)
-			->orWhereRaw(
+			->orWhereRaw(	// Recherche dans le Tite Du Parcours
 				"CONCAT(parcours.title->>'fr', parcours.title->>'en') ILIKE '%{$query}%'"
 			)
-			->orWhereRaw(
+			->orWhereRaw(	// Recherche dans la Description
 				"CONCAT(interests.description->>'fr', interests.description->>'en') ILIKE '%{$query}%'"
 			)
-			->orWhereRaw(
+			->orWhereRaw(	// Recherche dans la Description Du Parcours
 				"CONCAT(parcours.description->>'fr', parcours.description->>'en') ILIKE '%{$query}%'"
 			)
-			->orWhereRaw(
+			->orWhereRaw(	// Recherche dans le Tite De la Ville
 				"CONCAT(cities.title->>'fr', cities.title->>'en') ILIKE '%{$query}%'"
 			)
 		;
@@ -374,31 +477,45 @@ class Interests extends ModelUtil
 			$order = false;
 		}
 
+		// Tris pard défaut Title
 		if (!$order || ($orderCol !== "score" && !in_array($orderCol, $oModel->fillable))) {
 			$list->orderBy('interests.title->fr', 'ASC');
 		}
+		// Tri Par Score
 		elseif ($orderCol === 'score') {
 			$list->orderByRaw("
+				".	// Recherche dans le Tite => 25 Points
+				"
 				((
 					CONCAT(interests.title->>'fr', interests.title->>'en') ILIKE '%".$query."%')::int * 25
 				) +
+				".	// Recherche dans l'addresse' => 20 Points
+				"
 				((
 					CONCAT(interests.address->>'fr', interests.address->>'en') ILIKE '%".$query."%')::int * 20
 				) +
+				".	// Recherche dans l'audio_script' => 15 Points
+				"
 				((
 					CONCAT(interests.audio_script->>'fr', interests.audio_script->>'en') ILIKE '%".$query."%')::int * 15
 				) +
+				".	// Recherche dans la description => 13 Points
+				"
 				((
 					CONCAT(interests.description->>'fr', interests.description->>'en') ILIKE '%".$query."%')::int * 13
 				) +
-
+				".	// Recherche dans le Titre du Parcours => 13 Points
+				"
 				((
 					CONCAT(parcours.title->>'fr', parcours.title->>'en') ILIKE '%".$query."%')::int * 10
 				) +
-
+				".	// Recherche dans la description Du Parcours => 10 Points
+				"
 				((
 					CONCAT(parcours.description->>'fr', parcours.description->>'en') ILIKE '%".$query."%')::int * 3
 				) +
+				".	// Recherche dans le Titre De La Ville => 5 Points
+				"
 				((
 					CONCAT(cities.title->>'fr', cities.title->>'en') ILIKE '%".$query."%')::int * 5
 				)
@@ -406,6 +523,7 @@ class Interests extends ModelUtil
 				".$orderWay."
 			");
 		}
+		// Tris par Colone demandée
 		else {
 			if (!in_array($orderCol, $oModel->aTranslateVars)) {
 				$list->orderBy('interests.'.$orderCol, $orderWay);
@@ -416,5 +534,36 @@ class Interests extends ModelUtil
 		}
 
 		return $list->get();
+	}
+
+	/**
+	 * Récupère le point d'interest le plus Proche
+	 * @param  Array  $aGeo  tableau Latitude / longitude
+	 * @param  String $sParc ID Parcours Si Demandé (FALSE => peu importe le Parcours || 'null' => Hors Parcours Uniquement) 
+	 * @return Interests         Le Point Le Plus Proche de la Géoloc
+	 */
+	public static function closest($aGeo, $sParc=false) {
+		$lat = (float) $aGeo[0];
+		$lon = (float) $aGeo[1];
+
+		$oModelList = Self::Where('state', 'true');
+
+		// Application Du Parcours
+		if ($sParc) {
+			if ($sParc !== 'null') {
+				$oModelList->where('parcours_id', $sParc);
+			}
+			else{
+				$oModelList->whereNull('parcours_id');
+			}
+		}
+
+		// Trie PAr Proximité
+		$oModelList->orderByRaw("
+				ABS((geoloc->>'latitude')::FLOAT - ".$lat.") + ABS((geoloc->>'longitude')::FLOAT - ".$lon.")
+				ASC
+			");
+
+		return $oModelList->get()->first();
 	}
 }
