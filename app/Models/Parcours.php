@@ -77,6 +77,8 @@ class Parcours extends ModelUtil
 	  'audio_script'
 	];
 
+	public $interestsList = [];
+
 	/**
 	 * Retrourne une nouvelle instance vide
 	 * @return Parcours nouvelle instance
@@ -120,26 +122,12 @@ class Parcours extends ModelUtil
 		return $bSuccess;
 	}
 
-	/**
-	 * Calcule la distance + le time les plus courts pour suivre le parcours
-	 * @param  String $parcId Id du parcours
-	 * @return Array         [
-	 *     'pointCnt' => nombre De points à parcourir
-	 *     'distance' => Distance à parcourir en Mètres
-	 *     'time' => [
-	 *         'string' => Heure Sous Forme: 5h 30min
-	 *         'h' => Nombre d'Heures
-	 *         'm' => Nombre de Minutes
-	 *     ]
-	 * ]
-	 */
-	public function getLength() {
-		$cnt = 0;
+	public function getFirstInterest() {
 		$oMin = false;
 		$oMax = false;
 		$dMinScore = 0;
 		$dMaxScore = 0;
-
+		
 		// Recherche d'un point de départ le plus à l'extrême
 		foreach ($this->interests as $key => $oInt) {
 			if (!$oInt->state) {
@@ -147,8 +135,6 @@ class Parcours extends ModelUtil
 			}
 
 			$oInt->setLang('fr');
-
-			$cnt++;
 			
 			$geoloc = $oInt->geoloc;
 			$dNewScore = $geoloc->latitude + $geoloc->longitude;
@@ -163,7 +149,37 @@ class Parcours extends ModelUtil
 			}*/
 		}
 
-		$oFirst = $oMin;
+		return $oMin;
+	}
+
+	/**
+	 * Calcule la distance + le time les plus courts pour suivre le parcours
+	 * @param  String $parcId Id du parcours
+	 * @return Array         [
+	 *     'pointCnt' => nombre De points à parcourir
+	 *     'distance' => Distance à parcourir en Mètres
+	 *     'time' => [
+	 *         'string' => Heure Sous Forme: 5h 30min
+	 *         'h' => Nombre d'Heures
+	 *         'm' => Nombre de Minutes
+	 *     ]
+	 * ]
+	 */
+	public function getLength() {
+		$cnt = 1;
+		$oFirst = $this->getFirstInterest();
+		if (!$oFirst) {
+			return $aRes = [
+				'pointCnt' => 0,
+				'distance' => 0,
+				'time' => [
+					'string' => 0,
+					'h' => 0,
+					'm' => 0,
+					'totSec' => 0
+				]
+			];
+		}
 		/*if ($oMin === $oMax) {
 			$oFirst = $oMax;
 		}
@@ -207,12 +223,14 @@ class Parcours extends ModelUtil
 				continue;
 			}
 
+			$cnt++;
 			$totalTime += $oWay->time;
 			$totalLength += $oWay->distance;
 			$oCurrent = $oNext;
 		}
 
 		// On arrondit pour retirer les secondes 
+		$totSec = $totalTime;
 		$totalTime = round($totalTime / 60) * 60;
 
 		$sTime = date('H:i', $totalTime);
@@ -228,7 +246,8 @@ class Parcours extends ModelUtil
 			'time' => [
 				'string' => $sTime,
 				'h' => (int) $h,
-				'm' => (int) $m
+				'm' => (int) $m,
+				'totSec' => (int) $totSec
 			]
 		];
 

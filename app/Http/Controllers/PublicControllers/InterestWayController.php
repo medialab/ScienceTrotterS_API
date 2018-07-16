@@ -40,8 +40,12 @@ class InterestWayController extends Controller
 	 */
 	public function closest($sInterestId, Request $oRequest) {
 		// Récupération des Points à Ignorer
+		$sLang = $oRequest->input('lang');
+		$bApiData = (bool) $oRequest->input('apiData');
 		$aIgnores = $oRequest->input('ignore');
-		$oModelList = InterestWay::closest($sInterestId, $aIgnores);
+
+		$oModelList = InterestWay::closest($sInterestId, $aIgnores, $sLang, $bApiData);
+
 
 		if (is_null($oModelList)) {
 			return $this->sendResponse([]);

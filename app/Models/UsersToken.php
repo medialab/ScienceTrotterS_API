@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Lcobucci\JWT\Builder as TokenBuilder;
-
-use Lcobucci\JWT\Parser as TokenParser;
+use Lcobucci\JWT\Token;
 use Lcobucci\JWT\ValidationData;
+use Lcobucci\JWT\Parser as TokenParser;
+use Lcobucci\JWT\Builder as TokenBuilder;
 
 class UsersToken extends Model
 {
@@ -58,6 +58,17 @@ class UsersToken extends Model
 		return md5($user->id.'-'.$user->created_at.'-'.$user->email);
 	}
 	
+	public static function validateToken(Users $user, Token $token) {
+		// validation Des Donnés du Token
+		$validationData = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
+		$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
+		$validationData->setAudience('http://'.$_SERVER['HTTP_HOST']);
+		$validationData->setId(Self::idfyUser($user));
+		$validationData->setCurrentTime(time());
+
+		return $token->validate($validationData);
+	}
+
 	/**
 	 * Crée Un Nouveau Token Pour un Utilisateur
 	 * @param  Users           $user     L'Utilisateur
@@ -86,6 +97,11 @@ class UsersToken extends Model
 			// Génération du Token
 			->getToken()
 		;
+
+
+		if (!Self::validateToken($user, $token)) {
+			return false;
+		}
 
 		// Enregistrement Du Token En Base
 		$tokenMdl->user = $user->id;

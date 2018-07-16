@@ -23,13 +23,18 @@ class MapApiUtil {
 	 *     'distance' => Int (Distance en Mètres)
 	 * ]
 	 */
-	public function getDistance($oInt1, $oInt2) {
+	public function getDistance($oInt1, $oInt2) {		
 		$aData = [
-			'instructions' => false,
-			'geometry' => false,
-			'preference' => 'recommended',
 			'unit' => 'm',
+			'instructions' => 'false',
 			'profile' => 'foot-walking',
+			'preference' => 'recommended',
+			
+			'geometry' => 'true',
+			
+			'geometry_simplify' => 'true',
+			'geometry_format' => 'geojson',
+			
 			'api_key' => $this->sKey,
 			'coordinates' => 
 				$oInt1->geoloc->longitude.','.$oInt1->geoloc->latitude.'|'.
@@ -37,18 +42,26 @@ class MapApiUtil {
 		];
 
 		$c = new CurlMgrUtil($this->sUrl, $aData);
-		$c->setMethod('get');		
-		$result = json_decode($c->exec());
+		$c->setMethod('get');
 
-		/*var_dump($oInt1->geoloc);
-		var_dump($oInt2->geoloc);
-		var_dump($result);
+		$apiResponse = $c->exec();
+		$result = json_decode($apiResponse);
+
+		/*var_dump($result);
 		exit;*/
 
 		if (is_null($result) || !empty($result->error)) {
 			return false;
 		}
 
-		return $result->routes[0]->summary;
+		unset($result->info);
+		
+		$aResult = [
+			'api_response' => json_encode($result),
+			'time' => &$result->routes[0]->summary->duration,
+			'distance' => &$result->routes[0]->summary->distance,
+		];
+
+		return $aResult;
 	}
 }

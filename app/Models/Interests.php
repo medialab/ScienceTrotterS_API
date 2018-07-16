@@ -10,6 +10,7 @@ class Interests extends ModelUtil
 	
 	protected $parcours = false;	// Parcours Associé
 	protected $distances = false;	// Les Différent Trajets Associes
+	protected $api_response = false;	// La réponse de Open Route Service pour l'affichage des la map
 
 	public $timestamps = true;
 
@@ -402,6 +403,15 @@ class Interests extends ModelUtil
 		return false;
 	}
 
+	public function toArray($bAdmin=false) {
+		$aResult = Parent::toArray($bAdmin);
+		if ($this->api_response) {
+			$aResult['api_data'] = $this->api_response;
+		}
+
+		return $aResult;
+	}
+
 	/**
 	 * Récupération Par Parcours
 	 * @param  String  $id       ID Parcours
@@ -412,7 +422,7 @@ class Interests extends ModelUtil
 	public static function byParcours($id, $oRequest, $bAdmin = false) {
 		$where = [['parcours_id', '=', $id]];
 		if (!$bAdmin) {
-		    $where[] = ['state', '=', 'true'];
+			$where[] = ['state', '=', 'true'];
 		}
 
 		$oModelList = Self::list($oRequest, $bAdmin);
@@ -455,11 +465,14 @@ class Interests extends ModelUtil
 			->orWhereRaw(	// Recherche dans l'audio Script'
 				"CONCAT(interests.audio_script->>'fr', interests.audio_script->>'en') ILIKE '%{$query}%'"
 			)
-			->orWhereRaw(	// Recherche dans le Tite Du Parcours
-				"CONCAT(parcours.title->>'fr', parcours.title->>'en') ILIKE '%{$query}%'"
-			)
 			->orWhereRaw(	// Recherche dans la Description
 				"CONCAT(interests.description->>'fr', interests.description->>'en') ILIKE '%{$query}%'"
+			)
+			->orWhereRaw(	// Recherche dans la Description
+				"CONCAT(interests.bibliography->>'fr', interests.bibliography->>'en') ILIKE '%{$query}%'"
+			)
+			->orWhereRaw(	// Recherche dans le Tite Du Parcours
+				"CONCAT(parcours.title->>'fr', parcours.title->>'en') ILIKE '%{$query}%'"
 			)
 			->orWhereRaw(	// Recherche dans la Description Du Parcours
 				"CONCAT(parcours.description->>'fr', parcours.description->>'en') ILIKE '%{$query}%'"
@@ -504,20 +517,25 @@ class Interests extends ModelUtil
 				((
 					CONCAT(interests.description->>'fr', interests.description->>'en') ILIKE '%".$query."%')::int * 13
 				) +
-				".	// Recherche dans le Titre du Parcours => 13 Points
+				".	// Recherche dans la Bibliography => 11 Points
+				"
+				((
+					CONCAT(interests.bibliography->>'fr', interests.bibliography->>'en') ILIKE '%".$query."%')::int * 11
+				) +
+				".	// Recherche dans le Titre du Parcours => 10 Points
 				"
 				((
 					CONCAT(parcours.title->>'fr', parcours.title->>'en') ILIKE '%".$query."%')::int * 10
 				) +
-				".	// Recherche dans la description Du Parcours => 10 Points
+				".	// Recherche dans la description Du Parcours => 5 Points
 				"
 				((
-					CONCAT(parcours.description->>'fr', parcours.description->>'en') ILIKE '%".$query."%')::int * 3
+					CONCAT(parcours.description->>'fr', parcours.description->>'en') ILIKE '%".$query."%')::int * 5
 				) +
-				".	// Recherche dans le Titre De La Ville => 5 Points
+				".	// Recherche dans le Titre De La Ville => 3 Points
 				"
 				((
-					CONCAT(cities.title->>'fr', cities.title->>'en') ILIKE '%".$query."%')::int * 5
+					CONCAT(cities.title->>'fr', cities.title->>'en') ILIKE '%".$query."%')::int * 3
 				)
 
 				".$orderWay."
@@ -542,7 +560,7 @@ class Interests extends ModelUtil
 	 * @param  String $sParc ID Parcours Si Demandé (FALSE => peu importe le Parcours || 'null' => Hors Parcours Uniquement) 
 	 * @return Interests         Le Point Le Plus Proche de la Géoloc
 	 */
-	public static function closest($aGeo, $sParc=false) {
+	public static function closest($aGeo, $sParc=false, $sLang=false, $columns=null) {
 		$lat = (float) $aGeo[0];
 		$lon = (float) $aGeo[1];
 
@@ -558,12 +576,21 @@ class Interests extends ModelUtil
 			}
 		}
 
+		if ($sLang) {
+			$oModelList->where(function($query) use ($sLang) {
+				$query->whereNull('force_lang')
+					  ->orWhere('force_lang', $sLang)
+					  ->orWhere('force_lang', '')
+				;
+			});
+		}
+
 		// Trie PAr Proximité
 		$oModelList->orderByRaw("
-				ABS((geoloc->>'latitude')::FLOAT - ".$lat.") + ABS((geoloc->>'longitude')::FLOAT - ".$lon.")
-				ASC
-			");
+			ABS((geoloc->>'latitude')::FLOAT - ".$lat.") + ABS((geoloc->>'longitude')::FLOAT - ".$lon.")
+			ASC
+		");
 
-		return $oModelList->get()->first();
+		return $oModelList->get($columns)->first();
 	}
 }

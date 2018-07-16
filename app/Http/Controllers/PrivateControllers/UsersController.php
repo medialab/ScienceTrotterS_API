@@ -55,7 +55,7 @@ class UsersController extends Controller
 
 		// Si User Introuvable
 		if (!$user) {
-			return response()->json(['status' => false], 401);
+			return response()->json(['success' => false, 'message' => 'Identifiant / Mot de passe invalides.'], 401);
 		}
 		
 		// Vérification Du PassWord
@@ -69,10 +69,14 @@ class UsersController extends Controller
 
 			// Génération Du Token
 			$token = UsersToken::generateToken($user, $tokenMdl);
-			return response()->json(['status' => true,'token' => $token]);
+			if (!$token) {
+				return response()->json(['success' => false, 'message' => 'Impossible de générer un nouveau Token', 'code' => 500], 400);
+			}
+
+			return response()->json(['success' => true,'token' => $token]);
 		}
 		else{
-			return response()->json(['status' => false], 401);
+			return response()->json(['success' => false, 'message' => 'Identifiant / Mot de passe invalides.'], 401);
 		}
 	}
 
@@ -87,11 +91,11 @@ class UsersController extends Controller
 
 		// Si Le Token Est Introuvable
 		if (!$tokenMdl) {
-			return response()->json(['status' => false], 401);
+			return response()->json(['success' => false], 401);
 		}
 
 		// On Supprime Le Token
 		$tokenMdl->delete();
-		return response()->json(['status' => true], 200);
+		return response()->json(['success' => true], 200);
 	}
 }

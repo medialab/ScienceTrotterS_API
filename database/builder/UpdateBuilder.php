@@ -38,6 +38,7 @@ class UpdateBuilder
                 $table->float('time');
                 $table->boolean('state');
                 $table->float('distance');
+                $table->json('api_response')->nullable();
             });
 
             DB::statement('ALTER TABLE interest_way ALTER COLUMN state SET DEFAULT true;');

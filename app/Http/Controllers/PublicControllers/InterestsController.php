@@ -19,6 +19,7 @@ class InterestsController extends Controller
 	 * @return [type]            [description]
 	 */
 	public function closest(Request $oRequest) {
+		$sLang = $oRequest->input('lang');
 		$geoloc = $oRequest->input('geoloc');
 		$sParc = $oRequest->input('parcours');
 
@@ -33,7 +34,7 @@ class InterestsController extends Controller
 		}
 
 		// Recherche du Point
-		$oModel = Interests::closest($aGeo, $sParc);
+		$oModel = Interests::closest($aGeo, $sParc, $sLang);
 		if (is_null($oModel)) {
 			return $this->sendResponse([]);
 		}

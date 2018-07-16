@@ -247,11 +247,16 @@ abstract class ModelUtil extends Model
 		}
 		// Si la variable fait parti de la table BDD
 		elseif(array_key_exists($sVar, $this->attributes) || in_array($sVar, $this->fillable)){
-			// Si la Variable est de type Json, on le Cast en StdClass
-			if (isset($this->casts[$sVar]) && $this->casts[$sVar] === 'json') {
-				$value = (object)$value;
-			}
 
+			// Si la Variable est de type Json, on le Cast en StdClass
+			if (isset($this->casts[$sVar]) && $this->casts[$sVar] === 'json' && !is_object($value)) {
+				if (is_string($value)) {
+					$value = json_decode($value);
+				}
+				elseif(is_array($value)) {
+					$value = (object)$value;
+				}
+			}
 			$this->attributes[$sVar] = $value;
 		}
 		// Si la variable Fait parti de l'Objet
@@ -303,6 +308,7 @@ abstract class ModelUtil extends Model
 		if (!$bAdmin) {
 			// Si une langue est sélectionnée
 			if ($sLang) {
+				var_dump($sLang);
 				// On Cible la langue
 			    $oModelList->where(function($query) use ($sLang, $bAdmin, $sTable){
 		            $query->Where($sTable.'.force_lang', '')
@@ -323,15 +329,15 @@ abstract class ModelUtil extends Model
 				$oModelList->leftJoin($sChild, function($query) use ($childColumn, $sChild, $sTable, $sLang) {
 					$query->on($sTable.'.id', '=', $childColumn);
 
-					$query->Where(function($query) use ($sChild, $sLang) {
-						$query->Where($sChild.'.force_lang', '')
-							  ->orWhereNull($sChild.'.force_lang')
-						;
+					if ($sLang) {
+						$query->Where(function($query) use ($sChild, $sLang) {
+							$query->Where($sChild.'.force_lang', '')
+								  ->orWhereNull($sChild.'.force_lang')
+							;
 
-						if ($sLang) {
 							$query->orWhere($sChild.'.force_lang', $sLang);
-						}
-					});
+						});
+					}
 				});
 
 				$oModelList->groupBy($sTable.'.id');
@@ -666,7 +672,7 @@ abstract class ModelUtil extends Model
 		// Si Erreur Ecriture du Message
 		else{
 			$this->errorMsg = 'Impossible d\'activer '.$this->userStr.'.<br>Veuillez renseinger les champs suivants ';
-			$this->errorMsg .= !$this->force_lang ? 'dans toutes les langues:' : 'dans la langue:';
+			$this->errorMsg .= !$this->force_lang ? 'dans <b>toutes les langues</b> :' : 'dans la langue :';
 
 			$this->errorMsg .= '<ul>';
 			foreach ($aErrors as $name) {

@@ -2,7 +2,13 @@
 
 /* API INFOS */
 $router->get('/', function () use ($router) {
-    return 'private : ' . $router->app->version();
+	return json_encode([
+		'success' => true,
+		'data' => [
+			'version' => $router->app->version()
+		],
+		'message ' => null
+	]);
 });
 
 /* USERT */

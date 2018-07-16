@@ -164,7 +164,12 @@ class APIControllerUtil extends BaseController
                 $oModel->setLang($sLang);
 
                 // Récupéartion  Du Msg Warning
-                $msg = $oModel->getError();
+                $msg2 = $oModel->getError();
+
+                if (!empty($msg2)) {
+                    $msg = $mgs2;
+                }
+
                 return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
             }
             else{
@@ -392,6 +397,7 @@ class APIControllerUtil extends BaseController
         $class = $this->getClass();
 
         $oModelList = ($class)::list($oRequest, $this->bAdmin, $where);
+        //var_dump($oModelList->toSql());
         $oModelList = $oModelList
             ->where($where)
             ->take($limit)
@@ -456,7 +462,6 @@ class APIControllerUtil extends BaseController
             ->skip($skip)
             ->get($columns)
         ;
-
 
         // Selection DDe la Langue
         if ($sLang) {

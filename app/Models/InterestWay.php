@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Utils\ModelUtil;
@@ -22,7 +23,8 @@ class InterestWay extends ModelUtil
 		'int1' => 'string',
 		'int2' => 'string',
 		'time' => 'float',
-		'distance' => 'float'
+		'distance' => 'float',
+		'api_response' => 'json'
 	];
 
 
@@ -33,7 +35,8 @@ class InterestWay extends ModelUtil
 		'int1',
 		'int2',
 		'time',
-		'distance'
+		'distance',
+		'api_response'
 	];
 
 	/**
@@ -50,14 +53,26 @@ class InterestWay extends ModelUtil
 	 * @param  Array $aIgnores Tableau d'IDs de Points à ignorer
 	 * @return ModelCollection            Colection des résultats
 	 */
-	public static function closest($oInt, $aIgnores=false) {
+	public static function closest($oInt, $aIgnores=false, $sLang=false, $bApiData=false, $columns=null) {
 		// Récupération de l'id
 		$id = is_string($oInt) ? $oInt : $oInt->id;
+
 
 		// Where l'id du Point Cible
 		$oModelList = InterestWay::Where(function($query) use ($id) {
 			$query->where('int1', $id)->orWhere('int2', $id);
 		});
+
+		if ($sLang) {
+			$oModelList->leftJoin('interests', 'interests.id', '=', DB::raw('\''.$id.'\''));
+			
+			$oModelList->where(function($query) use ($sLang) {
+				$query->whereNull('force_lang')
+					  ->orWhere('force_lang', $sLang)
+					  ->orWhere('force_lang', '')
+				;
+			});
+		}
 
 		if ($aIgnores) {
 			// Exclusion des ignores
@@ -72,6 +87,9 @@ class InterestWay extends ModelUtil
 			->orderBy('distance', 'ASC')
 		;
 
+		/*var_dump($oModelList->toSql());
+		exit;*/
+
 		// Récupération Du Plus Proche
 		$oWay = $oModelList->get()->first();
 		if (is_null($oWay)) {
@@ -80,7 +98,16 @@ class InterestWay extends ModelUtil
 
 		// Récupération Du Model du Point
 		$intId = $id !== $oWay->int1 ? $oWay->int1 : $oWay->int2;
-		return Interests::Where('id', $intId)->get()->first();
+		$oInterestList =  Interests::Where('id', $intId);
+
+		$oIntResult = $oInterestList->get($columns)->first();
+		
+		if ($bApiData) {
+			$oIntResult->api_response = $oWay->api_response;
+			//var_dump($oIntResult->api_response);
+		}
+
+		return $oIntResult;
 	}
 
 	/**
@@ -96,7 +123,7 @@ class InterestWay extends ModelUtil
 	}
 
 	/**
-	 * Récupération d'un' trajets d'un Couple de Points
+	 * Récupération d'un trajets d'un Couple de Points
 	 * @param  S $oInt1 [description]
 	 * @param  String | Interests  $oInt1     (string) Id Point | Model\Interests
 	 * @param  String | Interests  $oInt2     (string) Id Point | Model\Interests
@@ -153,20 +180,25 @@ class InterestWay extends ModelUtil
 
 			// Appel à L'api Open Route Service
 			$aDist = $mapApi->getDistance($oInt, $oInt2);
-			if ($aDist) {
-				// var_dump("VALID DISTANCE");
-				$aDist = [
-					'time' => $aDist->duration, 
-					'distance' => $aDist->distance
-				];
-			}
-			else{
+			if (!$aDist) {
 				// var_dump("FAIL DISTANCE");
 				$aDist = [
 					'time' => -1, 
-					'distance' => -1
+					'distance' => -1,
+					'api_response' => null
 				];
 			}
+
+			/*
+				else{
+					// var_dump("VALID DISTANCE");
+					$aDist = [
+						'time' => $aDist->duration,
+						'distance' => $aDist->distance
+						'api_response' => $aDist->api_response,
+					];
+				}
+			*/
 
 			// Récupération du Trajet
 			$oWay = InterestWay::byInterests($oInt, $oInt2);
@@ -182,9 +214,8 @@ class InterestWay extends ModelUtil
 			if ($oWay->time !== $aDist['time'] || $oWay->distance !== $aDist['distance']) {
 				$oWay->time = $aDist['time'];
 				$oWay->distance = $aDist['distance'];
+				$oWay->api_response = $aDist['api_response'];
 
-				// var_dump("Save Way");
-				// var_dump($oWay->time);
 				$b = $oWay->save();
 			}
 
