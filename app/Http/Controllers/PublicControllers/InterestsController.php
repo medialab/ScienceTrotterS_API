@@ -22,6 +22,9 @@ class InterestsController extends Controller
 		$sLang = $oRequest->input('lang');
 		$geoloc = $oRequest->input('geoloc');
 		$sParc = $oRequest->input('parcours');
+		$sCity = $oRequest->input('city');
+		$columns = $oRequest->input('columns');
+		//$list = $oRequest->input('list');
 
 		// Vérification Du Paramètre
 		if (empty($geoloc)) {
@@ -32,13 +35,15 @@ class InterestsController extends Controller
 		if (count($aGeo) !== 2 || (float) $aGeo[0] == 0 || (float) $aGeo[1] == 0) {
 			return $this->sendError('Geoloc must be a string like "2.564;48.56"', [], 400);
 		}
-
 		// Recherche du Point
-		$oModel = Interests::closest($aGeo, $sParc, $sLang);
-		if (is_null($oModel)) {
-			return $this->sendResponse([]);
+		$oFirst = Interests::closest($aGeo, $sParc, $sCity, $sLang, $columns);
+		if (is_null($oFirst)) {
+			return $this->sendResponse(false, 'Not found');
 		}
-		return $this->sendResponse($oModel->toArray($this->bAdmin));
+		
+		$aResult = Interests::optimizeOrder($oFirst, $sLang, $columns, $this->bAdmin);
+
+		return $this->sendResponse($aResult['best']['interests']);
 	}
 
 	public function byId($sInterestId) {
@@ -57,5 +62,4 @@ class InterestsController extends Controller
 
 		return $this->sendResponse($aData);
 	}
-
 }

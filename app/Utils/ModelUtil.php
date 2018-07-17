@@ -10,7 +10,7 @@ abstract class ModelUtil extends Model
 	/**
 	 * Langue Séléctionnée
 	 */
-	private $sCurLang = false;
+	public $sCurLang = false;
 
 	/**
 	 * Nom du Model pour un utilisateur
@@ -271,7 +271,23 @@ abstract class ModelUtil extends Model
 	
 	// Définis la langue de l'objet
 	public function setLang($l = false) {
-		$this->sCurLang = $l;
+		// Si la Langue est Différent De défault
+		if ($l !== 'default') {
+			if(strlen($this->force_lang)){
+				$this->sCurLang = $this->force_lang;
+			}
+			else{
+				$this->sCurLang = $l;
+			}
+		}
+		// Si le Force Lang Est défini
+		elseif(strlen($this->force_lang)){
+			$this->sCurLang = $this->force_lang;
+		}
+		// Par Défaut La Langue Est Français
+		else {
+			$this->sCurLang = 'fr';
+		}
 	}
 
 	// Définis la langue de l'objet

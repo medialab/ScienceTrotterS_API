@@ -12,6 +12,7 @@ class Interests extends ModelUtil
 	protected $distances = false;	// Les Différent Trajets Associes
 	protected $api_response = false;	// La réponse de Open Route Service pour l'affichage des la map
 
+	public $way = true;
 	public $timestamps = true;
 
 	/**
@@ -560,7 +561,7 @@ class Interests extends ModelUtil
 	 * @param  String $sParc ID Parcours Si Demandé (FALSE => peu importe le Parcours || 'null' => Hors Parcours Uniquement) 
 	 * @return Interests         Le Point Le Plus Proche de la Géoloc
 	 */
-	public static function closest($aGeo, $sParc=false, $sLang=false, $columns=null) {
+	public static function closest($aGeo, $sParc=false, $sCity=false, $sLang=false, $columns=null) {
 		$lat = (float) $aGeo[0];
 		$lon = (float) $aGeo[1];
 
@@ -585,12 +586,94 @@ class Interests extends ModelUtil
 			});
 		}
 
+		if ($sCity) {
+			$oModelList->where(function($query) use ($sCity) {
+				$query->where('cities_id', $sCity);
+			});
+		}
+
 		// Trie PAr Proximité
 		$oModelList->orderByRaw("
 			ABS((geoloc->>'latitude')::FLOAT - ".$lat.") + ABS((geoloc->>'longitude')::FLOAT - ".$lon.")
 			ASC
 		");
 
+
 		return $oModelList->get($columns)->first();
+	}
+
+	public static function optimizeOrder(Interests $oFirst, $sLang=false, $columns=false, $bAdmin=false) {
+		$aOrder = [];
+		$aResults = [];
+		$aPrevious = [];
+		$dBestDistance = -1;
+
+		// On Test plusieurs Trajets possible pour optimiser la parcours
+		for ($i=0; $i < 3; $i++) {
+			$oCurrent = $oFirst;
+
+			$aPrevious[$i] = [];
+			$aResults[$i] = [
+				'time' => 0, 
+				'distance' => 0,
+				'interests' => [$oFirst]
+			];
+
+			if ($i > 0) {
+				if (isset($aPrevious[0][1])) {
+					$aPrevious[$i][0] = $aPrevious[0][1];
+				}
+
+				if ($i > 1) {
+					if (isset($aPrevious[0][2])) {
+						$aPrevious[$i][1] = $aPrevious[0][2];
+					}
+				}
+			}
+
+			$z = 0;
+			$totTime = 0;
+			$totDistance = 0;
+			while(!is_null($oNext = InterestWay::closest($oCurrent, $aPrevious[$i], $sLang, true, $columns))) {// Récupération Du point le plus proche
+
+				if ($i > 0 && $z == 0) {
+					unset($aPrevious[$i][0]);
+					if ($i > 1) {
+						unset($aPrevious[$i][1]);
+					}
+				}
+
+				// Si Désactivé, on continue
+				if (!$oNext->state) {
+					$aPrevious[$i][] = $oNext->id;
+					continue;
+				}
+
+				$totTime += $oNext->way->time;
+				$totDistance += $oNext->way->distance;
+
+
+				$aPrevious[$i][] = $oCurrent->id;
+				$aResults[$i]['interests'][] = $oNext->toArray($bAdmin);
+
+				$z++;
+				$oCurrent = $oNext;
+			}
+
+			$aResults[$i]['time'] = $totTime;
+			$aResults[$i]['distance'] = $totDistance;
+		}
+
+		$i = 0;
+		$best = -1;
+		$bestID = -1;
+		foreach ($aResults as $i => $res) {
+			if ($best == -1 || $best > $res['time']) {
+				$best = $res['time'];
+				$bestID = $i;
+			}
+		}
+
+		return ['best' => &$aResults[$bestID], 'results' => $aResults[$bestID]];
 	}
 }

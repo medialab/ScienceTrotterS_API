@@ -97,6 +97,11 @@ class Parcours extends ModelUtil
 			case 'interests':
 				return $this->getInterests();
 				break;
+
+			case 'city':
+				$this->loadParents();
+				return $this->attributes['city'];
+				break;
 			
 			default:
 				return Parent::__get($sVar);
@@ -115,9 +120,26 @@ class Parcours extends ModelUtil
 		
 		$bCurState = $this->attributes['state'];
 
-		if (!$bSuccess || !$bPrevState || $bPrevState == $bCurState) {
-			return $bSuccess;
+		if (!$bSuccess) {
+			return false;
 		}
+
+		$this->city->setLang('fr');
+
+		if (!empty($this->city)) {
+			$parcLang = $this->force_lang;
+			$cityLang = $this->city->force_lang;
+
+			if ($cityLang && $parcLang && $cityLang !== $parcLang) {
+				$this->city->setLang('fr');
+				$aLangs = ['fr' => 'français', 'en' => 'anglais'];
+
+				$this->errorMsg = 'Attention: La ville: '.$this->city->title.' est en '.$aLangs[$cityLang].' uniquement, alors que le parcours est en '.$aLangs[$parcLang].' uniquement';
+			}
+		}
+
+		unset($this->city);
+		unset($this->attributes['city']);
 
 		return $bSuccess;
 	}
@@ -264,7 +286,7 @@ class Parcours extends ModelUtil
 			return;
 		}
 
-		$city = Cities::Where('id', $this->attributes['cities_id'])->get(['id', 'title'])->first();
+		$city = Cities::Where('id', $this->attributes['cities_id'])->get(['id', 'title', 'state', 'force_lang'])->first();
 		if (!empty($city)) {
 			$city->setLang($this->getLang());
 		}
@@ -387,5 +409,87 @@ class Parcours extends ModelUtil
 		}
 
 		return $list->get();
+	}
+
+	public function getOptimizedTrace(Interests $oFirst=null, $sLang=false, $columns=[], $bAdmin=false) {
+		// Si Aucun Parcours de Départ Sélectionné On prend Le Premier
+		if (is_null($oFirst)) {
+			$oFirst = $oParc->getFirstInterest();
+		}
+
+		$aResults = Interests::optimizeOrder($oFirst, $sLang, $columns, $bAdmin);
+
+		$res = $aResults['best'];
+		$sTime = date('H:i', $res['time']);
+		$h = explode(':', $sTime);
+		$m = $h[1];
+		$h = $h[0];
+
+		return [
+			'interests' => $res['interests'],
+
+			'length' => [
+				'pointCnt' => count($res['interests']),
+				'distance' => $res['distance'],
+				'time' => [
+					'string' => $sTime,
+					'h' => $h,
+					'm' => $m
+				]
+			]
+		];
+	}
+
+	public static function closest($aGeo, $cityId, $sLang=false, $columns=false) {
+		$oParcoursList = Parcours::Where([['cities_id', '=', $cityId], ['state', '=', true]]);
+
+		if ($sLang) {
+			$oParcoursList->where(function($query) use ($sLang) {
+				$query->Where('force_lang', '')
+					->orWhereNull('force_lang')
+					->orWhere('force_lang', $sLang);
+			});
+		}
+
+
+		$oParcoursList = $oParcoursList->get($columns);
+		if (!count($oParcoursList)) {
+			return false;
+		}
+
+		if ($columns && !in_array('geoloc', $columns)) {
+			$columns[] = 'geoloc';
+		}
+
+		$aOrder = [];
+		$dBestDistance = -1;
+		$oParcSelected = false;
+		$oInterestSelected = false;
+		foreach ($oParcoursList as $oParc) {
+			$oParc->setLang($sLang);
+
+			$oInt = Interests::closest($aGeo, $oParc->id, false, $sLang, $columns);
+			if (is_null($oInt)) {
+				continue;
+			}
+			$oInt->setLang($sLang);
+
+			$distance = abs($oInt->geoloc->latitude - $aGeo[0]) + abs($oInt->geoloc->longitude - $aGeo[1]);
+
+			$aOrder[$distance * 10000] = $oParc;			
+			if ($dBestDistance == -1 || $distance < $dBestDistance) {
+				$oParcSelected = $oParc;
+				$dBestDistance = $distance;
+				$oInterestSelected = $oInt;
+			}
+
+		}
+
+		ksort($aOrder);
+		if (!$oParcSelected) {
+			return false;
+		}
+
+		return ['parcours' => array_values($aOrder), 'interest' => $oInterestSelected->toArray(false)];
 	}
 }
