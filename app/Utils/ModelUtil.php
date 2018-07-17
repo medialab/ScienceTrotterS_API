@@ -273,6 +273,17 @@ abstract class ModelUtil extends Model
 	public function setLang($l = false) {
 		$this->sCurLang = $l;
 	}
+	
+	// Définis la langue de l'objet
+	public function defineLang($l = false) {
+		if ($this->force_lang) {
+			$this->sCurLang = $this->force_lang;
+		}
+		else{
+			$this->sCurLang = $l;
+		}
+
+	}
 
 	// Définis la langue de l'objet
 	public function getLang() {
