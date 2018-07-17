@@ -71,4 +71,19 @@ class RequestUtil extends Request
 
 		return $aOrder;
 	}
+
+	public function getGeoloc() {
+		$geoloc = $this->input('geoloc');
+		if (!empty($geoloc)) {
+			$aGeo = explode(';', $geoloc);
+			if (count($aGeo) !== 2 || (float) $aGeo[0] == 0 || (float) $aGeo[1] == 0) {
+				return false;
+			}
+		}
+		else{
+			$aGeo = false;
+		}
+
+		return $aGeo;
+	}
 }

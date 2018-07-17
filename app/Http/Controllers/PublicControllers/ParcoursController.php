@@ -55,14 +55,93 @@ class ParcoursController extends Controller
 		$aRes = $oParc->getLength();
 		return $this->sendResponse($aRes);
 	}
+ 
+	/*
+		public function trace(Request $oRequest, $parcId) {
+			$geoloc = $oRequest->input('geoloc');
+
+			if (!empty($geoloc)) {
+				$aGeo = explode(';', $geoloc);
+				if (count($aGeo) !== 2 || (float) $aGeo[0] == 0 || (float) $aGeo[1] == 0) {
+					return $this->sendError('Geoloc must be a string like "2.564;48.56"', [], 400);
+				}
+			}
+			else{
+				$aGeo = false;
+			}
+
+			$sLang = $oRequest->input('lang');
+
+			$oParcList = Parcours::Where([
+				['id', '=', $parcId],
+				['state', '=', true]
+			]);
+
+			if ($sLang) {
+				$oParcList->where(function($query) use ($sLang) {
+					$query->whereNull('force_lang')
+						  ->orWhere('force_lang', $sLang)
+						  ->orWhere('force_lang', '')
+					;
+				});
+			}
+
+			$oParc = $oParcList->get()->first();
+
+			$columns = ['id', 'title', 'geoloc', 'state'];
+			$aPrevious = [];
+
+			if ($aGeo) {
+				$oFirst = $oCurrent = Interests::closest($aGeo, $parcId, $sLang, $columns);
+			}
+			else{
+				$oFirst = $oCurrent = $oParc->getFirstInterest();
+			}
+			
+
+			$oParc->interestsList = [$oCurrent];
+
+			//$oFirst->setLang('fr');
+			//var_dump("First: ".$oFirst->title);
+
+			$i=0;
+			while(!is_null($oNext = InterestWay::closest($oCurrent, $aPrevious, $sLang, true, $columns))) { // Récupération Du point le plus proche
+
+				// Si Désactivé, on continue
+				if (!$oNext->state) {
+					$aPrevious[] = $oNext->id;
+					continue;
+				}
+
+				$aPrevious[] = $oCurrent->id;
+
+				$oParc->interestsList[] = $oNext->toArray();
+				$i++;
+				$oCurrent = $oNext;
+			}
+
+			$aResponse = $oParc->toArray();
+
+			$aResponse['interests'] = $oParc->interestsList;
+			$aResponse['length'] = $oParc->getLength();
+			return $this->sendResponse($aResponse);
+		}
+	*/
 
 	public function trace(Request $oRequest, $parcId) {
 		$geoloc = $oRequest->input('geoloc');
-		$aGeo = explode(';', $geoloc);
-		if (count($aGeo) !== 2 || (float) $aGeo[0] == 0 || (float) $aGeo[1] == 0) {
-			return $this->sendError('Geoloc must be a string like "2.564;48.56"', [], 400);
+
+		if (!empty($geoloc)) {
+			$aGeo = explode(';', $geoloc);
+			if (count($aGeo) !== 2 || (float) $aGeo[0] == 0 || (float) $aGeo[1] == 0) {
+				return $this->sendError('Geoloc must be a string like "2.564;48.56"', [], 400);
+			}
+		}
+		else{
+			$aGeo = false;
 		}
 
+		$columns = ['id', 'title', 'geoloc', 'state'];
 		$sLang = $oRequest->input('lang');
 
 		$oParcList = Parcours::Where([
@@ -81,48 +160,36 @@ class ParcoursController extends Controller
 
 		$oParc = $oParcList->get()->first();
 
-		$columns = ['id', 'title', 'geoloc', 'state'];
-		$aPrevious = [];
-		$oFirst = $oCurrent = Interests::closest($aGeo, $parcId, $sLang, $columns);
-		$oParc->interestsList = [$oCurrent];
-
-		$oFirst->setLang('fr');
-		//var_dump("First: ".$oFirst->title);
-
-		$i=0;
-		while(!is_null($oNext = InterestWay::closest($oCurrent, $aPrevious, $sLang, true, $columns))) { // Récupération Du point le plus proche
-			//var_dump("Current: ".$oCurrent->title);
-			$oNext->setLang('fr');
-
-
-			// Si Désactivé, on continue
-			if (!$oNext->state) {
-				//var_dump("Skipped: ".$oNext->title);
-				$aPrevious[] = $oNext->id;
-				continue;
-			}
-
-			$aPrevious[] = $oCurrent->id;
-
-			//var_dump("next: ".$oNext->title);
-
-			/*if (empty($oFirst->api_response)) {
-				//var_dump("Setting first ")
-				$oWay = InterestWay::byInterests($oFirst, $oNext);
-				$oFirst->api_response = $oWay->api_response;
-			}*/
-
-			//var_dump("Trace: ", is_null($oNext->api_response));
-			$oParc->interestsList[] = $oNext->toArray();
-			$i++;
-			$oCurrent = $oNext;
+		if ($aGeo) {
+			$oFirst = $oCurrent = Interests::closest($aGeo, $parcId, false, $sLang, $columns);
+		}
+		else{
+			$oFirst = $oCurrent = $oParc->getFirstInterest();
 		}
 
-		//$oParc->interestsList[$i]["api_data"] = null;
-		$aResponse = $oParc->toArray();
+		$aResult = $oParc->getOptimizedTrace($oFirst, $sLang, $columns, $this->bAdmin);
 
-		$aResponse['interests'] = $oParc->interestsList;
-		$aResponse['length'] = $oParc->getLength();
+		$aResponse = array_merge($oParc->toArray($this->bAdmin), $aResult);
+
 		return $this->sendResponse($aResponse);
+		/*var_dump("==== TESTING RESPONSE ====");
+		var_dump($aResponse);
+		exit;*/
+	}
+
+	public function closest(Request $oRequest, $cityId) {
+		$sLang = $oRequest->input('lang');
+		$aGeo = $oRequest->getGeoloc();
+		$columns = $oRequest->input('columns');
+		if (!$aGeo) {
+			return $this->sendError('Geoloc must be a string like "2.564;48.56"', [], 400);
+		}
+
+		if ($columns && !in_array('id', $columns)) {
+			$columns[] = 'id';
+		}
+
+		$aResult = Parcours::closest($aGeo, $cityId, $sLang, $columns);
+		return $this->sendResponse($aResult, 'No result found');
 	}
 }

@@ -167,7 +167,7 @@ class APIControllerUtil extends BaseController
                 $msg2 = $oModel->getError();
 
                 if (!empty($msg2)) {
-                    $msg = $mgs2;
+                    $msg = $msg2;
                 }
 
                 return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);

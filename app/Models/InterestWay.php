@@ -51,7 +51,7 @@ class InterestWay extends ModelUtil
 	 * Retourne le point d'interet le plus proche de la cible
 	 * @param  String | Interests  $oInt     (string) Id Point | Model\Interests
 	 * @param  Array $aIgnores Tableau d'IDs de Points à ignorer
-	 * @return ModelCollection            Colection des résultats
+	 * @return Interests            Le Point d'interet le plus proche ou NULL
 	 */
 	public static function closest($oInt, $aIgnores=false, $sLang=false, $bApiData=false, $columns=null) {
 		// Récupération de l'id
@@ -104,6 +104,7 @@ class InterestWay extends ModelUtil
 		
 		if ($bApiData) {
 			$oIntResult->api_response = $oWay->api_response;
+			$oIntResult->way = $oWay;
 			//var_dump($oIntResult->api_response);
 		}
 
