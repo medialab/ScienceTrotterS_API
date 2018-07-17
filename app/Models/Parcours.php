@@ -124,17 +124,21 @@ class Parcours extends ModelUtil
 			return false;
 		}
 
-		$this->city->setLang('fr');
-
+		$this->city->defineLang('fr');
 		if (!empty($this->city)) {
+			$this->city->defineLang('fr');
 			$parcLang = $this->force_lang;
 			$cityLang = $this->city->force_lang;
 
+			$this->city->defineLang('fr');
+			
+
 			if ($cityLang && $parcLang && $cityLang !== $parcLang) {
-				$this->city->setLang('fr');
+				$title = !empty($this->city->title->fr) ? $this->city->title->fr : $this->city->title->en;
+
 				$aLangs = ['fr' => 'français', 'en' => 'anglais'];
 
-				$this->errorMsg = 'Attention: La ville: '.$this->city->title.' est en '.$aLangs[$cityLang].' uniquement, alors que le parcours est en '.$aLangs[$parcLang].' uniquement';
+				$this->errorMsg = 'Attention: La ville: '.$title.' est en '.$aLangs[$cityLang].' uniquement, alors que le parcours est en '.$aLangs[$parcLang].' uniquement';
 			}
 		}
 
