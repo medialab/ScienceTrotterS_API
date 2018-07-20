@@ -4,7 +4,7 @@
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-use Database\Builder\UpdateBuilder;
+use Database\Builder\UpdateBuilderV2;
 use Database\Mockup\DefaultMockup;
 
 /*
@@ -34,7 +34,7 @@ $app = require __DIR__.'/bootstrap/app.php';
 /**
  * INIT DATABASE
  */
-$oDefaultBuilder = new UpdateBuilder;
+$oDefaultBuilder = new UpdateBuilderV2;
 $oDefaultBuilder->init();
 
 /**

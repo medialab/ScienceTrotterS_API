@@ -25,6 +25,7 @@ class Parcours extends ModelUtil
 	 * Liste Des traduction des propriétés
 	 */
 	protected $aProperties = [
+		'cities_id' => 'Ville',
 		'title' => 'Titre',
 		'state' => 'Status',
 		'time' => 'Durée',
@@ -78,6 +79,7 @@ class Parcours extends ModelUtil
 	];
 
 	public $interestsList = [];
+	public $distance = 0;
 
 	/**
 	 * Retrourne une nouvelle instance vide
@@ -124,32 +126,51 @@ class Parcours extends ModelUtil
 			return false;
 		}
 
-		$this->city->defineLang('fr');
+		$this->loadParents();
 		if (!empty($this->city)) {
 			$this->city->defineLang('fr');
 			$parcLang = $this->force_lang;
 			$cityLang = $this->city->force_lang;
+			
+			
+			/*
+			var_dump("CityForce: ". $cityLang);
+			var_dump("ParcoursForce: ". $parcLang);
+			var_dump("Diff: ". $cityLang !== $parcLang);
+			*/
 
 			$this->city->defineLang('fr');
 			
 
 			if ($cityLang && $parcLang && $cityLang !== $parcLang) {
-				$title = !empty($this->city->title->fr) ? $this->city->title->fr : $this->city->title->en;
+				$title = $this->city->title;
+				if (is_object($title)) {
+					$title = array_values(get_object_vars($title));
+					if (empty($title)) {
+						$title = '';
+					}
+					else {
+						$title = $title[0];
+					}
+				}
 
 				$aLangs = ['fr' => 'français', 'en' => 'anglais'];
 
-				$this->errorMsg = 'Attention: La ville: '.$title.' est en '.$aLangs[$cityLang].' uniquement, alors que le parcours est en '.$aLangs[$parcLang].' uniquement';
+				$this->errorMsg = 'Attention: La ville: '.$title.' est en '.$aLangs[$cityLang].' uniquement, alors que ce parcours est en '.$aLangs[$parcLang].' uniquement';
 			}
+			
+			//var_dump("Msg: ". $this->errorMsg);
 		}
 
 		unset($this->city);
 		unset($this->attributes['city']);
+		/*exit;*/
 
 		return $bSuccess;
 	}
 
 	public function getFirstInterest() {
-		$oMin = false;
+		$oMin = null;
 		$oMax = false;
 		$dMinScore = 0;
 		$dMaxScore = 0;
@@ -192,7 +213,7 @@ class Parcours extends ModelUtil
 	 * ]
 	 */
 	public function getLength() {
-		$cnt = 1;
+		/*$cnt = 1;
 		$oFirst = $this->getFirstInterest();
 		if (!$oFirst) {
 			return $aRes = [
@@ -205,24 +226,12 @@ class Parcours extends ModelUtil
 					'totSec' => 0
 				]
 			];
-		}
-		/*if ($oMin === $oMax) {
-			$oFirst = $oMax;
-		}
-		else{
-			$oMinClose = InterestWay::closest($oMin);
-			$oMinWay = InterestWay::byInterests($oMin, $oMinClose);
-
-			$oMaxClose = InterestWay::closest($oMax);
-			$oMaxWay = InterestWay::byInterests($oMax, $oMaxClose);
-
-			if ($oMinWay->distance < $oMaxWay->distance) {
-				$oFirst = $oMin;
-			}
-			else {
-				$oFirst = $oMax;
-			}
 		}*/
+
+
+		$aRes = $this->getOptimizedTrace();
+		return $aRes['length'];
+		exit;
 
 		$totalTime = 0;
 		$totalLength = 0;
@@ -257,14 +266,15 @@ class Parcours extends ModelUtil
 
 		// On arrondit pour retirer les secondes 
 		$totSec = $totalTime;
-		$totalTime = round($totalTime / 60) * 60;
+		$totalTime = round($totalTime / 1) * 1;
 
-		$sTime = date('H:i', $totalTime);
+		$sTime = date('H:i:s', $totalTime);
 		$h = explode(':', $sTime);
 		$m = $h[1];
+		$s = $h[2];
 		$h = $h[0];
-
 		$sTime = $h.'h '.$m.'min';
+
 
 		$aRes = [
 			'pointCnt' => $cnt,
@@ -415,10 +425,27 @@ class Parcours extends ModelUtil
 		return $list->get();
 	}
 
-	public function getOptimizedTrace(Interests $oFirst=null, $sLang=false, $columns=[], $bAdmin=false) {
+	public function getOptimizedTrace(Interests $oFirst=null, $sLang=false, $columns=null, $bAdmin=false) {
 		// Si Aucun Parcours de Départ Sélectionné On prend Le Premier
 		if (is_null($oFirst)) {
-			$oFirst = $oParc->getFirstInterest();
+			$oFirst = $this->getFirstInterest();
+		}
+
+		if (is_null($oFirst)) {
+			return [
+				'interests' => [],
+
+				'length' => [
+					'pointCnt' => 0,
+					'distance' => 0,
+					'time' => [
+						'string' => '00:00',
+						'h' => 0,
+						'm' => 0,
+						'totSec' => 0
+					]
+				]
+			];
 		}
 
 		$aResults = Interests::optimizeOrder($oFirst, $sLang, $columns, $bAdmin);
@@ -438,23 +465,32 @@ class Parcours extends ModelUtil
 				'time' => [
 					'string' => $sTime,
 					'h' => $h,
-					'm' => $m
+					'm' => $m,
+					'totSec' => $res['time'],
 				]
 			]
 		];
 	}
 
-	public static function closest($aGeo, $cityId, $sLang=false, $columns=false) {
-		$oParcoursList = Parcours::Where([['cities_id', '=', $cityId], ['state', '=', true]]);
+	public static function closest($aGeo, $parcId, $cityId, $sLang=false, $columns=false, $aOrder=false) {
+		$oParcoursList = Parcours::Select(['parcours.*']);
+		
+		$oParcoursList->where([['cities_id', '=', $cityId], ['parcours.state', '=', true]]);
+		$oParcoursList->leftJoin('cities', 'parcours.cities_id', '=', 'cities.id');
 
 		if ($sLang) {
 			$oParcoursList->where(function($query) use ($sLang) {
-				$query->Where('force_lang', '')
-					->orWhereNull('force_lang')
-					->orWhere('force_lang', $sLang);
+				$query->Where('parcours.force_lang', '')
+					->orWhereNull('parcours.force_lang')
+					->orWhere('parcours.force_lang', $sLang);
+			});
+			
+			$oParcoursList->where(function($query) use ($sLang) {
+				$query->Where('cities.force_lang', '')
+					->orWhereNull('cities.force_lang')
+					->orWhere('cities.force_lang', $sLang);
 			});
 		}
-
 
 		$oParcoursList = $oParcoursList->get($columns);
 		if (!count($oParcoursList)) {
@@ -465,7 +501,7 @@ class Parcours extends ModelUtil
 			$columns[] = 'geoloc';
 		}
 
-		$aOrder = [];
+		$aResults = [];
 		$dBestDistance = -1;
 		$oParcSelected = false;
 		$oInterestSelected = false;
@@ -480,7 +516,8 @@ class Parcours extends ModelUtil
 
 			$distance = abs($oInt->geoloc->latitude - $aGeo[0]) + abs($oInt->geoloc->longitude - $aGeo[1]);
 
-			$aOrder[$distance * 10000] = $oParc;			
+			$oParc->distance = $distance;
+			$aResults[$distance * 10000] = $oParc;			
 			if ($dBestDistance == -1 || $distance < $dBestDistance) {
 				$oParcSelected = $oParc;
 				$dBestDistance = $distance;
@@ -488,12 +525,44 @@ class Parcours extends ModelUtil
 			}
 
 		}
-
-		ksort($aOrder);
 		if (!$oParcSelected) {
 			return false;
 		}
 
-		return ['parcours' => array_values($aOrder), 'interest' => $oInterestSelected->toArray(false)];
+		if ($aOrder && $aOrder[0] === 'distance') {
+			usort($aResults, function($a, $b) use ($aOrder, $sLang) {
+				$fact = $aOrder[1] === 'desc' ? -1 : 1;
+
+				$a->defineLang($sLang);
+				$b->defineLang($sLang);
+				
+				if ($a->distance == $b->distance) {
+					return $fact * strcmp($a->title, $b->title);
+				}
+
+				return $fact * (($a->distance < $b->distance) ? -1 : 1);
+			});
+		}
+		else{
+			usort($aResults, function($a, $b) use ($aOrder, $sLang) {
+				$fact = $aOrder[1] === 'desc' ? -1 : 1;
+
+				$a->defineLang($sLang);
+				$b->defineLang($sLang);
+
+				$cmp = strcmp($a->title, $b->title);
+				if (!$cmp) {
+					if ($a->distance == $b->distance) {
+						return 0;
+					}
+
+					return $fact * ($a->distance < $b->distance ? -1: 1);
+				}
+
+				return $fact * $cmp;
+			});
+		}
+
+		return array_values($aResults);
 	}
 }

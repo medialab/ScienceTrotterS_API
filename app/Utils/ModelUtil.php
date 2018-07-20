@@ -52,6 +52,8 @@ abstract class ModelUtil extends Model
 	 */
 	protected $aOptionalFields = [];
 
+	protected static $sTable = 'model';
+
 	public function getId() {
 		return empty($this->attributes['id']) ? null : $this->attributes['id'];
 	}
@@ -317,15 +319,34 @@ abstract class ModelUtil extends Model
 
 		// Si le Context est public
 		if (!$bAdmin) {
+			if ($oModel->table !== 'cities') {
+				$oModelList->leftJoin('cities', $sTable.'.cities_id', '=', 'cities.id');
+			    $oModelList->where('cities.state', true);
+			}
+
 			// Si une langue est sélectionnée
 			if ($sLang) {
-				var_dump($sLang);
-				// On Cible la langue
+				// On Cible la langue du model
 			    $oModelList->where(function($query) use ($sLang, $bAdmin, $sTable){
+		            $query->Where($sTable.'.state', true);
+
 		            $query->Where($sTable.'.force_lang', '')
 		            	->orWhereNull($sTable.'.force_lang')
-		            	->orWhere($sTable.'.force_lang', $sLang);
+		            	->orWhere($sTable.'.force_lang', $sLang)
+		            ;
 			    });
+
+			    if ($oModel->table !== 'cities') {
+	    			// On Cible la langue de la ville
+	    		    $oModelList->where(function($query) use ($sLang){
+	    	            $query->Where('cities.state', true);
+
+	    	            $query->Where('cities.force_lang', '')
+	    	            	->orWhereNull('cities.force_lang')
+	    	            	->orWhere('cities.force_lang', $sLang)
+	    	            ;
+	    		    });
+			    }
 			}
 
 			// Si le Model à un Model Enfant On ne retourne les resultats qui ont au moins 1 enfant
@@ -338,15 +359,17 @@ abstract class ModelUtil extends Model
 
 				// Jointure de la table Enfant
 				$oModelList->leftJoin($sChild, function($query) use ($childColumn, $sChild, $sTable, $sLang) {
-					$query->on($sTable.'.id', '=', $childColumn);
+					$query->on($sTable.'.id', '=', $childColumn)
+						->where($sChild.'.state', '=', true)
+					;
 
 					if ($sLang) {
+	    				// On Cible la langue de l'enfant'
 						$query->Where(function($query) use ($sChild, $sLang) {
 							$query->Where($sChild.'.force_lang', '')
 								  ->orWhereNull($sChild.'.force_lang')
+								  ->orWhere($sChild.'.force_lang', $sLang)
 							;
-
-							$query->orWhere($sChild.'.force_lang', $sLang);
 						});
 					}
 				});
@@ -356,7 +379,6 @@ abstract class ModelUtil extends Model
 			}
 
 			// On Force le Status Actif
-		    $oModelList->where($sTable.'.state', true);
 		}
 
 		// Si un order est demandé
@@ -391,10 +413,24 @@ abstract class ModelUtil extends Model
 		        $oModelList->orderBy($sOrderCol, $sOrderWay);
 		    }
 		}
+		else{
+			if ($oModel->force_lang) {
+			    $sOrderCol = $oModel->table.'.title->'.$oModel->force_lang.'' ;
+			}
+			elseif ($sLang) {
+			    $sOrderCol = $oModel->table.'.title->'.$sLang.'' ;
+			}
+			else{
+			    $sOrderCol = $oModel->table.'.title->fr' ;
+			}
+
+		    $oModelList->orderBy($sOrderCol, 'asc');
+		}
 
 		$oModelList->take($limit)->skip($skip);
-		/*var_dump($oModelList->toSql());
-		var_dump($oModelList->get());
+		/*var_dump($sLang);
+		var_dump($oModelList->toSql());
+		var_dump($oModelList->get()->first());
 		exit;*/
 
 		return $oModelList;
@@ -682,7 +718,7 @@ abstract class ModelUtil extends Model
 		}
 		// Si Erreur Ecriture du Message
 		else{
-			$this->errorMsg = 'Impossible d\'activer '.$this->userStr.'.<br>Veuillez renseinger les champs suivants ';
+			$this->errorMsg = 'Impossible d\'activer '.$this->userStr.'.<br>Veuillez renseigner les champs suivants ';
 			$this->errorMsg .= !$this->force_lang ? 'dans <b>toutes les langues</b> :' : 'dans la langue :';
 
 			$this->errorMsg .= '<ul>';

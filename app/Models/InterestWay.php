@@ -72,6 +72,18 @@ class InterestWay extends ModelUtil
 					  ->orWhere('force_lang', '')
 				;
 			});
+
+	    	$oModelList->leftJoin('cities', 'interests.cities_id', '=', 'cities.id');
+	    	
+			// On Cible la langue
+		    $oModelList->where(function($query) use ($sLang){
+	            $query->Where('cities.state', true);
+
+	            $query->Where('cities.force_lang', '')
+	            	->orWhereNull('cities.force_lang')
+	            	->orWhere('cities.force_lang', $sLang)
+	            ;
+		    });
 		}
 
 		if ($aIgnores) {
@@ -87,8 +99,8 @@ class InterestWay extends ModelUtil
 			->orderBy('distance', 'ASC')
 		;
 
-		/*var_dump($oModelList->toSql());
-		exit;*/
+		/*var_dump($oModelList->toSql());*/
+		/*exit;*/
 
 		// Récupération Du Plus Proche
 		$oWay = $oModelList->get()->first();

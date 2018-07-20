@@ -8,8 +8,8 @@ class Interests extends ModelUtil
 	protected $table = 'interests';
 	protected $userStr = 'le point d\'intérêt';	// Nom du Model pour un utilisateur
 	
+	public $distances = false;	// Les Différent Trajets Associes
 	protected $parcours = false;	// Parcours Associé
-	protected $distances = false;	// Les Différent Trajets Associes
 	protected $api_response = false;	// La réponse de Open Route Service pour l'affichage des la map
 
 	public $way = true;
@@ -561,11 +561,13 @@ class Interests extends ModelUtil
 	 * @param  String $sParc ID Parcours Si Demandé (FALSE => peu importe le Parcours || 'null' => Hors Parcours Uniquement) 
 	 * @return Interests         Le Point Le Plus Proche de la Géoloc
 	 */
-	public static function closest($aGeo, $sParc=false, $sCity=false, $sLang=false, $columns=null) {
+	public static function closest($aGeo, $sParc=false, $sCity=false, $sLang=false, $columns=null, $aIgnores=[]) {
 		$lat = (float) $aGeo[0];
 		$lon = (float) $aGeo[1];
 
-		$oModelList = Self::Where('state', 'true');
+		$oModelList = Self::Select('interests.*');
+		$oModelList->where('interests.state', 'true');
+		$oModelList->leftJoin('cities', 'interests.cities_id', '=', 'cities.id');
 
 		// Application Du Parcours
 		if ($sParc) {
@@ -579,10 +581,17 @@ class Interests extends ModelUtil
 
 		if ($sLang) {
 			$oModelList->where(function($query) use ($sLang) {
-				$query->whereNull('force_lang')
-					  ->orWhere('force_lang', $sLang)
-					  ->orWhere('force_lang', '')
+				$query->whereNull('interests.force_lang')
+					  ->orWhere('interests.force_lang', $sLang)
+					  ->orWhere('interests.force_lang', '')
 				;
+			});
+
+
+			$oModelList->where(function($query) use ($sLang) {
+				$query->Where('cities.force_lang', '')
+					->orWhereNull('cities.force_lang')
+					->orWhere('cities.force_lang', $sLang);
 			});
 		}
 
@@ -592,17 +601,20 @@ class Interests extends ModelUtil
 			});
 		}
 
+		if (!empty($aIgnores)) {
+			$oModelList->whereNotIn('interests.id', $aIgnores);
+		}
+
 		// Trie PAr Proximité
 		$oModelList->orderByRaw("
-			ABS((geoloc->>'latitude')::FLOAT - ".$lat.") + ABS((geoloc->>'longitude')::FLOAT - ".$lon.")
+			ABS((interests.geoloc->>'latitude')::FLOAT - ".$lat.") + ABS((interests.geoloc->>'longitude')::FLOAT - ".$lon.")
 			ASC
 		");
-
 
 		return $oModelList->get($columns)->first();
 	}
 
-	public static function optimizeOrder(Interests $oFirst, $sLang=false, $columns=false, $bAdmin=false) {
+	public static function optimizeOrder(Interests $oFirst, $sLang=false, $columns=false, $bAdmin=false, $apiData=true) {
 		$aOrder = [];
 		$aResults = [];
 		$aPrevious = [];
@@ -653,6 +665,10 @@ class Interests extends ModelUtil
 				$totDistance += $oNext->way->distance;
 
 
+				if (!$apiData) {
+					$oNext->api_response = null;
+				}
+
 				$aPrevious[$i][] = $oCurrent->id;
 				$aResults[$i]['interests'][] = $oNext->toArray($bAdmin);
 
@@ -661,7 +677,7 @@ class Interests extends ModelUtil
 			}
 
 			$aResults[$i]['time'] = $totTime;
-			$aResults[$i]['distance'] = $totDistance;
+			$aResults[$i]['distance'] = round($totDistance / 1000, 3);
 		}
 
 		$i = 0;
