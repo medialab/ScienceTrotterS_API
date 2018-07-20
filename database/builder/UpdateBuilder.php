@@ -9,27 +9,11 @@ use Illuminate\Database\Migrations\Migration;
 class UpdateBuilder
 {
     public function init () {
-        $this->table_interests();
         $this->table_interest_way();
     }
 
-    public function table_interests () {
-        Schema::table('interests', function (Blueprint $table) {
-            /*$table->json('distances')->nullable();
-            $columns = $table->getColumns();
-            $bFound = false;
-            foreach ($columns as $oCol) {
-                if ($oCol->name === 'distances') {
-                    # code...
-                }
-            }
-            
-            exit;*/
-        });
-    }
-
     public function table_interest_way () {
-        Schema::dropIfExists('interest_way');
+        //Schema::dropIfExists('interest_way');
         if (!Schema::hasTable('interest_way')) {
             Schema::create('interest_way', function (Blueprint $table) {
                 $table->uuid('id')->primary();

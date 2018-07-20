@@ -37,11 +37,12 @@ class InterestsController extends Controller
 		}
 		// Recherche du Point
 		$oFirst = Interests::closest($aGeo, $sParc, $sCity, $sLang, $columns);
+
 		if (is_null($oFirst)) {
 			return $this->sendResponse(false, 'Not found');
 		}
 		
-		$aResult = Interests::optimizeOrder($oFirst, $sLang, $columns, $this->bAdmin);
+		$aResult = Interests::optimizeOrder($oFirst, $sLang, $columns, $this->bAdmin, false);
 
 		return $this->sendResponse($aResult['best']['interests']);
 	}
@@ -61,5 +62,76 @@ class InterestsController extends Controller
 		}
 
 		return $this->sendResponse($aData);
+	}
+
+	public function byCityId(Request $oRequest=NULL, $id) {
+	    if (is_null($oRequest)) {
+	        $oRequest = new Request();
+	    }
+
+	    $aGeo = $oRequest->getGeoloc();
+	    if (!$aGeo) {
+	    	return Parent::byCityId($oRequest, $id);
+	    }
+
+	    $skip = $oRequest->getSkip();
+	    $limit = $oRequest->getLimit();
+	    $sLang = $oRequest->input('lang');
+	    $aOrder = $oRequest->input('order');
+	    $columns = $oRequest->input('columns');
+
+	    $class = $this->getClass();
+	    $oModel = new $class;
+
+	    $where = [[$oModel->table.'.cities_id', '=', $id]];
+
+	    $aResults = [];
+	    $aPrevious = [];
+
+	    $i = 0;
+	    while (!is_null($oInt = Interests::closest($aGeo, false, $id, $sLang, $columns, $aPrevious))) {
+            $oInt->setLang($sLang);
+	    	//var_dump($oInt->title);
+	    	$oInt->distances = abs($oInt->geoloc->latitude - $aGeo[0]) + abs($oInt->geoloc->longitude - $aGeo[1]);
+
+	    	$aResults[] = $oInt;
+	    	$aPrevious[] = $oInt->id;
+	    }
+
+	    if ($aOrder && $aOrder[0] === 'distance') {
+	    	usort($aResults, function($a, $b) use ($aOrder, $sLang) {
+	    		$fact = $aOrder[1] === 'desc' ? -1 : 1;
+
+	    		$a->defineLang($sLang);
+	    		$b->defineLang($sLang);
+	    		
+	    		if ($a->distances == $b->distances) {
+	    			return $fact * strcmp($a->title, $b->title);
+	    		}
+
+	    		return $fact * (($a->distances < $b->distances) ? -1 : 1);
+	    	});
+	    }
+	    else{
+	    	usort($aResults, function($a, $b) use ($aOrder, $sLang) {
+	    		$fact = $aOrder[1] === 'desc' ? -1 : 1;
+
+	    		$a->defineLang($sLang);
+	    		$b->defineLang($sLang);
+
+	    		$cmp = strcmp($a->title, $b->title);
+	    		if (!$cmp) {
+	    			if ($a->distance == $b->distance) {
+	    				return 0;
+	    			}
+
+	    			return $fact * ($a->distance < $b->distance ? -1: 1);
+	    		}
+
+	    		return $fact * $cmp;
+	    	});
+	    }
+        
+        return $this->sendResponse($aResults, null)->content();
 	}
 }

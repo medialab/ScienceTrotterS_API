@@ -7,6 +7,7 @@ use App\Utils\ModelUtil;
 class Cities extends ModelUtil
 {
 	protected $table = 'cities';
+	protected static $sTable = 'cities';
 	protected $userStr = 'la ville';	// Nom du Model pour un utilisateur
 	protected static $sChildTable = 'interests';	// Table Enfant. Utilisé pour le Context public
 

@@ -3,6 +3,8 @@
 namespace App\Utils;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use App\Utils\RequestUtil as Request;
+use App\Models\Parcours;
+use App\Models\ListenAudio;
 
 class APIControllerUtil extends BaseController
 {
@@ -147,6 +149,7 @@ class APIControllerUtil extends BaseController
 
         // Récupération Du Status Actuel
         $bCurState = $oModel->state;
+
         // Mise à Jour
         $oModel->updateData($aData);
 
@@ -225,6 +228,13 @@ class APIControllerUtil extends BaseController
 
         // Sauvegarde Du Model
         if ($oModel->save()) {
+            // Récupéartion  Du Msg Warning
+           $msg2 = $oModel->getError();
+           //var_dump("Msg: ".$msg, "Msg2: ".$msg2);
+           if (!empty($msg2)) {
+               $msg = $msg2;
+           }
+           //var_dump("final Msg: ".$msg);
             return $this->sendResponse($oModel->toArray($this->bAdmin), $msg);
         }
 
@@ -382,7 +392,9 @@ class APIControllerUtil extends BaseController
 
         $skip = $oRequest->getSkip();
         $limit = $oRequest->getLimit();
+        $aGeo = $oRequest->getGeoloc();
         $sLang = $oRequest->input('lang');
+        $aOrder = $oRequest->input('order');
         $columns = $oRequest->input('columns');
 
         $class = $this->getClass();
@@ -395,21 +407,40 @@ class APIControllerUtil extends BaseController
         }
 
         $class = $this->getClass();
+        if (!$aGeo) {
+            $oModelList = ($class)::list($oRequest, $this->bAdmin, $where);
+            //var_dump($oModelList->toSql());
+            $oModelList = $oModelList
+                ->where($where)
+                ->take($limit)
+                ->skip($skip)
+                ->get($columns)
+            ;
 
-        $oModelList = ($class)::list($oRequest, $this->bAdmin, $where);
-        //var_dump($oModelList->toSql());
-        $oModelList = $oModelList
-            ->where($where)
-            ->take($limit)
-            ->skip($skip)
-            ->get($columns)
-        ;
+            if ($sLang) {
+                $oModelList->setLang($sLang);
+            }
 
-        if ($sLang) {
-            $oModelList->setLang($sLang);
+            return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
         }
+        else {
+            $oResult = $class::closest($aGeo, false, $id, $sLang, $columns, $aOrder);
+            if ($oResult instanceOf ModelUtil) {
+                if ($sLang) {
+                    $oResult->setLang($sLang);
+                }
 
-        return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
+                $oResult = $oResult->toArray($this->bAdmin);
+            }
+            /*elseif ($oResult && $sLang){
+                foreach ($oResult as &$oRes) {
+                    var_dump($oRes);
+                    $oRes->setLang($sLang);
+                }
+            }*/
+            
+            return $this->sendResponse($oResult, null)->content();
+        }
     }
 
     /**
@@ -455,6 +486,21 @@ class APIControllerUtil extends BaseController
         // Sans Ville
         if ($bNoCity) {
             $oModelList->whereNull('cities_id');
+        }
+
+        if ($sLang) {
+            $oModelList->where(function($query) use ($sLang) {
+                $query->Where('interests.force_lang', '')
+                    ->orWhereNull('interests.force_lang')
+                    ->orWhere('interests.force_lang', $sLang);
+            });
+            
+            $oModelList->leftJoin('cities', 'interests.cities_id', '=', 'cities.id');
+            $oModelList->where(function($query) use ($sLang) {
+                $query->Where('cities.force_lang', '')
+                    ->orWhereNull('cities.force_lang')
+                    ->orWhere('cities.force_lang', $sLang);
+            });
         }
 
         // Récupération
@@ -561,5 +607,50 @@ class APIControllerUtil extends BaseController
         }
 
         return $this->sendResponse($oModelList->toArray($this->bAdmin), null)->content();
+    }
+
+    public function listen(Request $oRequest=NULL, $id) {
+        if (is_null($oRequest)) {
+            $oRequest = new Request();
+        }
+
+        $sLang = $oRequest->input('lang');
+        $phone_id = $oRequest->input('phone_id');
+        
+        if (!$sLang) {
+            return $this->sendError('lang param must be specified.' [], 400);
+        }
+
+        if (!$phone_id) {
+            return $this->sendError('phone_id param must be specified.' [], 400);
+        }
+
+        $class = $this->getClass();
+
+        $b = ListenAudio::listen($sLang, $phone_id, $id, $class);
+        if ($b) {
+            return $this->sendResponse(true);
+        }
+
+        return $this->sendError('Fail To Save', [], 400);
+    }
+
+    public function listenCount(Request $oRequest=NULL, $id) {
+        $sLang = $oRequest->input('lang');
+
+        if (!$sLang) {
+            return $this->sendError('Lang param is required.', [], 400);
+        }
+
+        $class = $this->getClass();
+        $oModelList = ListenAudio::Where([
+            ['lang', '=', $sLang],
+            ['cont_id', '=', $id],
+            ['cont_type', '=', $class]
+        ]);
+
+        $dRes = count($oModelList->get());
+        
+        return $this->sendResponse($dRes);
     }
 }
