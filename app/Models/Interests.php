@@ -423,7 +423,7 @@ class Interests extends ModelUtil
 	public static function byParcours($id, $oRequest, $bAdmin = false) {
 		$where = [['parcours_id', '=', $id]];
 		if (!$bAdmin) {
-			$where[] = ['state', '=', 'true'];
+			$where[] = ['interests.state', '=', 'true'];
 		}
 
 		$oModelList = Self::list($oRequest, $bAdmin);
