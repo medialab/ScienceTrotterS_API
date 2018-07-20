@@ -315,6 +315,7 @@ abstract class ModelUtil extends Model
 
 		$sTable = $oModel->table;
 		$oModelList = Self::Select($sTable.'.*');
+		$oModelList->where([[$sTable.'.state', '=', true]]);
 
 
 		// Si le Context est public
