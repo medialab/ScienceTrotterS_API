@@ -85,11 +85,11 @@ class ParcoursController extends Controller
 				;
 			});
 
-	    	$oModelList->leftJoin('cities', 'parcours.cities_id', '=', 'cities.id');
+	    	$oParcList->leftJoin('cities', 'parcours.cities_id', '=', 'cities.id');
 	    	
-	    	$oModelList->whereNull('cities.id');
+	    	$oParcList->whereNull('cities.id');
 			// On Cible la langue
-		    $oModelList->orWhere(function($query) use ($sLang){
+		    $oParcList->orWhere(function($query) use ($sLang){
 	            $query->Where('cities.state', true);
 
 	            $query->Where('cities.force_lang', '')
