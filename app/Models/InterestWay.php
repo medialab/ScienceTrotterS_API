@@ -62,14 +62,13 @@ class InterestWay extends ModelUtil
 		$oModelList = InterestWay::Where(function($query) use ($id) {
 			$query->where('int1', $id)->orWhere('int2', $id);
 		});
-
 		if ($sLang) {
 			$oModelList->leftJoin('interests', 'interests.id', '=', DB::raw('\''.$id.'\''));
 			
 			$oModelList->where(function($query) use ($sLang) {
-				$query->whereNull('force_lang')
-					  ->orWhere('force_lang', $sLang)
-					  ->orWhere('force_lang', '')
+				$query->whereNull('interests.force_lang')
+					  ->orWhere('interests.force_lang', $sLang)
+					  ->orWhere('interests.force_lang', '')
 				;
 			});
 
@@ -98,6 +97,7 @@ class InterestWay extends ModelUtil
 			->limit(1)
 			->orderBy('distance', 'ASC')
 		;
+
 
 		/*var_dump($oModelList->toSql());*/
 		/*exit;*/

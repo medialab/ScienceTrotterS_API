@@ -26,6 +26,10 @@ class InterestsController extends Controller
 		$columns = $oRequest->input('columns');
 		//$list = $oRequest->input('list');
 
+		if (!$sLang) {
+			return $this->sendError('Lang param is required', [], 400);
+		}
+
 		// Vérification Du Paramètre
 		if (empty($geoloc)) {
 			return $this->sendError('No Geoloc in request', [], 400);

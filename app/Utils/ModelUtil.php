@@ -278,13 +278,28 @@ abstract class ModelUtil extends Model
 	
 	// Définis la langue de l'objet
 	public function defineLang($l = false) {
-		if ($this->force_lang) {
+		// Si la Langue est Différent De défault
+		if ($l !== 'default') {
+			if ($this->force_lang) {
+				$this->sCurLang = $this->force_lang;
+			}
+			else{
+				$this->sCurLang = $l;
+			}
+		}
+		// Si le Force Lang Est défini
+		elseif(strlen($this->force_lang)){
 			$this->sCurLang = $this->force_lang;
 		}
-		else{
-			$this->sCurLang = $l;
+		// Par Défaut La Langue Est Français
+		else {
+			if (!empty($this->title->fr)) {
+				$this->sCurLang = 'fr';
+			}
+			else{
+				$this->sCurLang = 'en';
+			}
 		}
-
 	}
 
 	// Définis la langue de l'objet

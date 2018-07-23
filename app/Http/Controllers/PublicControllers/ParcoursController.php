@@ -126,6 +126,10 @@ class ParcoursController extends Controller
 			return $this->sendError('Geoloc must be a string like "2.564;48.56"', [], 400);
 		}
 
+		if (!$sLang) {
+			return $this->sendError('Lang param is required', [], 400);
+		}
+
 		if ($columns && !in_array('id', $columns)) {
 			$columns[] = 'id';
 		}
