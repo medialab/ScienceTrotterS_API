@@ -20,11 +20,10 @@ class InterestsController extends Controller
 	 */
 	public function closest(Request $oRequest) {
 		$sLang = $oRequest->input('lang');
+		$sCity = $oRequest->input('city');
 		$geoloc = $oRequest->input('geoloc');
 		$sParc = $oRequest->input('parcours');
-		$sCity = $oRequest->input('city');
 		$columns = $oRequest->input('columns');
-		//$list = $oRequest->input('list');
 
 		if (!$sLang) {
 			return $this->sendError('Lang param is required', [], 400);
@@ -39,16 +38,32 @@ class InterestsController extends Controller
 		if (count($aGeo) !== 2 || (float) $aGeo[0] == 0 || (float) $aGeo[1] == 0) {
 			return $this->sendError('Geoloc must be a string like "2.564;48.56"', [], 400);
 		}
+
+
 		// Recherche du Point
 		$oFirst = Interests::closest($aGeo, $sParc, $sCity, $sLang, $columns);
-
 		if (is_null($oFirst)) {
 			return $this->sendResponse(false, 'Not found');
 		}
-		
-		$aResult = Interests::optimizeOrder($oFirst, $sLang, $columns, $this->bAdmin, false);
 
-		return $this->sendResponse($aResult['best']['interests']);
+		if ($sParc) {			
+			$aResult = Interests::optimizeOrder($oFirst, $sLang, $columns, $this->bAdmin, false);
+			return $this->sendResponse($aResult['best']['interests']);
+		}
+		
+		$aResult = [$oFirst->toArray($this->bAdmin)];
+		$aPrevious = [$oFirst->id];
+		while (!is_null($oInt = Interests::closest($aGeo, false, $sCity, $sLang, $columns, $aPrevious))) {
+			$aPrevious[] = $oInt->id;
+
+			if (!$oInt->state) {
+				continue;
+			}
+
+			$aResult[] = $oInt->toArray($this->bAdmin);
+		}
+
+		return $this->sendResponse($aResult);
 	}
 
 	public function byId($sInterestId) {
