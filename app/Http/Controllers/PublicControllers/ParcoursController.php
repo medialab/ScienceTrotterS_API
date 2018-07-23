@@ -73,15 +73,15 @@ class ParcoursController extends Controller
 		$sLang = $oRequest->input('lang');
 
 		$oParcList = Parcours::Where([
-			['id', '=', $parcId],
-			['state', '=', true]
+			['parcours.id', '=', $parcId],
+			['parcours.state', '=', true]
 		]);
 
 		if ($sLang) {
 			$oParcList->where(function($query) use ($sLang) {
-				$query->whereNull('force_lang')
-					  ->orWhere('force_lang', $sLang)
-					  ->orWhere('force_lang', '')
+				$query->whereNull('parcours.force_lang')
+					  ->orWhere('parcours.force_lang', $sLang)
+					  ->orWhere('parcours.force_lang', '')
 				;
 			});
 
