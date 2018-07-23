@@ -509,11 +509,12 @@ class Parcours extends ModelUtil
 			$oParc->setLang($sLang);
 
 			$oInt = Interests::closest($aGeo, $oParc->id, false, $sLang, $columns);
+			
 			if (is_null($oInt)) {
 				continue;
 			}
-			$oInt->setLang($sLang);
 
+			$oInt->setLang($sLang);
 			$distance = abs($oInt->geoloc->latitude - $aGeo[0]) + abs($oInt->geoloc->longitude - $aGeo[1]);
 
 			$oParc->distance = $distance;
@@ -523,27 +524,14 @@ class Parcours extends ModelUtil
 				$dBestDistance = $distance;
 				$oInterestSelected = $oInt;
 			}
-
 		}
+		
 		if (!$oParcSelected) {
 			return false;
 		}
 
-		if ($aOrder && $aOrder[0] === 'distance') {
-			usort($aResults, function($a, $b) use ($aOrder, $sLang) {
-				$fact = $aOrder[1] === 'desc' ? -1 : 1;
 
-				$a->defineLang($sLang);
-				$b->defineLang($sLang);
-				
-				if ($a->distance == $b->distance) {
-					return $fact * strcmp($a->title, $b->title);
-				}
-
-				return $fact * (($a->distance < $b->distance) ? -1 : 1);
-			});
-		}
-		else{
+		if ($aOrder && $aOrder[0] !== 'distance') {
 			usort($aResults, function($a, $b) use ($aOrder, $sLang) {
 				$fact = $aOrder[1] === 'desc' ? -1 : 1;
 
@@ -560,6 +548,25 @@ class Parcours extends ModelUtil
 				}
 
 				return $fact * $cmp;
+			});
+		}
+		else{
+			usort($aResults, function($a, $b) use ($aOrder, $sLang) {
+				if (!empty($aOrder)) {
+					$fact = $aOrder[1] === 'desc' ? -1 : 1;
+				}
+				else{
+					$fact = 1;
+				}
+
+				$a->defineLang($sLang);
+				$b->defineLang($sLang);
+				
+				if ($a->distance == $b->distance) {
+					return $fact * strcmp($a->title, $b->title);
+				}
+
+				return $fact * (($a->distance < $b->distance) ? -1 : 1);
 			});
 		}
 
