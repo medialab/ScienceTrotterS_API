@@ -111,7 +111,7 @@ class ParcoursController extends Controller
 			return $this->sendResponse([]);
 		}
 
-		if ($aGeo) {
+		if ($aGeo) {			
 			$oFirst = $oCurrent = Interests::closest($aGeo, $parcId, false, $sLang, $columns);
 		}
 		else{
