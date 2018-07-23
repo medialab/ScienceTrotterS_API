@@ -97,15 +97,19 @@ class ParcoursController extends Controller
 
 		    		$query->where(function($q) use($sLang) {
 		            	$q->where('cities.force_lang', '')
-		            		->whereNull('cities.force_lang')
+		            		->orWhereNull('cities.force_lang')
 		            		->orWhere('cities.force_lang', $sLang)
 		            	;
 		    		});
             	});
 		    });
 		}
-
+		
 		$oParc = $oParcList->get()->first();
+		
+		if (is_null($oParc)) {
+			return $this->sendResponse([]);
+		}
 
 		if ($aGeo) {
 			$oFirst = $oCurrent = Interests::closest($aGeo, $parcId, false, $sLang, $columns);
