@@ -72,7 +72,8 @@ class ParcoursController extends Controller
 		$columns = ['id', 'title', 'geoloc', 'state'];
 		$sLang = $oRequest->input('lang');
 
-		$oParcList = Parcours::Where([
+		$oParcList = Parcours::Select('parcours.*');
+		$oParcList = $oParcList->where([
 			['parcours.id', '=', $parcId],
 			['parcours.state', '=', true]
 		]);

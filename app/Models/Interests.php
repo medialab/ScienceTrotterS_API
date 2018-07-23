@@ -228,6 +228,21 @@ class Interests extends ModelUtil
 		Parent::updateData($aData);
 	}
 
+	public function checkCityLang() {
+		if (!$this->force_lang) {
+			return true;
+		}
+
+		$res = 0;
+		$this->loadParents();
+
+		if (!empty($this->city)) {
+			$lang = $this->force_lang;
+			$cityLang = $this->city->force_lang;
+			
+		}
+	}
+
 	/**
 	 * Insert / Update Model
 	 * @param  Array|array $options Options Lumen
