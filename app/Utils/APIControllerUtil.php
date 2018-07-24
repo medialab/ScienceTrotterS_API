@@ -290,15 +290,19 @@ class APIControllerUtil extends BaseController
         // Récupération Du Model
         if (!$this->bAdmin) {
             // Limitation Du Context Public
-            $oModelList = 
-                ($class)::Where([['state', '=', true], ['id', '=', $id]])->where(function($query) use ($sLang){
+            $oModelList = ($class)::Where([['state', '=', true], ['id', '=', $id]]);
+
+            if ($sLang) {
+                $oModelList->where(function($query) use ($sLang){
                     $query->where('force_lang', $sLang)
                           ->orWhere('force_lang', '')
                           ->orWhereNull('force_lang')
                     ;
-                })
-            ;
+                });
+            }
 
+            /*var_dump($oModelList->toSql());
+            exit;*/
             $oModel = $oModelList->get($columns)->first();
         }
         else{
