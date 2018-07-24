@@ -628,7 +628,7 @@ abstract class ModelUtil extends Model
 		// Application de la Sauvegarde
 		$bResult = Parent::save($options);
 		if (!$bResult) {
-			$this->errorMsg = 'Une erreur s\'est produite lors de l\'enregistrement';
+			$this->setErrorMsg('Une erreur s\'est produite lors de l\'enregistrement');
 		}
 		else{
 			$this->errorMsg = null;
@@ -925,6 +925,21 @@ abstract class ModelUtil extends Model
 	 */
 	public function getProperyName($sProp) {
 		return empty($this->aProperties) ? null : $this->aProperties[$sProp];
+	}
+
+	protected function setErrorMsg($msg) {
+		if (empty($this->errorMsg)) {
+			$this->errorMsg = $msg;
+		}
+		elseif(is_string($this->errorMsg)) {
+			$this->errorMsg = [
+				$this->errorMsg,
+				$msg
+			];
+		}
+		else{
+			$this->errorMsg[] = $msg;
+		}
 	}
 
 	/**

@@ -111,7 +111,7 @@ class InterestsController extends Controller
 	    while (!is_null($oInt = Interests::closest($aGeo, false, $id, $sLang, $columns, $aPrevious))) {
             $oInt->setLang($sLang);
 	    	//var_dump($oInt->title);
-	    	$oInt->distances = abs($oInt->geoloc->latitude - $aGeo[0]) + abs($oInt->geoloc->longitude - $aGeo[1]);
+	    	$oInt->distances = sqrt(pow($oInt->geoloc->latitude - $aGeo[0], 2) + pow($oInt->geoloc->longitude - $aGeo[1], 2));
 
 	    	$aResults[] = $oInt;
 	    	$aPrevious[] = $oInt->id;

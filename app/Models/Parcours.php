@@ -505,6 +505,7 @@ class Parcours extends ModelUtil
 		$dBestDistance = -1;
 		$oParcSelected = false;
 		$oInterestSelected = false;
+
 		foreach ($oParcoursList as $oParc) {
 			$oParc->setLang($sLang);
 
@@ -515,7 +516,7 @@ class Parcours extends ModelUtil
 			}
 
 			$oInt->setLang($sLang);
-			$distance = abs($oInt->geoloc->latitude - $aGeo[0]) + abs($oInt->geoloc->longitude - $aGeo[1]);
+			$distance = sqrt(pow($oInt->geoloc->latitude - $aGeo[0], 2) + pow($oInt->geoloc->longitude - $aGeo[1], 2));
 
 			$oParc->distance = $distance;
 			$aResults[$distance * 10000] = $oParc;			

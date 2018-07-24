@@ -173,7 +173,7 @@ class Interests extends ModelUtil
 	 */
 	public function loadCity() {
 		if (!empty($this->attributes['cities_id'])) {
-			$city = Cities::Where('id', $this->attributes['cities_id'])->get(['id', 'title'])->first();
+			$city = Cities::Where('id', $this->attributes['cities_id'])->get(['id', 'title', 'force_lang', 'state'])->first();
 
 			if (!empty($city)) {				
 				$city->setLang($this->getLang());
@@ -191,8 +191,7 @@ class Interests extends ModelUtil
 	 */
 	public function loadParcours() {
 		if (!empty($this->attributes['parcours_id'])) {
-			$parcours = Parcours::Where('id', $this->attributes['parcours_id'])->get(['id', 'title'])->first();
-
+			$parcours = Parcours::Where('id', $this->attributes['parcours_id'])->get(['id', 'title', 'force_lang', 'state'])->first();
 			if (!empty($parcours)) {
 				$parcours->setLang($this->getLang());
 				$this->attributes['parcours'] = $parcours;
@@ -205,6 +204,7 @@ class Interests extends ModelUtil
 			$this->attributes['parcours'] = null;
 		}
 
+		$this->parcours = &$this->attributes['parcours'];
 		return $this->attributes['parcours'];
 	}
 
@@ -228,19 +228,61 @@ class Interests extends ModelUtil
 		Parent::updateData($aData);
 	}
 
-	public function checkCityLang() {
+	public function checkCityLang($bWriteMsg=false) {
 		if (!$this->force_lang) {
 			return true;
 		}
 
-		$res = 0;
-		$this->loadParents();
+		$this->loadCity();
 
-		if (!empty($this->city)) {
-			$lang = $this->force_lang;
-			$cityLang = $this->city->force_lang;
-			
+		if (empty($this->city)) {
+			return true;
 		}
+
+		$lang = $this->force_lang;
+		$cityLang = $this->city->force_lang;
+
+		$b = ($this->force_lang === $this->city->force_lang) || is_null($this->city->force_lang);
+
+		if (!$b && $bWriteMsg) {
+			$this->city->defineLang('default');
+			$title = $this->city->title;
+			$aLangs = ['fr' => 'français', 'en' => 'anglais'];
+
+			$msg = 'Attention: La ville: "'.$title.'" est en '.$aLangs[$cityLang].' uniquement, alors que ce Point d\'intérêt est en '.$aLangs[$lang].' uniquement';
+			$this->setErrorMsg($msg);
+		}
+
+		return $b;
+	}
+
+	public function checkParcoursLang($bWriteMsg=false) {
+		if (!$this->force_lang) {
+			return true;
+		}
+
+		$this->loadParcours();
+
+		if (empty($this->parcours)) {
+			return true;
+		}
+
+		$lang = $this->force_lang;
+		$parcoursLang = $this->parcours->force_lang;
+
+		$b = ($this->force_lang === $this->parcours->force_lang) || is_null($this->parcours->force_lang);
+
+		if (!$b && $bWriteMsg) {
+			$this->parcours->defineLang('default');
+			$title = $this->parcours->title;
+			$aLangs = ['fr' => 'français', 'en' => 'anglais'];
+
+			$msg = 'Attention: le parcours: "'.$title.'" est en '.$aLangs[$parcoursLang].' uniquement, alors que ce Point d\'intérêt est en '.$aLangs[$lang].' uniquement';
+
+			$this->setErrorMsg($msg);
+		}
+
+		return $b;
 	}
 
 	/**
@@ -268,10 +310,17 @@ class Interests extends ModelUtil
 
 		// SI le parcours et la geoloc Sont les Mêmes, Pas la peine de Mettre à jour les Trajets
 		if ($bGeoSame && !$bParcoursUpdated) {
-			return Parent::save($options);
+			$b = Parent::save($options);
+			if (!$b) {
+				return false;
+			}
+
+			$this->checkCityLang(true);
+			$this->checkParcoursLang(true);
+			return true;
 		}
 		// SI le Point N'existe pas On L'insère
-		elseif(empty($this->attributes['id'])){
+		elseif(empty($this->attributes['id'])) {
 			$b = Parent::save($options);
 			if (!$b) {
 				return false;
@@ -286,7 +335,15 @@ class Interests extends ModelUtil
 		if (empty($this->geoloc) || empty($attrs['parcours_id'])) {
 			$this->distances = [];
 			$this->parcours = null;
-			return Parent::save($options);
+			$b = Parent::save($options);
+
+			if (!$b) {
+				return false;
+			}
+
+			$this->checkCityLang(true);
+			$this->checkParcoursLang(true);
+			return true;
 		}
 	
 		// Mise à Jour des Trajets
@@ -321,9 +378,9 @@ class Interests extends ModelUtil
 				return false;
 			}
 			// Si L'activation A echoué On Garde Le Message D'Erreur de Coté
-			elseif (!$b) {
+			/*elseif (!$b) {
 				$msg = $this->errorMsg;
-			}
+			}*/
 		}
 
 		// On Sauvegarde Les Données
@@ -331,7 +388,8 @@ class Interests extends ModelUtil
 
 		// Si L'enregistrement Est OK On remet en place le potentiel Message d'erreur
 		if ($b) {
-			$this->errorMsg = $msg;
+			$this->checkCityLang(true);
+			$this->checkParcoursLang(true);
 		}
 		// Si L'enregistrement à Echouer On Remets En Place les Trajets
 		else{
@@ -619,7 +677,11 @@ class Interests extends ModelUtil
 
 		// Trie PAr Proximité
 		$oModelList->orderByRaw("
-			ABS((interests.geoloc->>'latitude')::FLOAT - ".$lat.") + ABS((interests.geoloc->>'longitude')::FLOAT - ".$lon.")
+			SQRT(
+				POW((interests.geoloc->>'latitude')::FLOAT - ".$lat.", 2) 
+				+ 
+				POW((interests.geoloc->>'longitude')::FLOAT - ".$lon.", 2)
+			)
 			ASC
 		");
 
