@@ -66,21 +66,8 @@ class InterestsController extends Controller
 		return $this->sendResponse($aResult);
 	}
 
-	public function byId($sInterestId) {
-		$aData = [];
-		if (CheckerUtil::is_uuid_v4($sInterestId)) {
-			$aWhereClauses = [
-				['state', '=', 'true'],
-				['id', '=', $sInterestId]
-			];
-			
-			$aData = Interests::where($aWhereClauses)
-				->get()
-				->toArray()
-			;
-		}
-
-		return $this->sendResponse($aData);
+	public function byId($sInterestId, Request $oRequest) {
+		return $this->get($sInterestId, $oRequest);
 	}
 
 	public function byCityId(Request $oRequest=NULL, $id) {
