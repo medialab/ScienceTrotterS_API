@@ -179,6 +179,12 @@ class Interests extends ModelUtil
 				$city->setLang($this->getLang());
 				$this->attributes['city'] = $city;
 			}
+			else{
+				$this->attributes['city'] = null;
+			}
+		}
+		else{
+			return null;
 		}
 
 		return $this->attributes['city'];

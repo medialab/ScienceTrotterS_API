@@ -18,12 +18,13 @@ class UpdateBuilderV2
             Schema::create('listen_audio', function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->text('lang');
+                $table->text('file')->nullable();
                 $table->text('app_id');
                 $table->uuid('cont_id');
                 $table->text('cont_type');
                 $table->timestamps();
 
-                $table->unique(['lang', 'app_id', 'cont_type', 'cont_id']);
+                $table->unique(['lang', 'app_id', 'cont_type', 'cont_id', 'file']);
             });
 
             DB::statement('ALTER TABLE listen_audio ALTER COLUMN id SET DEFAULT uuid_generate_v4();');

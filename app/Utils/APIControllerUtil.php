@@ -301,8 +301,6 @@ class APIControllerUtil extends BaseController
                 });
             }
 
-            /*var_dump($oModelList->toSql());
-            exit;*/
             $oModel = $oModelList->get($columns)->first();
         }
         else{
@@ -622,16 +620,25 @@ class APIControllerUtil extends BaseController
         $phone_id = $oRequest->input('phone_id');
         
         if (!$sLang) {
-            return $this->sendError('lang param must be specified.' [], 400);
+            return $this->sendError('lang param must be specified.', [], 400);
         }
 
         if (!$phone_id) {
-            return $this->sendError('phone_id param must be specified.' [], 400);
+            return $this->sendError('phone_id param must be specified.', [], 400);
         }
 
         $class = $this->getClass();
+        $oModelList = $class::Where([['id', '=', $id], ['state', '=', true]]);
+        
+        $oModel = $oModelList->get()->first();
+        if (is_null($oModel)) {
+            return $this->sendError('Not Found', ['Fail To Find '.$class.' with id: '.$id], 404);
+        }
 
-        $b = ListenAudio::listen($sLang, $phone_id, $id, $class);
+        $oModel->setLang($sLang);
+        $file = $oModel->audio;
+
+        $b = ListenAudio::listen($sLang, $phone_id, $id, $class, $file);
         if ($b) {
             return $this->sendResponse(true);
         }
@@ -647,10 +654,20 @@ class APIControllerUtil extends BaseController
         }
 
         $class = $this->getClass();
+        $oModelList = $class::Where([['id', '=', $id], ['state', '=', true]]);
+        
+        $oModel = $oModelList->get()->first();
+        if (is_null($oModel)) {
+            return $this->sendError('Not Found', ['Fail To Find '.$class.' with id: '.$id], 404);
+        }
+
+        $oModel->setLang($sLang);
+
         $oModelList = ListenAudio::Where([
             ['lang', '=', $sLang],
             ['cont_id', '=', $id],
-            ['cont_type', '=', $class]
+            ['cont_type', '=', $class],
+            ['file', '=', $oModel->audio]
         ]);
 
         $dRes = count($oModelList->get());
