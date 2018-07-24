@@ -46,7 +46,6 @@ class ListenAudio extends ModelUtil
         $oModel->cont_type = $cont_type;
 
         $b = $oModel->save();
-        var_dump("TEST", $b);
         return $b;
     }
 }
