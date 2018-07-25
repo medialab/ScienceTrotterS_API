@@ -15,6 +15,7 @@ class Credits extends ModelUtil
 	 */
 	protected $casts = [
 			'id' => 'string',
+			'title' => 'json',
 			'content' => 'json'
 	];
 
