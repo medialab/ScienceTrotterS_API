@@ -11,21 +11,4 @@ class CitiesController extends Controller
 {
   protected $bAdmin = false;
   protected $sModelClass = 'Cities';
-
-  public function byId($sCityId) {
-    $aData = [];
-
-    if (CheckerUtil::is_uuid_v4($sCityId)) {
-      $aWhereClauses = [
-        ['state', '=', 'true'],
-        ['id', '=', $sCityId]
-      ];
-      $aData = Cities::where($aWhereClauses)
-        ->get()
-        ->toArray();
-    }
-
-    return $this->sendResponse($aData);
-  }
-
 }

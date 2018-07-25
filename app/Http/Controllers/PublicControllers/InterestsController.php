@@ -66,10 +66,6 @@ class InterestsController extends Controller
 		return $this->sendResponse($aResult);
 	}
 
-	public function byId($sInterestId, Request $oRequest) {
-		return $this->get($sInterestId, $oRequest);
-	}
-
 	public function byCityId(Request $oRequest=NULL, $id) {
 	    if (is_null($oRequest)) {
 	        $oRequest = new Request();

@@ -3,6 +3,7 @@
 namespace App\Utils;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use App\Utils\RequestUtil as Request;
+use App\Utils\CheckerUtil as Check;
 use App\Models\Parcours;
 use App\Models\ListenAudio;
 
@@ -14,6 +15,10 @@ class APIControllerUtil extends BaseController
     // Récupération De la Classe Du Model
     public function getClass() {
         return 'App\Models\\'.$this->sModelClass;
+    }
+
+    public function byId($sInterestId, Request $oRequest) {
+        return $this->get($sInterestId, $oRequest);
     }
 
     /**
@@ -251,9 +256,12 @@ class APIControllerUtil extends BaseController
             'id' => 'required',
         ]);
 
-
         // Récupération Du Model
         $id = $oRequest->input('id');
+        if (!Check::is_uuid_v4($id)) {
+            return $this->sendError('Bad ID', ['id param must be string in uuid_v4 format'], 400);
+        }
+
         $class = $this->getClass();
         $oModel = call_user_func($class.'::where', 'id', $id)->first();
 
@@ -268,7 +276,7 @@ class APIControllerUtil extends BaseController
         }
         // Model Introuvable  => 404
         else{
-            return $this->sendError('Fail To Query Delete', ['Fail To Find '.$class.' with ID: '.$id], 400);
+            return $this->sendError('Not Found', ['Fail To Find '.$class.' with ID: '.$id], 404);
         }
     }
 
@@ -637,6 +645,10 @@ class APIControllerUtil extends BaseController
 
         $oModel->setLang($sLang);
         $file = $oModel->audio;
+
+        if (is_null($file)) {
+            return $this->sendResponse(true);
+        }
 
         $b = ListenAudio::listen($sLang, $phone_id, $id, $class, $file);
         if ($b) {
