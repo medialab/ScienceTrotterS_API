@@ -14,24 +14,6 @@ class ParcoursController extends Controller
 	protected $bAdmin = false;
 	protected $sModelClass = 'Parcours';
 
-	public function byId($sParcourId) {
-		$aData = [];
-
-		if (CheckerUtil::is_uuid_v4($sParcourId)) {
-			$aWhereClauses = [
-				['state', '=', 'true'],
-				['id', '=', $sParcourId]
-			];
-			
-			$aData = Parcours::where($aWhereClauses)
-				->get()
-				->toArray()
-			;
-		}
-
-		return $this->sendResponse($aData);
-	}
-
 	/**
 	 * Calcule la distance + le time les plus courts pour suivre le parcours
 	 * @param  String $parcId Id du parcours
