@@ -35,3 +35,11 @@ $aConfig = [
 $router->group($aConfig, function () use ($router) {
     require __DIR__.'/interestWay.php';
 });
+
+
+$aConfig = [
+  'prefix' => 'credits'
+];
+$router->group($aConfig, function () use ($router) {
+    require __DIR__.'/credits.php';
+});

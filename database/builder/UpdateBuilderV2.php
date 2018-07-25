@@ -10,6 +10,7 @@ class UpdateBuilderV2
 {
     public function init () {
         $this->table_listen();
+        $this->table_credits();
     }
 
     public function table_listen () {
@@ -28,6 +29,23 @@ class UpdateBuilderV2
             });
 
             DB::statement('ALTER TABLE listen_audio ALTER COLUMN id SET DEFAULT uuid_generate_v4();');
+        }
+    }
+
+    public function table_credits () {
+        Schema::dropIfExists('credits');
+        if (!Schema::hasTable('credits')) {
+            Schema::create('credits', function (Blueprint $table) {
+                $table->uuid('id')->primary();
+                $table->json('title');
+                $table->json('content')->nullable();
+                $table->text('css');
+                $table->boolean('state');
+                $table->timestamps();
+
+            });
+
+            DB::statement('ALTER TABLE credits ALTER COLUMN id SET DEFAULT uuid_generate_v4();');
         }
     }
 }

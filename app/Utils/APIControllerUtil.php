@@ -21,6 +21,14 @@ class APIControllerUtil extends BaseController
         return $this->get($sInterestId, $oRequest);
     }
 
+    public function latest(RequestUtil $oRequest) {
+        $class = $this->getClass();
+        $sLang = $oRequest->input('lang');
+        $oModel = $class::Take(1)->where('state', true)->orderBy('updated_at', 'desc');
+
+        return $oModel;
+    }
+
     /**
      * Retourne Une Liste de Models
      * @param  Request $oRequest Requete

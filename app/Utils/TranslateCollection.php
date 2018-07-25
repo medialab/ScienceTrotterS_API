@@ -30,6 +30,20 @@ class TranslateCollection extends Collection
 	}
 
 	/**
+	 * Séléction de la Langue
+	 * @param String $sLang La Langue à Séléctionné
+	 */
+	public function defineLang($sLang = false) {
+		$this->sCurLang = $sLang;
+
+		foreach ($this->items as &$oModel) {
+			$oModel->defineLang($this->sCurLang);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Charge les Parents
 	 */
 	public function loadParents() {
@@ -59,7 +73,7 @@ class TranslateCollection extends Collection
 	 * @param  Mixed $default Retour Si aucun Résultat
 	 * @return Model          Le Résultat
 	 */
-	public function get($key, $default = NULL) {
+	public function get($key=null, $default = NULL) {
 		$res = Parent::get($key, $default);
 		$this->setLang($this->sCurLang);
 
