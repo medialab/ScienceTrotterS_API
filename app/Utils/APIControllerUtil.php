@@ -17,7 +17,7 @@ class APIControllerUtil extends BaseController
         return 'App\Models\\'.$this->sModelClass;
     }
 
-    public function byId($sInterestId, Request $oRequest) {
+    public function byId(Request $oRequest, $sInterestId) {
         return $this->get($sInterestId, $oRequest);
     }
 
