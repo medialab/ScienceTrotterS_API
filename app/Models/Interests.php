@@ -698,13 +698,16 @@ class Interests extends ModelUtil
 		$aOrder = [];
 		$aResults = [];
 		$aPrevious = [];
+		$aPreviousNames = [];
 		$dBestDistance = -1;
 
 		// On Test plusieurs Trajets possible pour optimiser la parcours
 		for ($i=0; $i < 3; $i++) {
+
 			$oCurrent = $oFirst;
 
 			$aPrevious[$i] = [];
+			$aPreviousNames[$i] = [];
 			$aResults[$i] = [
 				'time' => 0, 
 				'distance' => 0,
@@ -714,33 +717,43 @@ class Interests extends ModelUtil
 			if ($i > 0) {
 				if (isset($aPrevious[0][1])) {
 					$aPrevious[$i][0] = $aPrevious[0][1];
+					$aPreviousNames[$i][0] = $aPreviousNames[0][1];
+
 				}
 
 				if ($i > 1) {
 					if (isset($aPrevious[0][2])) {
 						$aPrevious[$i][1] = $aPrevious[0][2];
+						$aPreviousNames[$i][1] = $aPreviousNames[0][2];
 					}
 				}
 			}
+
+			$oFirst->setLang($sLang);
 
 			$z = 0;
 			$totTime = 0;
 			$totDistance = 0;
 			while(!is_null($oNext = InterestWay::closest($oCurrent, $aPrevious[$i], $sLang, true, $columns))) {// Récupération Du point le plus proche
+				$oNext->setLang($sLang);
 
 				if ($i > 0 && $z == 0) {
 					unset($aPrevious[$i][0]);
+					unset($aPreviousNames[$i][0]);
 					if ($i > 1) {
 						unset($aPrevious[$i][1]);
+						unset($aPreviousNames[$i][1]);
 					}
 				}
 
 				// Si Désactivé, on continue
 				if (!$oNext->state) {
 					$aPrevious[$i][] = $oNext->id;
+					$aPreviousNames[$i][] = $oNext->title;
 					continue;
 				}
 
+				$ind = $z+1;
 				$totTime += $oNext->way->time;
 				$totDistance += $oNext->way->distance;
 
@@ -750,14 +763,21 @@ class Interests extends ModelUtil
 				}
 
 				$aPrevious[$i][] = $oCurrent->id;
+				$aPreviousNames[$i][] = $oCurrent->name;
+
 				$aResults[$i]['interests'][] = $oNext->toArray($bAdmin);
 
 				$z++;
 				$oCurrent = $oNext;
 			}
 
-			$aResults[$i]['time'] = $totTime;
-			$aResults[$i]['distance'] = round($totDistance / 1000, 3);
+			if ($z > 0 || $i == 0) {
+				$aResults[$i]['time'] = $totTime;
+				$aResults[$i]['distance'] = round($totDistance / 1000, 3);
+			}
+			else{
+				unset($aResults[$i]);
+			}
 		}
 
 		$i = 0;
