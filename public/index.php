@@ -2,11 +2,11 @@
 ini_set( 'display_errors', true );
 error_reporting( E_ALL | E_NOTICE );
 
-header('Access-Control-Allow-Origin: https://admin-sts-dev.actu.com/');
-header('Access-Control-Allow-Methods: GET, POST');
-
 $confPath = dirname(realpath('.')).'/config/conf.php';
 require_once($confPath);
+
+header('Access-Control-Allow-Origin: '.API_ALLOW_ORIGIN);
+header('Access-Control-Allow-Methods: GET, POST');
 
 ini_set('xdebug.var_display_max_data', -1);
 ini_set('xdebug.var_display_max_depth', -1);
