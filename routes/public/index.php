@@ -1,5 +1,13 @@
 <?php
 
+
+$aConfig = [
+  'prefix' => 'marker'
+];
+$router->group($aConfig, function () use ($router) {
+    require __DIR__.'/marker.php';
+});
+
 $aConfig = [
   'prefix' => 'colors'
 ];
