@@ -1,3 +1,3 @@
 <?php
 
-$router->get('/get/{color:[0-9a-f]+}', 'MarkerController@get');
+$router->get('/get/{color:[0-9a-fA-F]+}', 'MarkerController@get');
