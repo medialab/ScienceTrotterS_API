@@ -762,6 +762,7 @@ abstract class ModelUtil extends Model
 		
 		// On Garde En Mémoire le Status Courrant
 		$bCurState = (bool) @$this->attributes['state'];
+		$aFileDelete = [];
 
 		//var_dump("=== Updating Object ===", $aData);
 		// Mise à Jour des Donnés
@@ -774,12 +775,12 @@ abstract class ModelUtil extends Model
 			}
 			// Si la varialbe représente un fichier
 			if (in_array($key, $this->aUploads)) {
-				//var_dump($key, $value);
+				//var_dump($key);
 				// Si Aucune image On Ignore
-				if (empty($value)) {
-					//var_dump("Empty");
+				/*if (empty($value)) {
+
 					continue;
-				}
+				}*/
 
 				// Si la variable est un tableau de fichiers
 				if (is_array($aData[$key])) {
@@ -792,30 +793,57 @@ abstract class ModelUtil extends Model
 
 					// Les Fichiers Actuels
 					$aCurFiles = (object)$this->$key;
-
+					//var_dump("CURRENT", $aCurFiles);
 					foreach($aFiles as $i => $sFile) {
 						// Si le fichier n'est pas vide et est différent du fichier actuel On le Télécharge
-						if (!empty($sFile) && (empty($aCurFiles->$i) || $aCurFiles->$i !== $sFile)) {
-							$this->downloadImage($sFile);
+						if ((empty($aCurFiles->$i) || $aCurFiles->$i !== $sFile)) {
+							//var_dump("New: #$i", $sFile);
+							//var_dump("Cur: #$i", $aCurFiles->$i);
+							if (!empty($sFile)) {
+								$this->downloadImage($sFile);
+							}
+
+							if (!empty($aCurFiles->$i)) {
+								$aFileDelete[] = $aCurFiles->$i;
+							}
+
 							$aCurFiles->$i = $sFile;
 						}
 					}
 
-					//var_dump("VERIFY-4: $key", $value);
 					
 					// Mise à jour de la liste des fichiers
-					$this->$key = $aCurFiles;
+					$this->$key = (Object) array_values(array_filter((Array)$aCurFiles));
+					//var_dump("New: #$i", $sFile);
 					//var_dump("====== TEST Result =====", $this->$key);
 				}
 				else{
+					$lang = $this->sCurLang;
 					// Le Fichier Actuel
 					$sFile = $aData[$key];
-
+					if (in_array($key, $this->aTranslateVars)) {
+						if (!empty(($this->$key)->$lang)) {
+							$old = ($this->$key)->$lang;
+						}
+						else{
+							$old = null;
+						}
+					}
+					else{
+						$old = $this->$key;
+						
+					}
 					// Si le fichier est différent du fichier actuel On le Télécharge
 					if($sFile !== @$this->$key) {
-						//var_dump("Downloading");
-						
-						$this->downloadImage($sFile);
+						if ($old !== null) {
+							$aFileDelete[] = $old;
+						}
+
+
+						if ($sFile !== null) {
+							$this->downloadImage($sFile);
+						}
+
 						if (!in_array($key, $this->aTranslateVars)) {
 							$this->attributes[$key] = $sFile;
 						}
@@ -852,21 +880,23 @@ abstract class ModelUtil extends Model
 				$this->$key = $value;
 			}
 		}
-
-		//var_dump("--- TEST", $this->attributes);
-		//var_dump("--- Model Change Enable");
 		
 		// Si la Mise à jour du status est demandée
 		if (array_key_exists('state', $aData)) {
-			$b = $this->enable((bool)$aData['state']);
+			$saveSuccess = $this->enable((bool)$aData['state']);
 		}
 		// Si Non on Vérifie que son status est valide
 		else{
-			$b = $this->enable($this->attributes['state']);
+			$saveSuccess = $this->enable($this->attributes['state']);
 		}
 
 		// Si La mise à jour du status a échoué et que le Model est Actuellement Actif
-		if (!$b && $bCurState) {
+		if ($saveSuccess) {
+			foreach ($aFileDelete as $sFile) {
+				@unlink(UPLOAD_PATH.$sFile);
+			}
+		}
+		elseif ($bCurState) {
 
 			// On Précise qu'on Ne Peut Pas Sauvegarder Sans Dé-Activer Le Model
 			$this->errorMsg = str_replace(
@@ -875,6 +905,7 @@ abstract class ModelUtil extends Model
 				$this->errorMsg
 			);
 		}
+
 	}
 
 	/**

@@ -17,7 +17,7 @@ Install all dependencies
 composer install
 ```
 
-2) Set configuartions in /config/conf.php
+2) Copy /config/conf.php.default to conf.php and set his configuartions
 
 
 3) Configuration

@@ -674,7 +674,7 @@ class APIControllerUtil extends BaseController
         }
 
         $class = $this->getClass();
-        $oModelList = $class::Where([['id', '=', $id], ['state', '=', true]]);
+        $oModelList = $class::Where([['id', '=', $id]]);
         
         $oModel = $oModelList->get()->first();
         if (is_null($oModel)) {

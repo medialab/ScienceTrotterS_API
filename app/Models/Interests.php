@@ -50,9 +50,9 @@ class Interests extends ModelUtil
 		'schedule',
 		'price',
 		'audio',
-		'transport',
+		//'transport',
 		'audio_script',
-		'description',
+		//'description',
 		'gallery_image',
 		'bibliography',
 		'force_lang',
@@ -248,12 +248,14 @@ class Interests extends ModelUtil
 		$lang = $this->force_lang;
 		$cityLang = $this->city->force_lang;
 
-		$b = ($this->force_lang === $this->city->force_lang) || is_null($this->city->force_lang);
+		$b = ($this->force_lang === $this->city->force_lang) || empty($this->city->force_lang) || empty($lang);
 
 		if (!$b && $bWriteMsg) {
 			$this->city->defineLang('default');
 			$title = $this->city->title;
 			$aLangs = ['fr' => 'français', 'en' => 'anglais'];
+
+			var_dump($aLangs, $cityLang);
 
 			$msg = 'Attention: La ville: "'.$title.'" est en '.$aLangs[$cityLang].' uniquement, alors que ce Point d\'intérêt est en '.$aLangs[$lang].' uniquement';
 			$this->setErrorMsg($msg);
@@ -791,5 +793,24 @@ class Interests extends ModelUtil
 		}
 
 		return ['best' => &$aResults[$bestID], 'results' => $aResults[$bestID]];
+	}
+
+	public static function updateByParcours($oParc, $oRequest, $bAdmin) {
+		$oModelList = Interests::byParcours($oParc->id, $oRequest, $bAdmin)->get();
+
+		foreach ($oModelList as $oInt) {
+			$oInt->cities_id = $oParc->cities_id;
+
+			$oInt->setLang("fr");
+			var_dump("OINT: ".$oInt->title);
+			var_dump("ASK: ",$oParc->state);
+
+			$oInt->enable($oParc->state);
+			var_dump("Error-01: ",$oInt->getError());
+			$oInt->save();
+			var_dump("Error-02: ",$oInt->getError());
+			
+			var_dump("RESULT: ",$oInt->state);
+		}
 	}
 }

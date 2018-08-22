@@ -63,6 +63,15 @@ class Cities extends ModelUtil
 		return new Cities;
 	}
 
+	public function __set($sVar, $value) {
+		if ($sVar === 'title') {
+			$this->title = (object) ['fr' => $value, 'en' => $value];
+			return;
+		}
+
+		Parent::__set($sVar, $value);
+	}
+
 	/**
 	 * Recherche une phrase dans tous les Parcours
 	 * @param  String  $query   Recherche

@@ -6,6 +6,7 @@ $router->get('/{id:[a-z0-9-]+}', 'ParcoursAdminController@get');
 $router->get('listenCnt/{id:[a-z0-9-]+}', 'ParcoursAdminController@listenCount');
 
 $router->get('/byCityId/{id:[a-z0-9-]+}', 'ParcoursAdminController@byCityId');
+$router->get('/byCity/{id:[a-z0-9-]+}', 'ParcoursAdminController@byCityId');
 $router->get('/byNoCity', 'ParcoursAdminController@byNoCity');
 
 $router->post('/search', 'ParcoursAdminController@search');

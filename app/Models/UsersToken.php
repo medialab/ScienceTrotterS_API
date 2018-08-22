@@ -11,7 +11,7 @@ use Lcobucci\JWT\Builder as TokenBuilder;
 class UsersToken extends Model
 {
 	// Durée de Vie D'un Token
-	private static $expireDelay = 3600;
+	private static $expireDelay = API_SESSION_LIFETIME;
 
 	protected $table = 'users_token';
 

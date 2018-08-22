@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Utils\ModelUtil;
 use App\Models\InterestWay;
 
+use App\Utils\RequestUtil;
+
 class Parcours extends ModelUtil
 {
 	public $timestamps = true;
@@ -164,8 +166,8 @@ class Parcours extends ModelUtil
 
 		unset($this->city);
 		unset($this->attributes['city']);
-		/*exit;*/
 
+		Interests::updateByParcours($this, new RequestUtil(), true);
 		return $bSuccess;
 	}
 

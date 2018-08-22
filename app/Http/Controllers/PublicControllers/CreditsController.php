@@ -13,6 +13,7 @@ class CreditsController extends Controller
 
 	public function latest(Request $oRequest) {
 		$oModel = Parent::latest($oRequest);
+		
 		$oModel = $oModel->get()->first();
 
 		if (is_null($oModel)) {
