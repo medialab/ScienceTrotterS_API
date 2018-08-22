@@ -18,7 +18,13 @@ composer install
 ```
 
 2) Copy /config/conf.php.default to conf.php and set his configuartions
-
+API_PASS 				=> Api Password
+ADMIN_URL 				=> Url of Back Office
+PUBLIC_PATH 			=> The Public folder
+UPLOAD_PATH				=> The Upload Folder
+API_ALLOW_ORIGIN		=> Domains that are authorized tu use the private API (by default: ADMIN_URL)
+API_SESSION_LIFETIME	=> Session Lifetime in seconds
+MAP_API_KEY				=> Open Route Service Api Key (See: http://openrouteservice.org/)
 
 3) Configuration
 Set up Environment Variables in /etc/php/{$php_version}/fpm/pool.d/www.conf
