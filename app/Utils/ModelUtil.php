@@ -100,11 +100,20 @@ abstract class ModelUtil extends Model
 		//var_dump("New VAL", $value);
 
 		// Si la valeur actuelle est une string on la décode
-		if(is_string($var)) {
+		if (is_array($var)) {
+			$var = (object) $var;
+		}
+		elseif(is_string($var)) {
 			$var = json_decode($var);
+
+			if (is_null($var)) {
+				$var = new StdClass;
+			}
 		}
 		//var_dump("Cur VAL Decoded", $var);
 
+
+		var_dump($var);
 
 		$var->$sLang = $value;
 		
