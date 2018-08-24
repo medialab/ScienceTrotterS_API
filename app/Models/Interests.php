@@ -802,15 +802,9 @@ class Interests extends ModelUtil
 			$oInt->cities_id = $oParc->cities_id;
 
 			$oInt->setLang("fr");
-			var_dump("OINT: ".$oInt->title);
-			var_dump("ASK: ",$oParc->state);
 
 			$oInt->enable($oParc->state);
-			var_dump("Error-01: ",$oInt->getError());
 			$oInt->save();
-			var_dump("Error-02: ",$oInt->getError());
-			
-			var_dump("RESULT: ",$oInt->state);
 		}
 	}
 }
