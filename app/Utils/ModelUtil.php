@@ -112,9 +112,6 @@ abstract class ModelUtil extends Model
 		}
 		//var_dump("Cur VAL Decoded", $var);
 
-
-		var_dump($var);
-
 		$var->$sLang = $value;
 		
 		$this->attributes[$sVar] = $var;
