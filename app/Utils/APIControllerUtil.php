@@ -45,6 +45,7 @@ class APIControllerUtil extends BaseController
         $sLang = $oRequest->input('lang');
         $columns = $oRequest->input('columns');
         $parents = $oRequest->input('parents');
+
         $oModelList = $oModelList->get($columns);
 
         // Définition De La Langue

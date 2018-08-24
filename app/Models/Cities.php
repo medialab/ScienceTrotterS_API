@@ -52,6 +52,13 @@ class Cities extends ModelUtil
 	 * Variables à Traduire
 	 */
 	protected $aTranslateVars = [
+	  //'title'
+	];
+
+	/**
+	 * Variables à Traduire
+	 */
+	protected $aIgnoreTranslateVars = [
 	  'title'
 	];
 
@@ -65,7 +72,7 @@ class Cities extends ModelUtil
 
 	public function __set($sVar, $value) {
 		if ($sVar === 'title') {
-			$this->title = (object) ['fr' => $value, 'en' => $value];
+			$this->attributes['title'] = (object) ['fr' => $value, 'en' => $value];
 			return;
 		}
 

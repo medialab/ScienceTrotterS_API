@@ -52,6 +52,14 @@ abstract class ModelUtil extends Model
 	 */
 	protected $aOptionalFields = [];
 
+
+	/**
+	 * Variables à Traduire
+	 */
+	protected $aIgnoreTranslateVars = [
+	  'title'
+	];
+
 	protected static $sTable = 'model';
 
 	public function getId() {
@@ -307,6 +315,11 @@ abstract class ModelUtil extends Model
 		return $this->sCurLang;
 	}
 
+	// Définis la langue de l'objet
+	public function getDefaultLang() {
+		return !empty($this->attributes['force_lang']) ? $this->attributes['force_lang'] : 'fr';
+	}
+
 	/**
 	 * Retrourne une nouvelle instance vide
 	 * @return Cities nouvelle instance
@@ -415,7 +428,7 @@ abstract class ModelUtil extends Model
 		    	$sColName = explode('.', $sOrderCol);
 		    	$sColName = $sColName[count($sColName)-1];
 
-		        if (in_array($sColName, $oModel->aTranslateVars)) {
+		        if (in_array($sColName, $oModel->aTranslateVars) || in_array($sColName, $oModel->aIgnoreTranslateVars)) {
 		            if ($oModel->force_lang) {
 		                $sOrderCol .= '->'.$oModel->force_lang.'' ;
 		            }
@@ -862,6 +875,7 @@ abstract class ModelUtil extends Model
 			else if (in_array($key, $this->aTranslateVars)) {
 				//var_dump("VERIFY-0: $key", $value);
 				// Définition de la langue même
+				
 				if ($this->sCurLang) {
 					$this->setValueByLang($key, $value);
 				}
@@ -871,13 +885,12 @@ abstract class ModelUtil extends Model
 				}
 			}
 			// Si la Variable est un Json On Cast l'array en StdClass
-			elseif (isset($this->casts[$key]) && $this->casts[$key] === 'json') {
+			elseif (isset($this->casts[$key]) && $this->casts[$key] === 'json' && !in_array($key, $this->aIgnoreTranslateVars)) {
 				//var_dump("VERIFY-1: $key", (object)$value);
 				$this->attributes[$key] = (object)$value;
 			}
 			else{
-				//var_dump("VERIFY-2: $key", $value);
-				$this->$key = $value;
+				$this->__set($key, $value);
 			}
 		}
 		

@@ -231,6 +231,33 @@ class Interests extends ModelUtil
 			InterestWay::deleteByInterest($this, true);
 		}
 
+		if (!empty($aData['bibliography'])) {
+
+			$aBiblio = &$this->attributes['bibliography'];
+			if (is_string($aBiblio)) {
+				$aBiblio = json_decode($aBiblio, true);
+			}
+			
+			if (!is_null($aBiblio)) {
+				foreach ($aBiblio as $lang => &$biblio_lang) {
+					foreach ($biblio_lang as $key => $value) {
+						if (empty($value)) {
+							unset($biblio_lang[$key]);
+						}
+					}
+
+					if (empty($biblio_lang)) {
+						unset($aBiblio[$lang]);
+					}
+				}
+			}
+			
+			
+			if (empty($aBiblio)) {
+				$this->attributes['bibliography'] = null;
+			}
+		}
+
 		Parent::updateData($aData);
 	}
 
