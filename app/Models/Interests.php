@@ -240,9 +240,11 @@ class Interests extends ModelUtil
 			
 			if (!is_null($aBiblio)) {
 				foreach ($aBiblio as $lang => &$biblio_lang) {
-					foreach ($biblio_lang as $key => $value) {
-						if (empty($value)) {
-							unset($biblio_lang[$key]);
+					if (!empty($biblio_lang)) {
+						foreach ($biblio_lang as $key => $value) {
+							if (empty($value)) {
+								unset($biblio_lang[$key]);
+							}
 						}
 					}
 
