@@ -58,7 +58,7 @@ class UsersToken extends Model
 		return md5($user->id.'-'.$user->created_at.'-'.$user->email);
 	}
 	
-	public static function validateToken(Users $user, Token $token) {
+	public static function validateToken(Users $user, Token $token, $bextend=false) {
 		// validation Des Donnés du Token
 		$validationData = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
 		$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
@@ -66,7 +66,50 @@ class UsersToken extends Model
 		$validationData->setId(Self::idfyUser($user));
 		$validationData->setCurrentTime(time());
 
-		return $token->validate($validationData);
+		$b = $token->validate($validationData);
+
+		if (!$b || !$bextend) {
+			return $b;
+		}
+
+		$old = (string) $token;
+
+		$tokenMdl = UsersToken::where('key', $old)->get()->first();
+
+		if (!$tokenMdl) {
+			return false;
+		}
+
+
+		if (!Self::validateToken($user, $token)) {
+			return false;
+		}
+
+		$token = Self::gen($user);
+		$tokenMdl->key = (string) $token;
+		$tokenMdl->save();
+		
+		return $token;
+	}
+
+	private static function gen(Users $user) {
+		return (new TokenBuilder())
+			// Définition Domaine
+			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
+			->setAudience('http://'.$_SERVER['HTTP_HOST'])
+			// Définition Hash User
+			->setId(Self::idfyUser($user), true)
+			// Définition Id User
+			->set('uid', $user->id)
+			// Définition de l'heure de création
+			->setIssuedAt(time())
+			// Définition de l'heure de départ
+			->setNotBefore(time())
+			// Définition de l'heure d'Expiration'
+			->setExpiration(time() + Self::$expireDelay)
+			// Génération du Token
+			->getToken()
+		;
 	}
 
 	/**

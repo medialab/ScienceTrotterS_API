@@ -84,6 +84,11 @@ class APIControllerUtil extends BaseController
             'data'    => $result,
             'message' => $message,
         ];
+
+        if ($this->bAdmin) {
+            $aResponse['token'] = _USER_TOKEN_;
+        }
+
         if ($cl) {
             echo $cl.'('.json_encode($aResponse).')';
             exit;   
@@ -120,6 +125,10 @@ class APIControllerUtil extends BaseController
 
         if (! empty($errorMessages)) {
             $aResponse['data'] = $errorMessages;
+        }
+
+        if ($this->bAdmin) {
+            $aResponse['token'] = _USER_TOKEN_;
         }
 
         if ($cl) {

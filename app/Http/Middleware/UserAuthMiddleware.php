@@ -96,15 +96,18 @@ class UserAuthMiddleware extends Controller
             }
 
             // Si la Validation a échoué
-            if (!UsersToken::validateToken($user, $token)) {
+            if (!$token = UsersToken::validateToken($user, $token, true)) {
                 $tokenMdl->delete();
                 return response()->json(Self::INVALID, 401);
             }
+
+            define("_USER_TOKEN_", (string)$token);
 
             // Execution de la Requête
     		return $oNext($oRequest);
             
         } catch (\Exception $e) {
+            var_dump("FAIL DECODE");
             return response()->json(SELF::BAD_TOKEN, 401);
         }
     }
