@@ -1,7 +1,7 @@
 <?php
 
 $router->get('/list', 'ParcoursAdminController@list');
-$router->get('/length/{id:[a-z0-9-]+}', 'ParcoursController@length');
+$router->get('/length/{id:[a-z0-9-]+}', 'ParcoursAdminController@length');
 $router->get('/{id:[a-z0-9-]+}', 'ParcoursAdminController@get');
 $router->get('listenCnt/{id:[a-z0-9-]+}', 'ParcoursAdminController@listenCount');
 
