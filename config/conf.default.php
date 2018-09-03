@@ -1,7 +1,9 @@
 <?php
-define('API_PASS', getenv('API_PASS'));
-define('API_ALLOW_ORIGIN', getenv('API_ALLOW_ORIGIN'));
-define('ADMIN_URL', getenv('BACKOFFICE_URL'));
+<?php
+define('API_PASS', env('API_PASS'));
+define('ADMIN_URL', env('BACKOFFICE_URL'));
 define('PUBLIC_PATH', realpath('.').'/ressources/');
 define('UPLOAD_PATH', PUBLIC_PATH.'upload/');
-define('MAP_API_KEY', getenv('MAP_API_KEY'));
+
+define('API_SESSION_LIFETIME', 3600);
+define('MAP_API_KEY', '58d904a497c67e00015b45fcece96ee921414b469f0981e2b5d51aba');
