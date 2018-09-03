@@ -10,3 +10,4 @@ config/conf.php
 /public/ressources/*
 *.env
 *.bak
+config/conf.php
