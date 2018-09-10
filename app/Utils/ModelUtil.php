@@ -938,19 +938,27 @@ abstract class ModelUtil extends Model
 		if (!is_dir($dir)) {
 			mkdir($dir, 0775, true);
 		}
-
-		/* Url De téléchargement de l'image */
-		$imgUrl = ADMIN_URL.'upload/'.$sName;
-		
 		/* si l'image existe on la remplace */
 		$sPath = UPLOAD_PATH.$sName;
 		
 		if (file_exists($sPath)) {
 			unlink($sPath);
 		}
+		//option to fetch upload file from FileSystem
+		if (UPLOAD_COPY){
+			$imgPath = UPLOAD_BACKOFFICE_PATH.$sName;
+			//var_dump($imgPath);
+			$b = copy($imgPath, $sPath);
+		}
+		else {
+		//default fetch the file from backoffice URL
+			/* Url De téléchargement de l'image */
+			$imgUrl = ADMIN_URL.'upload/'.$sName;
 
-		//var_dump("URL: $imgUrl");
-		$b = file_put_contents($sPath, fopen($imgUrl, 'r'));
+			//var_dump("URL: $imgUrl");
+			$b = file_put_contents($sPath, fopen($imgUrl, 'r'));
+		}
+
 		return $b;
 	}
 

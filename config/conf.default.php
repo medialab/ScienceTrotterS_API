@@ -7,3 +7,5 @@ define('UPLOAD_PATH', PUBLIC_PATH.'upload/');
 define('API_SESSION_LIFETIME', getenv('API_SESSION_LIFETIME'));
 define('MAP_API_KEY', getenv('MAP_API_KEY'));
 
+define('UPLOAD_COPY', true);
+define('UPLOAD_BACKOFFICE_PATH', '/backoffice/media/upload/');
