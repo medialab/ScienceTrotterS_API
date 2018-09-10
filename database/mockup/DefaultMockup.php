@@ -16,9 +16,9 @@ class DefaultMockup
   }
 
   public function init() {
-    $this->table_cities();
+    /*$this->table_cities();
     $this->table_parcours();
-    $this->table_interests();
+    $this->table_interests();*/
     $this->table_users();
     $this->table_colors();
   }
