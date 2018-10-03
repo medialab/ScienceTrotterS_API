@@ -61,8 +61,8 @@ class UsersToken extends Model
 	public static function validateToken(Users $user, Token $token, $bextend=false) {
 		// validation Des Donnés du Token
 		$validationData = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
-		$validationData->setIssuer('http://'.$_SERVER['HTTP_HOST']);
-		$validationData->setAudience('http://'.$_SERVER['HTTP_HOST']);
+		$validationData->setIssuer('STS');
+		$validationData->setAudience('backoffice');
 		$validationData->setId(Self::idfyUser($user));
 		$validationData->setCurrentTime(time());
 
@@ -95,8 +95,8 @@ class UsersToken extends Model
 	private static function gen(Users $user) {
 		return (new TokenBuilder())
 			// Définition Domaine
-			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
-			->setAudience('http://'.$_SERVER['HTTP_HOST'])
+			->setIssuer('STS')
+			->setAudience('backoffice')
 			// Définition Hash User
 			->setId(Self::idfyUser($user), true)
 			// Définition Id User
@@ -125,8 +125,8 @@ class UsersToken extends Model
 
 		$token = (new TokenBuilder())
 			// Définition Domaine
-			->setIssuer('http://'.$_SERVER['HTTP_HOST'])
-			->setAudience('http://'.$_SERVER['HTTP_HOST'])
+			->setIssuer('STS')
+			->setAudience('backoffice')
 			// Définition Hash User
 			->setId(Self::idfyUser($user), true)
 			// Définition Id User
