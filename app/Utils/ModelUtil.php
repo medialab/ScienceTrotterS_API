@@ -911,6 +911,7 @@ abstract class ModelUtil extends Model
 
 		// Si La mise à jour du status a échoué et que le Model est Actuellement Actif
 		if ($saveSuccess) {
+			// Il faudra peut être virer ça suite au passage à un seul dossier upload
 			foreach ($aFileDelete as $sFile) {
 				@unlink(UPLOAD_PATH.$sFile);
 			}
@@ -933,33 +934,40 @@ abstract class ModelUtil extends Model
 	 * @return Int        Nombre d'Octés Ecrits
 	 */
 	private function downloadImage($sName) {
-		/* On crée le dossier de l'image */
-		$dir = dirname(UPLOAD_PATH.$sName);
-		if (!is_dir($dir)) {
-			mkdir($dir, 0775, true);
-		}
-		/* si l'image existe on la remplace */
+
 		$sPath = UPLOAD_PATH.$sName;
-		
+
+		// Si on configure API et backoffice pour pointer sur le même dossier de ressource
+		// alors le fichier doit normalement déjà existé et il n'a rien à faire
 		if (file_exists($sPath)) {
-			unlink($sPath);
-		}
-		//option to fetch upload file from FileSystem
-		if (UPLOAD_COPY){
-			$imgPath = UPLOAD_BACKOFFICE_PATH.$sName;
-			//var_dump($imgPath);
-			$b = copy($imgPath, $sPath);
+			return true;
 		}
 		else {
-		//default fetch the file from backoffice URL
-			/* Url De téléchargement de l'image */
-			$imgUrl = ADMIN_URL.'upload/'.$sName;
+			// l'API et le backoffice ne partage pas le même dossier de ressources
+					/* On crée le dossier de l'image */
+			$dir = dirname($sPath);
+			if (!is_dir($dir)) {
+				mkdir($dir, 0775, true);
+			}			
+			
+			//option to fetch upload file from FileSystem
+			if (API_UPLOAD_COPY_FROM_PATH){
+				$imgPath = API_UPLOAD_COPY_FROM_PATH.$sName;
+				//var_dump($imgPath);
+				$b = copy($imgPath, $sPath);
+			}
+			else {
+			//default fetch the file from backoffice URL
+				/* Url De téléchargement de l'image */
+				$imgUrl = BACKOFFICE_URL.'/upload/'.$sName;
 
-			//var_dump("URL: $imgUrl");
-			$b = file_put_contents($sPath, fopen($imgUrl, 'r'));
+				//var_dump("URL: $imgUrl");
+				$b = file_put_contents($sPath, fopen($imgUrl, 'r'));
+			}
+
+			return $b;
+
 		}
-
-		return $b;
 	}
 
 	/**
