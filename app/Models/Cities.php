@@ -79,6 +79,25 @@ class Cities extends ModelUtil
 		Parent::__set($sVar, $value);
 	}
 
+	public function __get($sVar) {
+		if ($sVar !== 'title') {
+			return;
+		}
+
+		if (empty($this->attributes['title'])) {
+			return null;
+		}
+
+		if (is_string($this->attributes['title'])) {
+			$oTitle = json_decode($this->attributes['title']);
+		}
+		else {
+			$oTitle = $this->attributes['title'];
+		}
+
+		return $oTitle->fr;
+	}
+
 	/**
 	 * Recherche une phrase dans tous les Parcours
 	 * @param  String  $query   Recherche
