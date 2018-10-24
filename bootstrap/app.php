@@ -103,6 +103,4 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
-header("Access-Control-Allow-Origin: *");
-
 return $app;
