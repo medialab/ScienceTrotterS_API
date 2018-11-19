@@ -23,14 +23,14 @@ class RequestUtil extends Request
 		}
 
 		// ==> Set limit.
-		$limit = (int)$this->input('limit');
+		$limit = (int)$this->getParam('limit');
 		if (!$limit) {
 			$limit = 5000;
 		}
 		static::$dLimit = $limit;
 		
 		// ==> Set skip.
-		$skip = (int)$this->input('skip');
+		$skip = (int)$this->getParam('skip');
 		if (!$skip) {
 			$skip = 0;
 		}
@@ -40,7 +40,15 @@ class RequestUtil extends Request
 	}
 
 	public function getParam($sKey) {
-		return $this->input($sKey);
+		$res = $this->input($sKey);
+		if (empty($res) && !empty($_GET[$sKey])) {
+			$res = $_GET[$sKey];
+		}
+		elseif (empty($res) && !empty($_POST[$sKey])) {
+			$res = $_POST[$sKey];
+		}
+
+		return $res;
 	}
 
 	public static function getParams() {
@@ -64,7 +72,7 @@ class RequestUtil extends Request
 	}
 
 	public function getOrder () {
-		$aOrder = $this->input('order');
+		$aOrder = $this->getParam('order');
 		if (empty($aOrder) || !is_array($aOrder) || empty($aOrder)) {
 			return false;
 		}
@@ -73,7 +81,7 @@ class RequestUtil extends Request
 	}
 
 	public function getGeoloc() {
-		$geoloc = $this->input('geoloc');
+		$geoloc = $this->getParam('geoloc');
 		if (!empty($geoloc)) {
 			$aGeo = explode(';', $geoloc);
 			if (count($aGeo) !== 2 || (float) $aGeo[0] == 0 || (float) $aGeo[1] == 0) {
@@ -85,5 +93,34 @@ class RequestUtil extends Request
 		}
 
 		return $aGeo;
+	}
+
+	public function __toString() {
+		$aData = [];
+
+
+		if (!empty($this->getParam('lang'))) {
+			$aData['lang'] = $this->getParam('lang');
+		}
+
+		if (!empty($this->getParam('skip'))) {
+			$aData['skpi'] = $this->getParam('skip');
+		}
+
+		if (!empty($this->getParam('limit'))) {
+			$aData['limit'] = $this->getParam('limit');
+		}
+
+		$aOrder = $this->getOrder();
+		if (!empty($aOrder)) {
+			$aData['order'] = var_export($aOrder, true);
+		}
+
+		$aGeo = $this->getGeoloc();
+		if (!empty($aGeo)) {
+			$aData['geoloc'] = var_export($aGeo, true);
+		}
+
+		return var_export($aData, true);
 	}
 }

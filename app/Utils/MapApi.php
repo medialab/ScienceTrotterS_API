@@ -51,6 +51,7 @@ class MapApiUtil {
 		exit;*/
 
 		if (is_null($result) || !empty($result->error)) {
+			$this->logError($c, $aData, $result);
 			return false;
 		}
 
@@ -63,5 +64,44 @@ class MapApiUtil {
 		];
 
 		return $aResult;
+	}
+
+
+	/**
+	 * Écrit Dans les Logs du Web Server actif (Apache/ngix)
+	 */
+	private function logError(CurlMgrUtil $c, $aData, $aResponse) {
+		$sDate = date('Y-m-d H:i:d');
+
+		$aInfos = $c->getInfos();
+		$aErrors = $c->getError();
+		$sParams = var_export($aData, true);
+
+		$sMapCode =  $aResponse->error->code;
+		$sMapMsg =  $aResponse->error->message;
+
+		$sMsg = "
+			============== API: {$sDate} ==============
+				Type: Fail To Execute A Request From Our Api To OpenMapService Api
+
+				++++ Self Error:
+					-- method: {$_SERVER['REQUEST_METHOD']}
+					-- Url: {$_SERVER['REQUEST_URI']}
+
+				++++ Curl Error:
+					-- Code: {$aErrors['code']}
+					-- Message: {$aErrors['err']}
+
+				++++ MaiApi-Request:
+					-- Method: Get
+					-- Url: {$aInfos['url']}
+					-- Http-Code: {$aInfos['http_code']}
+					-- Response Code: {$sMapCode}
+					-- Response Message: {$sMapMsg}
+					-- Params: {$sParams}
+		";
+
+		$sMsg = preg_replace("/\t{3}/", "", $sMsg);
+		error_log($sMsg);
 	}
 }

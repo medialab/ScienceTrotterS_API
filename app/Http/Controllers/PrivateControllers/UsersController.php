@@ -39,6 +39,28 @@ class UsersController extends Controller
 	}
 
 	/**
+	 * Écrit Dans les Logs du Web Server actif (Apache/ngix)
+	 */
+	private function logError($sMsg) {
+	    $sDate = date('Y-m-d H:i:d');
+		$sAddress = $_SERVER['REMOTE_ADDR'];
+
+	    $sMsg = "
+	        ============== API: {$sDate} ==============
+	            Type: Fail To Login To Api
+
+	            ++++ Api Error:
+	                -- method: {$_SERVER['REQUEST_METHOD']}
+	                -- Url: {$_SERVER['REQUEST_URI']}
+	                -- User IP: {$sAddress}
+	                -- Message: {$sMsg}
+	    ";
+
+	    $sMsg = preg_replace("/\t{3}/", "", $sMsg);
+	    error_log($sMsg);
+	}
+
+	/**
 	 * Connexion Utilisateur
 	 * @param  Request $request La Requete
 	 * @return Json           Résultat
@@ -55,6 +77,7 @@ class UsersController extends Controller
 
 		// Si User Introuvable
 		if (!$user) {
+			$this->logError('Bad Password');
 			return response()->json(['success' => false, 'message' => 'Identifiant / Mot de passe invalides.'], 401);
 		}
 		
@@ -70,12 +93,14 @@ class UsersController extends Controller
 			// Génération Du Token
 			$token = UsersToken::generateToken($user, $tokenMdl);
 			if (!$token) {
+				$this->logError('Fail To Générate Token');
 				return response()->json(['success' => false, 'message' => 'Impossible de générer un nouveau Token', 'code' => 500], 400);
 			}
 
 			return response()->json(['success' => true,'token' => $token]);
 		}
 		else{
+			$this->logError('Bad Password');
 			return response()->json(['success' => false, 'message' => 'Identifiant / Mot de passe invalides.'], 401);
 		}
 	}
