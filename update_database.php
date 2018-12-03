@@ -4,6 +4,9 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Database\Builder\UpdateBuilder;
 use Database\Mockup\DefaultMockup;
+
+include "database/builder/UpdateBuilder.php";
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application

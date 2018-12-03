@@ -6,6 +6,9 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Database\Builder\DefaultBuilder;
 use Database\Mockup\DefaultMockup;
 
+include "database/builder/DefaultBuilder.php";
+include "database/builder/DefaultMockup.php";
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application
