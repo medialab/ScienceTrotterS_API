@@ -7,7 +7,7 @@ use Database\Builder\DefaultBuilder;
 use Database\Mockup\DefaultMockup;
 
 include "database/builder/DefaultBuilder.php";
-include "database/builder/DefaultMockup.php";
+include "database/mockup/DefaultMockup.php";
 
 /*
 |--------------------------------------------------------------------------
