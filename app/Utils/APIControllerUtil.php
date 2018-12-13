@@ -369,7 +369,6 @@ class APIControllerUtil extends BaseController
 		
 		try {
 			$oModel = call_user_func($class.'::where', 'id', $id)->first();
-			$oModel->updateData($aData);
 
 			// Model Trouvé
 			if ($oModel) {
