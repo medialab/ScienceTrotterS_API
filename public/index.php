@@ -5,7 +5,6 @@ error_reporting( E_ALL | E_NOTICE );
 $confPath = dirname(realpath('.')).'/config/conf.php';
 require_once($confPath);
 
-header('Access-Control-Allow-Origin: '.API_ALLOW_ORIGIN);
 header('Access-Control-Allow-Methods: GET, POST');
 
 ini_set('xdebug.var_display_max_data', -1);
